@@ -28,8 +28,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Parse.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="484">
-              <caret line="118" column="116" selection-start-line="118" selection-start-column="116" selection-end-line="118" selection-end-column="116" />
+            <state relative-caret-position="537">
+              <caret line="115" column="124" selection-start-line="115" selection-start-column="124" selection-end-line="115" selection-end-column="124" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -198,12 +198,12 @@
       <option name="presentableId" value="Default" />
       <updated>1575106932996</updated>
       <workItem from="1575106937012" duration="2734000" />
-      <workItem from="1575117551813" duration="21980000" />
+      <workItem from="1575117551813" duration="22112000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="24714000" />
+    <option name="totallyTimeSpent" value="24846000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -216,6 +216,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1680" height="1027" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.25" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -231,7 +232,7 @@
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3290461" />
-      <window_info anchor="bottom" id="Terminal" order="7" weight="0.51446944" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="7" visible="true" weight="0.0943194" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Messages" order="10" weight="0.3290461" />
@@ -354,8 +355,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Parse.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="484">
-          <caret line="118" column="116" selection-start-line="118" selection-start-column="116" selection-end-line="118" selection-end-column="116" />
+        <state relative-caret-position="537">
+          <caret line="115" column="124" selection-start-line="115" selection-start-column="124" selection-end-line="115" selection-end-column="124" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

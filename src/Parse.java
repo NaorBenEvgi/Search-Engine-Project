@@ -109,7 +109,7 @@ public class Parse {
                         else {
                             parsedWords.add(parseNumber(word));
                         }
-                    } catch (Exception e) {
+                    } catch (Exception e) { // if there is no extra word after "word"
                         parsedWords.add(parseNumber(word));
                     }
                 } else {
