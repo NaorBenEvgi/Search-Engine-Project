@@ -102,21 +102,21 @@ public class Parse {
                             parsedWords.add(word + "%");
                             i++;
                         } else if (character != null) {
+                            // TODO: Handle "number over million section";
                             parsedWords.add(word + character);
                             i++;
-                        } else {
+                        }// TODO: Handle dates before handle number (for not making date 1.993K);
+                        else {
                             parsedWords.add(parseNumber(word));
                         }
                     } catch (Exception e) {
                         parsedWords.add(parseNumber(word));
                     }
                 } else {
+                    // TODO: Handle only "​Between number and number (for example: between 18 and 24)" section in range part
                     parsedWords.add(word);
                 }
             }
-            // TODO: Handle dates;
-            // TODO: Handle "number over million section";
-            // TODO: Handle only "​Between number and number (for example: between 18 and 24)" section in range part
         }
 
         return parsedWords;
