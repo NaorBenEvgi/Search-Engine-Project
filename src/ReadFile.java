@@ -30,23 +30,23 @@ public class ReadFile {
     }
 
     private ArrayList<Article> extractArticlesFromFile(String inputFile) {
-        ArrayList<Article> docs = new ArrayList<>();
+        ArrayList<Article> articles = new ArrayList<>();
         Document xml = convertToValidXML(inputFile);
         if(xml == null){
-            return docs;
+            return articles;
         }
-        NodeList nList = xml.getElementsByTagName("DOC");
-        for (int temp = 0; temp < nList.getLength(); temp++) {
+        NodeList articleList = xml.getElementsByTagName("DOC");
+        for (int i = 0; i < articleList.getLength(); i++) {
             try {
-                Node nNode = nList.item(temp);
-                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element eElement = (Element) nNode;
+                Node article = articleList.item(i);
+                if (article.getNodeType() == Node.ELEMENT_NODE) {
+                    Element eElement = (Element) article;
                     String docId = eElement.getElementsByTagName("DOCNO").item(0).getTextContent();
 //                    String date = eElement.getElementsByTagName("DATE1").item(0).getTextContent();
 //                    String title = eElement.getElementsByTagName("TI").item(0).getTextContent();
                     try{
                         String content = eElement.getElementsByTagName("TEXT").item(0).getTextContent();
-                        docs.add(new Article(docId, content));
+                        articles.add(new Article(docId, content));
                     } catch (Exception e) {
 //                        System.out.println(docId + " has no text attribute");
                     }
@@ -55,30 +55,30 @@ public class ReadFile {
 //                System.out.println(inputFile);
             }
         }
-        return docs;
+        return articles;
     }
 
     public ArrayList<Article> readOneFile(String filePath){
-        ArrayList<Article> docs = new ArrayList<>();
+        ArrayList<Article> articles = new ArrayList<>();
         try {
             String inputFile = new String ( Files.readAllBytes( Paths.get(filePath) ) );
-            docs = extractArticlesFromFile(inputFile);
+            articles = extractArticlesFromFile(inputFile);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return docs;
+        return articles;
     }
 
-    public void extractFilesFromFolder(File file, ArrayList<File> files){
+    public void extractFilesFromFolder(File file, ArrayList<File> container){
         if(file.isDirectory()){
             File[] fileList = file.listFiles();
             if(fileList != null){
                 for (File f : fileList) {
                     if(f.isDirectory()){
-                        extractFilesFromFolder(f, files);
+                        extractFilesFromFolder(f, container);
                     }
                     else {
-                       files.add(f);
+                       container.add(f);
                     }
                 }
             }
@@ -86,13 +86,14 @@ public class ReadFile {
     }
 
     public ArrayList<Article> readFiles(String pathToDocsFolder){
-        ArrayList<Article> docs = new ArrayList<>();
         File folder = new File(pathToDocsFolder);
-        ArrayList<File> files = new ArrayList<>();
-        extractFilesFromFolder(folder, files);
-        for (File file : files) {
-            docs.addAll(readOneFile(file.getPath()));
+        ArrayList<File> filesList = new ArrayList<>();
+        extractFilesFromFolder(folder, filesList);
+
+        ArrayList<Article> articles = new ArrayList<>();
+        for (File file : filesList) {
+            articles.addAll(readOneFile(file.getPath()));
         }
-        return docs;
+        return articles;
     }
 }
