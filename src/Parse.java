@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 public class Parse {
 
     private static final String REGEX_BY_LINES = "\\r?\\n";
-    private static final String REGEX_BY_WORDS = "[^\\w/]+";
+    private static final String REGEX_BY_WORDS = "[^\\w/-]+";
     private static final String DECIMAL_FORMAT = "#.###";
     private static final String REGEX_SEARCH_FOR_NUMBER = "-?\\d+(\\.\\d+)?";
     private static final String REGEX_SEARCH_FOR_FRACTION = "-?\\d+/(\\d+)?";
@@ -28,7 +28,7 @@ public class Parse {
         return pattern.matcher(strNum).matches() || isFraction(strNum);
     }
 
-    float parseFraction(String ratio) {
+    private float parseFraction(String ratio) {
         if (ratio.contains("/")) {
             String[] rat = ratio.split("/");
             return Float.parseFloat(rat[0]) / Float.parseFloat(rat[1]);
@@ -37,7 +37,7 @@ public class Parse {
         }
     }
 
-    private String handleBigNumbers(String number) {
+    private String parseNumber(String number) {
         DecimalFormat df = new DecimalFormat(DECIMAL_FORMAT);
         float parsedNumber = parseFraction(number);
         String formattedNumber;
@@ -105,15 +105,18 @@ public class Parse {
                             parsedWords.add(word + character);
                             i++;
                         } else {
-                            parsedWords.add(handleBigNumbers(word));
+                            parsedWords.add(parseNumber(word));
                         }
                     } catch (Exception e) {
-                        parsedWords.add(handleBigNumbers(word));
+                        parsedWords.add(parseNumber(word));
                     }
                 } else {
                     parsedWords.add(word);
                 }
             }
+            // TODO: Handle dates;
+            // TODO: Handle "number over million section";
+            // TODO: Handle only "​Between number and number (for example: between 18 and 24)" section in range part
         }
 
         return parsedWords;
