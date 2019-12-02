@@ -15,11 +15,21 @@ public class Parse {
     private static final float BILLION = 1000000000;
 
 
+    /**
+     * Checks if a given string contains a numerical fraction
+     * @param strNum the given string
+     * @return true if it contains a fraction, false otherwise
+     */
     private boolean isFraction(String strNum) {
         Pattern pattern = Pattern.compile(REGEX_SEARCH_FOR_FRACTION);
         return pattern.matcher(strNum).matches();
     }
 
+    /**
+     * Checks if a given string contains a number
+     * @param strNum the given string
+     * @return true if it contains a number, false otherwise
+     */
     private boolean isNumber(String strNum) {
         if (strNum == null) {
             return false;
@@ -28,6 +38,11 @@ public class Parse {
         return pattern.matcher(strNum).matches() || isFraction(strNum);
     }
 
+    /**
+     * Returns the numerical value of a fraction that's contained in a given string
+     * @param ratio the given string
+     * @return the numerical value of the fraction
+     */
     private float parseFraction(String ratio) {
         if (ratio.contains("/")) {
             String[] rat = ratio.split("/");
@@ -37,6 +52,11 @@ public class Parse {
         }
     }
 
+    /**
+     * Checks the value of the number in a given string, and returns a string that is a parsed form of it, according to its magnitude.
+     * @param number the number as a string
+     * @return the parsed form of the number
+     */
     private String parseNumber(String number) {
         DecimalFormat df = new DecimalFormat(DECIMAL_FORMAT);
         float parsedNumber = parseFraction(number);
@@ -56,17 +76,27 @@ public class Parse {
         return number;
     }
 
-    private boolean isPercent(String precentage) {
-        return "percent".equals(precentage) || "percentage".equals(precentage);
+    /**
+     * Checks if a given string is either the word "percent" or "percentage".
+     * @param percentage the given string
+     * @return true if it's one of the words above, false otherwise
+     */
+    private boolean isPercent(String percentage) {
+        return "percent".equals(percentage) || "percentage".equals(percentage);
     }
 
+    /**
+     * Parses the words that contain the dollar sign in a given line.
+     * @param line the given line
+     * @return the line with the $'s replaced with "Dollars"
+     */
     private String handleDollarCases(String line) {
         ArrayList<String> words = new ArrayList<>(Arrays.asList(line.split("\\s+")));
         StringBuilder parsedLine = new StringBuilder();
         for (int i = 0; i < words.size(); ++i) {
             String word = words.get(i);
             if (word.contains("$")) {
-                parsedLine.append(word.replace("$", "")).append(" Dollar");
+                parsedLine.append(word.replace("$", "")).append(" Dollars");
             } else {
                 if (i != 0) {
                     parsedLine.append(" ");
@@ -77,6 +107,12 @@ public class Parse {
         return parsedLine.toString();
     }
 
+    /**
+     * Checks if a given string is one of the words "Thousand", "Million" or "Billion", and returns a matching character for each one.
+     * In case the given string is none of these words, null is returned.
+     * @param bigNumber the given string
+     * @return a string that matches the magnitude of the number, or null if the conditions are not satisfied
+     */
     private String convertNumberFromTextToChar(String bigNumber) {
         if ("Thousand".equals(bigNumber) || "Thousand".toLowerCase().equals(bigNumber) || "Thousand".toUpperCase().equals(bigNumber)) {
             return "K";
@@ -88,6 +124,12 @@ public class Parse {
         return null;
     }
 
+    /**
+     * Checks if a given string is a name of a month, and returns the matching number of the month as a string.
+     * In case the given string is not a month, an empty string is returned.
+     * @param month the given string
+     * @return the matching number of the month as a string
+     */
     private String convertMonthToNumber(String month){
         if("January".equalsIgnoreCase(month) || "JAN".equalsIgnoreCase(month)){
             return "01";
@@ -128,7 +170,14 @@ public class Parse {
         return "";
     }
 
-
+    /**
+     * Parses two given strings into a date format.
+     * The given strings are two components of a date. The first component is either a name of a month or a number of the day in the month,
+     * and the second component is either a year or a name of a month.
+     * @param datePart1 the first component of the date
+     * @param datePart2 the second component of the date
+     * @return a parsed form of the date, composed of the two given date parts
+     */
     private String parseDates(String datePart1, String datePart2) {
 
         if(!convertMonthToNumber(datePart1).equals("")){
@@ -154,6 +203,11 @@ public class Parse {
         return null;
     }
 
+    /**
+     * Parses the words in a given line.
+     * @param line the given line
+     * @return an ArrayList that contains the parsed words in the line
+     */
     private ArrayList<String> parseLine(String line) {
         ArrayList<String> parsedWords = new ArrayList<>();
         ArrayList<String> words = new ArrayList<>(Arrays.asList(line.split(REGEX_BY_WORDS)));
@@ -206,6 +260,12 @@ public class Parse {
     }
 
 
+    /**
+     * Parses the content of a given document, according to the rules that are defined in this class's functions.
+     * The words are being parsed and added to the returned ArrayList.
+     * @param article the given document
+     * @return an ArrayList of the parsed words
+     */
     public ArrayList<String> parse(Article article) {
         ArrayList<String> articleLines = new ArrayList<>(Arrays.asList(article.getContent().split(REGEX_BY_LINES)));
         ArrayList<String> parsedWords = new ArrayList<>();
