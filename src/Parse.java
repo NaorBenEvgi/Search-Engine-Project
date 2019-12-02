@@ -88,6 +88,72 @@ public class Parse {
         return null;
     }
 
+    private String convertMonthToNumber(String month){
+        if("January".equalsIgnoreCase(month) || "JAN".equalsIgnoreCase(month)){
+            return "01";
+        }
+        if("February".equalsIgnoreCase(month) || "FEB".equalsIgnoreCase(month)){
+            return "02";
+        }
+        if("March".equalsIgnoreCase(month) || "MAR".equalsIgnoreCase(month)){
+            return "03";
+        }
+        if("April".equalsIgnoreCase(month) || "APR".equalsIgnoreCase(month)){
+            return "04";
+        }
+        if("May".equalsIgnoreCase(month)){
+            return "05";
+        }
+        if("June".equalsIgnoreCase(month) || "JUN".equalsIgnoreCase(month)){
+            return "06";
+        }
+        if("July".equalsIgnoreCase(month) || "JUL".equalsIgnoreCase(month)){
+            return "07";
+        }
+        if("August".equalsIgnoreCase(month) || "AUG".equalsIgnoreCase(month)){
+            return "08";
+        }
+        if("September".equalsIgnoreCase(month) || "SEP".equalsIgnoreCase(month)){
+            return "09";
+        }
+        if("October".equalsIgnoreCase(month) || "OCT".equalsIgnoreCase(month)){
+            return "10";
+        }
+        if("November".equalsIgnoreCase(month) || "NOV".equalsIgnoreCase(month)){
+            return "11";
+        }
+        if("December".equalsIgnoreCase(month) || "DEC".equalsIgnoreCase(month)){
+            return "12";
+        }
+        return "";
+    }
+
+
+    private String parseDates(String datePart1, String datePart2) {
+
+        if(!convertMonthToNumber(datePart1).equals("")){
+            if(datePart2.length() == 1){ //covers the case of Month D
+                return convertMonthToNumber(datePart1) + "-0" + datePart2;
+            }
+            if(datePart2.length() == 2){ //covers the case of Month DD
+                return convertMonthToNumber(datePart1) + "-" + datePart2;
+            }
+            if(datePart2.length() == 4){ // covers the case of Month YYYY
+                return datePart2 + "-" + convertMonthToNumber(datePart1);
+            }
+        }
+        else{
+            if(datePart1.length() == 1){ //covers the case of D Month
+                return convertMonthToNumber(datePart2) + "-0" + datePart1;
+            }
+            else{ // covers the case of DD Month
+                return convertMonthToNumber(datePart2) + "-" + datePart1;
+            }
+        }
+
+        return null;
+    }
+
     private ArrayList<String> parseLine(String line) {
         ArrayList<String> parsedWords = new ArrayList<>();
         ArrayList<String> words = new ArrayList<>(Arrays.asList(line.split(REGEX_BY_WORDS)));
@@ -105,14 +171,31 @@ public class Parse {
                             // TODO: Handle "number over million section";
                             parsedWords.add(word + character);
                             i++;
-                        }// TODO: Handle dates before handle number (for not making date 1.993K);
+                        }else if (!convertMonthToNumber(nextWord).equals("")) { //covers cases of: DD MM
+                            parseDates(word,nextWord);
+                            i++;
+                        }
                         else {
                             parsedWords.add(parseNumber(word));
                         }
                     } catch (Exception e) { // if there is no extra word after "word"
                         parsedWords.add(parseNumber(word));
                     }
-                } else {
+                } else if (!convertMonthToNumber(word).equals("")){
+                    try{
+                        String nextWord = words.get(i + 1).replaceAll(",", "");
+                        if(isNumber(nextWord)){
+                            parseDates(word,nextWord);
+                        }
+                        else{
+                            parsedWords.add(word);
+                        }
+                    }
+                    catch (Exception e){
+                        parsedWords.add(word);
+                    }
+                }
+                else {
                     // TODO: Handle only "​Between number and number (for example: between 18 and 24)" section in range part
                     parsedWords.add(word);
                 }
@@ -121,6 +204,7 @@ public class Parse {
 
         return parsedWords;
     }
+
 
     public ArrayList<String> parse(Article article) {
         ArrayList<String> articleLines = new ArrayList<>(Arrays.asList(article.getContent().split(REGEX_BY_LINES)));
