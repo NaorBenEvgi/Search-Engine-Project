@@ -3,6 +3,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
+/**
+ * This class is responsible for parsing all the words and terms in a document into a certain format, depends on what the term represents.
+ */
 public class Parse {
 
     private static final String REGEX_BY_LINES = "\\r?\\n";
