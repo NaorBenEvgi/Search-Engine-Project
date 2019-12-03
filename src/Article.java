@@ -1,5 +1,5 @@
 /**
- * This class represents a document. A document consists an ID, title, publication date and a content.
+ * This class represents a document. A document has an ID, title, publication date and a content.
  */
 public class Article {
 
