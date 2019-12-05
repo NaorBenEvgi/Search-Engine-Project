@@ -178,9 +178,14 @@ public class Parse {
             String word = words.get(i);
             if (word.contains("m")) { //#m Dollars -> # M Dollars
                 parsedLine.append(word.replace("m", "")).append(" M");
-            }else if (word.contains("bn")) { //#bn Dollars -> #000 M Dollars
-                parsedLine.append(word.replace("bn", "")).append("000").append(" M");
-            }else if(isNumber(word)) { // # million / billion U.S. dollars -> # M Dollars
+            }
+            else if (word.contains("bn")) { //#bn Dollars -> #000 M Dollars
+                Double wordToMultiply = new Double(word.replace("bn", ""));
+                wordToMultiply *= 1000;
+                String multipliedWord = wordToMultiply.toString().substring(0,wordToMultiply.toString().length()-2);
+                parsedLine.append(multipliedWord).append(" M");
+            }
+            else if(isNumber(word)) { // # million / billion U.S. dollars -> # M Dollars
                 try {
                     String nextWord = words.get(i + 1);
                     if (nextWord.equalsIgnoreCase("million") || nextWord.equalsIgnoreCase("billion")) {
@@ -190,8 +195,12 @@ public class Parse {
                             if (nextNextNextWord.equalsIgnoreCase("dollars")) {
                                 if (nextWord.equalsIgnoreCase("million")) {
                                     parsedLine.append(word).append(" M Dollars");
-                                } else {
-                                    parsedLine.append(word).append("000 M Dollars");
+                                }
+                                else {
+                                    Double wordToMultiply = new Double(word);
+                                    wordToMultiply *= 1000;
+                                    String multipliedWord = wordToMultiply.toString().substring(0,wordToMultiply.toString().length()-2);
+                                    parsedLine.append(word).append(multipliedWord).append(" M Dollars");
                                 }
                                 i += 3;
                             }
@@ -203,7 +212,8 @@ public class Parse {
                     }
                     parsedLine.append(word);
                 }
-            }else{ // not a price
+            }
+            else{ // not a price
                 if (i != 0) {
                     parsedLine.append(" ");
                 }
@@ -343,6 +353,7 @@ public class Parse {
         }
     }
 
+
     /**
      * Parses the words in a given line.
      * @param line the given line
@@ -380,7 +391,8 @@ public class Parse {
                     } catch (Exception e) { // if there is no extra word after "word"
                         parsedWords.add(parseNumber(word));
                     }
-                } else if (!convertMonthToNumber(word).equals("")){ //checks the date formats
+                }
+                else if (!convertMonthToNumber(word).equals("")){ //checks the date formats
                     try{
                         String nextWord = words.get(i + 1).replaceAll(",", "");
                         if(isNumber(nextWord)){
@@ -394,8 +406,20 @@ public class Parse {
                         parsedWords.add(word);
                     }
                 }
-                else {
-                    // TODO: Handle only "​Between number and number (for example: between 18 and 24)" section in range part
+                else if(word.equalsIgnoreCase("between")){
+                    try{
+                        String nextWord = words.get(i+1), doubleNextWord = words.get(i+2);
+                        if (isNumber(nextWord) && isNumber(doubleNextWord)){ //if the next two words after "between" are actually numbers (ignoring stop words)
+                            parsedWords.add(nextWord + "-" + doubleNextWord);
+                            parsedWords.add(parseNumber(nextWord));
+                            parsedWords.add(parseNumber(doubleNextWord));
+                            i+=2;
+                        }
+                    }catch(Exception e){
+                        parsedWords.add(word);
+                    }
+                }
+                else{
                     parsedWords.add(word);
                 }
             }
