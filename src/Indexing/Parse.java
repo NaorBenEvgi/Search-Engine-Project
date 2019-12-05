@@ -332,9 +332,11 @@ public class Parse {
                     termFrequencyInDoc = capitalLettersWords.get(wordsInLine[i]);
                     if(!termFrequencyInDoc.containsKey(docID)){
                         termFrequencyInDoc.put(docID,1);
+                        capitalLettersWords.put(wordsInLine[i],termFrequencyInDoc);
                     }
                     else{ //the case that this is not the first time we encountered that word in this document
                         termFrequencyInDoc.put(docID,termFrequencyInDoc.get(docID)+1);
+                        capitalLettersWords.put(wordsInLine[i],termFrequencyInDoc);
                     }
                 }
             }

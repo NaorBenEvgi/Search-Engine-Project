@@ -3,12 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="99826e6b-4d06-4c50-91f4-a3ecdd3902a0" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/corpus/FB396001/FB396001" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/FB396001/FB396001" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/FB396001" beforeDir="false" afterPath="$PROJECT_DIR$/docs/FB396001" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Article.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Indexing/Article.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Indexing/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Parse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Indexing/Parse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ReadFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Indexing/ReadFile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Indexing/Parse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Indexing/Parse.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -25,8 +20,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Indexing/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+            <state relative-caret-position="391">
+              <caret line="23" selection-start-line="23" selection-end-line="23" />
             </state>
           </provider>
         </entry>
@@ -34,8 +29,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Indexing/Parse.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="14" column="13" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
+            <state relative-caret-position="505">
+              <caret line="338" column="83" selection-start-line="338" selection-start-column="83" selection-end-line="338" selection-end-column="83" />
               <folding>
                 <element signature="method#fillStopWords#0;class#Parse#0" />
                 <element signature="method#isStopWord#0;class#Parse#0" />
@@ -90,6 +85,7 @@
         <option value="$PROJECT_DIR$/corpus/FB396001/FB396001" />
         <option value="$PROJECT_DIR$/src/Article.java" />
         <option value="$PROJECT_DIR$/src/Parse.java" />
+        <option value="$PROJECT_DIR$/src/GUI/Controller.java" />
         <option value="$PROJECT_DIR$/src/Indexing/Parse.java" />
       </list>
     </option>
@@ -107,6 +103,7 @@
     </navigator>
     <panes>
       <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -129,7 +126,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
       <pane id="CatdeaLogs" />
     </panes>
   </component>
@@ -137,8 +133,8 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1575564930919" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/.." />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1575565048218" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -216,7 +212,21 @@
       <option name="project" value="LOCAL" />
       <updated>1575564075875</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="added gui package">
+      <created>1575564953948</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1575564953948</updated>
+    </task>
+    <task id="LOCAL-00006" summary="added gui package">
+      <created>1575565053241</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1575565053241</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
@@ -235,7 +245,7 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.09865772" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -276,7 +286,8 @@
     <MESSAGE value="Added JavaDoc to the Article class" />
     <MESSAGE value="added stop words file reading" />
     <MESSAGE value="added capital letters collecting function and HashMap" />
-    <option name="LAST_COMMIT_MESSAGE" value="added capital letters collecting function and HashMap" />
+    <MESSAGE value="added gui package" />
+    <option name="LAST_COMMIT_MESSAGE" value="added gui package" />
   </component>
   <component name="editorHistoryManager">
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_211.jdk/Contents/Home/src.zip!/org/w3c/dom/Document.java" />
@@ -373,17 +384,22 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/GUI/ViewController.java" />
+    <entry file="file://$PROJECT_DIR$/src/GUI/View.java" />
+    <entry file="file://$PROJECT_DIR$/src/GUI/Controller.java" />
+    <entry file="file://$PROJECT_DIR$/src/GUI/Controller2.java" />
+    <entry file="file://$PROJECT_DIR$/src/GUI/view.fxml" />
     <entry file="file://$PROJECT_DIR$/src/Indexing/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+        <state relative-caret-position="391">
+          <caret line="23" selection-start-line="23" selection-end-line="23" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Indexing/Parse.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="14" column="13" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
+        <state relative-caret-position="505">
+          <caret line="338" column="83" selection-start-line="338" selection-start-column="83" selection-end-line="338" selection-end-column="83" />
           <folding>
             <element signature="method#fillStopWords#0;class#Parse#0" />
             <element signature="method#isStopWord#0;class#Parse#0" />
