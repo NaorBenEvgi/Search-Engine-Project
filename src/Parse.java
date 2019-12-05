@@ -1,6 +1,9 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.regex.Pattern;
 
 /**
@@ -16,6 +19,37 @@ public class Parse {
     private static final float THOUSAND = 1000;
     private static final float MILLION = 1000000;
     private static final float BILLION = 1000000000;
+    protected static HashSet<String> stopWords;
+
+
+    /**
+     * Reads the stop words file and fills the stop words database
+     * @param pathToStopWords the path to the stop words file
+     */
+    private void fillStopWords(String pathToStopWords){
+        stopWords = new HashSet<>();
+        try{
+            BufferedReader stopWordsReader = new BufferedReader(new FileReader(pathToStopWords));
+            String word;
+            while((word = stopWordsReader.readLine()) != null){
+                stopWords.add(word);
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Checks if a given word is a stop word
+     * @param word the given word
+     * @return true if the word is a stop word, false otherwise
+     */
+    private boolean isStopWord(String word){
+        if(stopWords.contains(word)){
+            return true;
+        }
+        return false;
+    }
 
 
     /**
