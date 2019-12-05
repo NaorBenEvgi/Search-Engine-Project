@@ -1,3 +1,5 @@
+package Indexing;
+
 /**
  * This class represents a document. A document has an ID, title, publication date and a content.
  */
