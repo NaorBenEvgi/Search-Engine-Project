@@ -3,6 +3,7 @@ import java.io.FileReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 
@@ -20,6 +21,7 @@ public class Parse {
     private static final float MILLION = 1000000;
     private static final float BILLION = 1000000000;
     protected static HashSet<String> stopWords;
+    protected static HashMap<String, HashMap<String, Integer>> capitalLettersWords = new HashMap<>();
 
 
     /**
@@ -34,6 +36,7 @@ public class Parse {
             while((word = stopWordsReader.readLine()) != null){
                 stopWords.add(word);
             }
+            stopWordsReader.close();
         } catch(Exception e){
             e.printStackTrace();
         }
@@ -162,9 +165,9 @@ public class Parse {
     }
 
     /**
-     *
-     * @param line
-     * @return
+     *Checks if the line contains prices with number larger than million, and parses them accordingly
+     * @param line the line to parse
+     * @return the parsed line
      */
     private String pricesOverMillion(String line){
         ArrayList<String> words = new ArrayList<>(Arrays.asList(line.split("\\s+")));
@@ -306,6 +309,36 @@ public class Parse {
         return null;
     }
 
+
+    /**
+     * Iterates over a line and collects all the words that start with a capital letter.
+     * All these words are put in a HashMap, with the ID's of the documents and the amount of times it appears in them.
+     * @param line the line to iterate over
+     * @param docID the ID of the document in which the line is taken from
+     */
+    private void collectCapitalLetterWords(String line, String docID){
+        String[] wordsInLine = line.split(" ");
+        HashMap<String,Integer> termFrequencyInDoc;
+        for(int i=0; i<wordsInLine.length; i++){
+            if(Character.isUpperCase(wordsInLine[i].charAt(0))){
+                if(!capitalLettersWords.containsKey(wordsInLine[i])){ //Checks if this is the first time we encounter that capital-letter-starting word
+                    termFrequencyInDoc = new HashMap<>();
+                    termFrequencyInDoc.put(docID,1);
+                    capitalLettersWords.put(wordsInLine[i],termFrequencyInDoc);
+                }
+                else{ //Checks if that word exists in the capital letter words database, but this is the first time we encounter it in a specific document
+                    termFrequencyInDoc = capitalLettersWords.get(wordsInLine[i]);
+                    if(!termFrequencyInDoc.containsKey(docID)){
+                        termFrequencyInDoc.put(docID,1);
+                    }
+                    else{ //the case that this is not the first time we encountered that word in this document
+                        termFrequencyInDoc.put(docID,termFrequencyInDoc.get(docID)+1);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Parses the words in a given line.
      * @param line the given line
@@ -316,6 +349,9 @@ public class Parse {
         ArrayList<String> words = new ArrayList<>(Arrays.asList(line.split(REGEX_BY_WORDS)));
         for (int i = 0; i < words.size(); i++) {
             String word = words.get(i).replaceAll(",", "");
+            if(isStopWord(word.toLowerCase())){
+                continue;
+            }
             if (word.length() > 1) {
                 if (isNumber(word)) {
                     try {
