@@ -64,6 +64,7 @@ public class Parse {
         DecimalFormat df = new DecimalFormat(DECIMAL_FORMAT);
         float parsedNumber = parseFraction(number);
         String formattedNumber;
+        //TODO: check if after the nubmer there is the letter "M"
         if (parsedNumber >= THOUSAND) {
             if (parsedNumber >= MILLION) {
                 if (parsedNumber >= BILLION) {
@@ -99,7 +100,23 @@ public class Parse {
         for (int i = 0; i < words.size(); ++i) {
             String word = words.get(i);
             if (word.contains("$")) {
-                parsedLine.append(word.replace("$", "")).append(" Dollars");
+                try {
+                    String nextWord = words.get(i+1);
+                    if (nextWord.equalsIgnoreCase("million")) {
+                        parsedLine.append(word.replace("$", "")).append(" M").append(" Dollars");
+                        i++;
+                    }
+                    else if(nextWord.equalsIgnoreCase("billion")){
+                        parsedLine.append(word.replace("$", "")).append("000").append(" M").append(" Dollars");
+                        i++;
+                    }
+                    else { //in case the number should stay as it is
+                        parsedLine.append(word.replace("$", "")).append(" Dollars");
+                    }
+                }
+                catch (Exception e){
+                    parsedLine.append(word.replace("$", "")).append(" Dollars");
+                }
             } else {
                 if (i != 0) {
                     parsedLine.append(" ");
@@ -109,6 +126,55 @@ public class Parse {
         }
         return parsedLine.toString();
     }
+
+    /**
+     *
+     * @param line
+     * @return
+     */
+    private String pricesOverMillion(String line){
+        ArrayList<String> words = new ArrayList<>(Arrays.asList(line.split("\\s+")));
+        StringBuilder parsedLine = new StringBuilder();
+        for (int i = 0; i < words.size(); ++i) {
+            String word = words.get(i);
+            if (word.contains("m")) { //#m Dollars -> # M Dollars
+                parsedLine.append(word.replace("m", "")).append(" M");
+            }else if (word.contains("bn")) { //#bn Dollars -> #000 M Dollars
+                parsedLine.append(word.replace("bn", "")).append("000").append(" M");
+            }else if(isNumber(word)) { // # million / billion U.S. dollars -> # M Dollars
+                try {
+                    String nextWord = words.get(i + 1);
+                    if (nextWord.equalsIgnoreCase("million") || nextWord.equalsIgnoreCase("billion")) {
+                        String nextNextWord = words.get(i + 2);
+                        if (nextNextWord.equalsIgnoreCase("U.S.")) {
+                            String nextNextNextWord = words.get(i + 3);
+                            if (nextNextNextWord.equalsIgnoreCase("dollars")) {
+                                if (nextWord.equalsIgnoreCase("million")) {
+                                    parsedLine.append(word).append(" M Dollars");
+                                } else {
+                                    parsedLine.append(word).append("000 M Dollars");
+                                }
+                                i += 3;
+                            }
+                        }
+                    }
+                } catch (Exception e) { // doesn't satisfy the pattern
+                    if (i != 0) {
+                        parsedLine.append(" ");
+                    }
+                    parsedLine.append(word);
+                }
+            }else{ // not a price
+                if (i != 0) {
+                    parsedLine.append(" ");
+                }
+                parsedLine.append(word);
+            }
+        }
+
+        return parsedLine.toString();
+    }
+
 
     /**
      * Checks if a given string is one of the words "Thousand", "Million" or "Billion", and returns a matching character for each one.
@@ -220,25 +286,27 @@ public class Parse {
                 if (isNumber(word)) {
                     try {
                         String nextWord = words.get(i + 1).replaceAll(",", "");
-                        String character = convertNumberFromTextToChar(nextWord);
-                        if (isPercent(nextWord)) {
+                        String character = convertNumberFromTextToChar(nextWord); //checks the pattern # thousand / million / billion - step one
+                        if (isPercent(nextWord)) { // checks the percentage pattern
                             parsedWords.add(word + "%");
                             i++;
-                        } else if (character != null) {
-                            // TODO: Handle "number over million section";
+                        } else if(nextWord.equals("M")){ //checks the prices over million pattern
+                            parsedWords.add(word + nextWord);
+                            i++;
+                        } else if (character != null) { //checks the pattern # thousand / million / billion - next two
                             parsedWords.add(word + character);
                             i++;
                         }else if (!convertMonthToNumber(nextWord).equals("")) { //covers cases of: DD MM
                             parseDates(word,nextWord);
                             i++;
                         }
-                        else {
+                        else { //there number doesn't belong to any special case
                             parsedWords.add(parseNumber(word));
                         }
                     } catch (Exception e) { // if there is no extra word after "word"
                         parsedWords.add(parseNumber(word));
                     }
-                } else if (!convertMonthToNumber(word).equals("")){
+                } else if (!convertMonthToNumber(word).equals("")){ //checks the date formats
                     try{
                         String nextWord = words.get(i + 1).replaceAll(",", "");
                         if(isNumber(nextWord)){
@@ -274,6 +342,7 @@ public class Parse {
         ArrayList<String> parsedWords = new ArrayList<>();
         for (String line : articleLines) {
             line = handleDollarCases(line);
+            line = pricesOverMillion(line);
             parsedWords.addAll(parseLine(line));
         }
         return parsedWords;
