@@ -27,6 +27,7 @@ public class Parse {
     private HashMap<String,Term> dictionary;
     private int termPositionInDocument;
 
+    //TODO: a constructor to initialize the stop words database and the capital letters database
 
     /**
      * Reads the stop words file and fills the stop words database

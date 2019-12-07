@@ -14,7 +14,7 @@ public class Term {
     }
 
     //will be used in the indexer
-    public String lineInPostingFile(Article doc) {
+    private String lineInPostingFile(Article doc) {
         StringBuilder line = new StringBuilder();
         if (termPositions.containsKey(doc)) {
             line.append(doc.getDocId()).append(":");
@@ -28,6 +28,11 @@ public class Term {
             line.append("_").append(positionsForCurrentDoc.size()).append("_");
         }
         return line.toString();
+    }
+
+
+    public String getPostingLineInDoc(Article doc){
+        return lineInPostingFile(doc);
     }
 
 
