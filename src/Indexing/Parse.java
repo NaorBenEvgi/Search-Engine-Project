@@ -23,7 +23,9 @@ public class Parse {
     private static final float MILLION = 1000000;
     private static final float BILLION = 1000000000;
     protected static HashSet<String> stopWords;
-    protected static HashMap<String, HashMap<String, Integer>> capitalLettersWords = new HashMap<>();
+    protected HashMap<String, HashMap<String, Integer>> capitalLettersWords;
+    private HashMap<String,Term> dictionary;
+    private int termPositionInDocument;
 
 
     /**
@@ -57,6 +59,24 @@ public class Parse {
     }
 
 
+    /**
+     * Iterates over a line and removes all the stop words in it.
+     * @param line the given line
+     * @return the line without stop words
+     */
+    private String eliminateStopWords(String line){
+        StringBuilder lineWithoutStopWords = new StringBuilder();
+        ArrayList<String> words = new ArrayList<>(Arrays.asList(line.split("\\s+")));
+        for(int i=0; i<words.size(); i++){
+            if(!isStopWord(words.get(i))){
+                if(i != 0){
+                    lineWithoutStopWords.append(" ");
+                }
+                lineWithoutStopWords.append(words.get(i));
+            }
+        }
+        return lineWithoutStopWords.toString();
+    }
     /**
      * Checks if a given string contains a numerical fraction
      * @param strNum the given string
@@ -333,6 +353,12 @@ public class Parse {
         HashMap<String,Integer> termFrequencyInDoc;
         for(int i=0; i<wordsInLine.length; i++){
             if(Character.isUpperCase(wordsInLine[i].charAt(0))){
+                if(isStopWord(wordsInLine[i].toLowerCase())){
+                    /*try{
+                        String nextWord = wordsInLine[i+1];
+                    }*/
+                }
+
                 if(!capitalLettersWords.containsKey(wordsInLine[i])){ //Checks if this is the first time we encounter that capital-letter-starting word
                     termFrequencyInDoc = new HashMap<>();
                     termFrequencyInDoc.put(docID,1);
@@ -364,9 +390,9 @@ public class Parse {
         ArrayList<String> words = new ArrayList<>(Arrays.asList(line.split(REGEX_BY_WORDS)));
         for (int i = 0; i < words.size(); i++) {
             String word = words.get(i).replaceAll(",", "");
-            if(isStopWord(word.toLowerCase())){
+            /*if(isStopWord(word)){
                 continue;
-            }
+            }*/
             if (word.length() > 1) {
                 if (isNumber(word)) {
                     try {
@@ -435,14 +461,34 @@ public class Parse {
      * @param article the given document
      * @return an ArrayList of the parsed words
      */
-    public ArrayList<String> parse(Article article) {
+    public HashMap<String,Term> parse(Article article) {
+        dictionary = new HashMap<>();
+        termPositionInDocument = 0;
         ArrayList<String> articleLines = new ArrayList<>(Arrays.asList(article.getContent().split(REGEX_BY_LINES)));
         ArrayList<String> parsedWords = new ArrayList<>();
         for (String line : articleLines) {
+            line = eliminateStopWords(line);
             line = handleDollarCases(line);
             line = pricesOverMillion(line);
             parsedWords.addAll(parseLine(line));
+            for(String word : parsedWords){
+                Stemmer.setCurrent(word);
+                Stemmer.stem();
+                word = Stemmer.getCurrent();
+                Term term;
+                if(!dictionary.containsKey(word)){
+                    term = new Term(word);
+                    dictionary.put(word,term);
+                }
+                else{
+                    term = dictionary.get(word);
+                }
+                term.addPositionInDoc(article,termPositionInDocument);
+                termPositionInDocument++;
+            }
+
+
         }
-        return parsedWords;
+        return dictionary;
     }
 }
