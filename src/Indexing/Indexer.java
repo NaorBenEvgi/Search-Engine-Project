@@ -1,11 +1,10 @@
 package Indexing;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import javafx.util.Pair;
+
+import java.io.*;
+import java.nio.Buffer;
+import java.util.*;
 
 public class Indexer {
 
@@ -75,5 +74,63 @@ public class Indexer {
             }
         }
     }
+
+    /**
+     *  Merges two temporary posting files into one sorted posting file.
+     * @param firstFilePath the path to the first file
+     * @param secondFilePath the path to the second file
+     * @param targetPath the path in which the merged file will be saved
+     */
+    public void mergePostingFiles(String firstFilePath, String secondFilePath, String targetPath){
+        String mergedPostingFilePath = targetPath + "\\tempPostingFile" + postingFilesCounter;
+        postingFilesCounter++;
+        SortedMap<String,StringBuilder> mergedDictionary = new TreeMap<>();
+        BufferedReader postingFile1,postingFile2;
+        try {
+            postingFile1 = new BufferedReader(new FileReader(firstFilePath));
+            String[] linesInFile1 = (String[])postingFile1.lines().toArray();
+            for(int i=0; i<linesInFile1.length; i++){
+                Pair<String,StringBuilder> mapEntry = convertLineToTermAndPosting(linesInFile1[i]);
+                mergedDictionary.put(mapEntry.getKey(),mapEntry.getValue());
+            }
+
+            postingFile2 = new BufferedReader(new FileReader(secondFilePath));
+            String[] linesInFile2 = (String[])postingFile2.lines().toArray();
+            for(int i=0; i<linesInFile2.length; i++){
+                Pair<String,StringBuilder> mapEntry = convertLineToTermAndPosting(linesInFile2[i]);
+                if(mergedDictionary.containsKey(mapEntry.getKey())){
+                    mergedDictionary.get(mapEntry.getKey()).append(mapEntry.getValue().toString().replace(mapEntry.getKey() + "|",""));
+                } else{
+                    mergedDictionary.put(mapEntry.getKey(),mapEntry.getValue());
+                }
+            }
+
+            StringBuilder fileContent = new StringBuilder();
+            Iterator<String> termsIterator = mergedDictionary.keySet().iterator();
+            while(termsIterator.hasNext()){
+                fileContent.append(mergedDictionary.get(termsIterator.next())).append("\n");
+            }
+            writePostingLinesToTempFile(mergedPostingFilePath,fileContent.toString());
+
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     *
+     * @param line
+     * @return
+     */
+    private Pair<String,StringBuilder> convertLineToTermAndPosting(String line){
+        String[] termAndPosting = line.split("|");
+        StringBuilder postingLine = new StringBuilder();
+        postingLine.append(termAndPosting[1]);
+        Pair<String,StringBuilder> pair = new Pair<>(termAndPosting[0],postingLine);
+        return pair;
+    }
+
+
 
 }
