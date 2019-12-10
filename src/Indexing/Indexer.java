@@ -3,7 +3,6 @@ package Indexing;
 import javafx.util.Pair;
 
 import java.io.*;
-import java.nio.Buffer;
 import java.util.*;
 
 public class Indexer {
@@ -40,7 +39,7 @@ public class Indexer {
      */
     public void createTemporaryPosting(String path){
         ArrayList<String> sortedTerms = new ArrayList<>(postingLines.keySet());
-        Collections.sort(sortedTerms);
+        Collections.sort(sortedTerms,String.CASE_INSENSITIVE_ORDER);
         StringBuilder temporaryPostingLinesBuilder = new StringBuilder();
         for(int i=0; i<sortedTerms.size(); i++){
             temporaryPostingLinesBuilder.append(sortedTerms.get(i)).append("|" + postingLines.get(i).toString()+"\n");
@@ -76,7 +75,7 @@ public class Indexer {
     }
 
     /**
-     *  Merges two temporary posting files into one sorted posting file.
+     * Merges two temporary posting files into one sorted posting file.
      * @param firstFilePath the path to the first file
      * @param secondFilePath the path to the second file
      * @param targetPath the path in which the merged file will be saved
@@ -84,7 +83,7 @@ public class Indexer {
     public void mergePostingFiles(String firstFilePath, String secondFilePath, String targetPath){
         String mergedPostingFilePath = targetPath + "\\tempPostingFile" + postingFilesCounter;
         postingFilesCounter++;
-        SortedMap<String,StringBuilder> mergedDictionary = new TreeMap<>();
+        SortedMap<String,StringBuilder> mergedDictionary = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         BufferedReader postingFile1,postingFile2;
         try {
             postingFile1 = new BufferedReader(new FileReader(firstFilePath));
@@ -131,6 +130,134 @@ public class Indexer {
         return pair;
     }
 
+
+    /**
+     *
+     * @param firstFilePath
+     * @param secondFilePath
+     * @param targetPath
+     */
+    public void mergeAndSplitByLetter(String firstFilePath, String secondFilePath, String targetPath) {
+        // create an 27 cells sized array, each cell contains list<String>
+        // iterate through
+
+
+
+            /*while((line = file2Reader.readLine()) != null){
+                term = line.substring(0,line.indexOf("|"));
+                sortedTerms.add(term);
+            }
+            sortedTerms.sort(String::compareTo);
+            file1Reader = new BufferedReader(new FileReader(path1));
+            file2Reader = new BufferedReader(new FileReader(path2));
+            Iterator<String> sortedTermsIterator = sortedTerms.iterator();
+            while(sortedTermsIterator.hasNext()){
+                term = sortedTermsIterator.next();
+                line1 = file1Reader.readLine();
+                line2 = file2Reader.readLine();
+                if(line1.startsWith(term)){
+                    letterFileWriter.write(line1);
+                    letterFileWriter.flush();
+                    line1 = file1Reader.readLine();
+                } else{
+                    letterFileWriter.write(line2);
+                    letterFileWriter.flush();
+                    line2 = file1Reader.readLine();
+                }*/
+
+
+    }
+
+
+
+    private List<String>[] createTermsListByLetter(String firstFilePath, String secondFilePath) {
+        BufferedReader file1Reader, file2Reader;
+        boolean foundFirst = false;
+        String term, line1, line2;
+        HashMap<String,StringBuilder> sortedTerms = new HashMap<>();
+
+
+        try {
+            file1Reader = new BufferedReader(new FileReader(firstFilePath));
+            file2Reader = new BufferedReader(new FileReader(secondFilePath));
+
+            while(!((line1 = file1Reader.readLine()).startsWith("a") || (line1 = file1Reader.readLine()).startsWith("A"))){
+                StringBuilder lineBuilder = new StringBuilder();
+                term = line1.substring(0,line1.indexOf("|"));
+                if(!concatenateTerms(sortedTerms,term)){
+                    lineBuilder.append(line1);
+                    sortedTerms.put(term,lineBuilder);
+                }
+            }
+            while(!((line2 = file2Reader.readLine()).startsWith("a") || (line2 = file2Reader.readLine()).startsWith("A"))){
+                StringBuilder lineBuilder = new StringBuilder();
+                term = line2.substring(0,line2.indexOf("|"));
+                if(!concatenateTerms(sortedTerms,term)){
+                    lineBuilder.append(line2);
+                    sortedTerms.put(term,lineBuilder);
+                }
+            }
+            ArrayList<String> sortedTermsList = new ArrayList<>(sortedTerms.keySet());
+            Collections.sort(sortedTermsList,String.CASE_INSENSITIVE_ORDER);
+
+/*
+            //iterates over the two files and fills a list with all the terms in them, and sorts the list after that
+            while ((line = file1Reader.readLine()) != null) {
+                if (line.startsWith("" + letter)) {
+                    foundFirst = true;
+                } else {
+                    if (foundFirst) {
+                        break;
+                    } else {
+                        continue;
+                    }
+                }
+
+                term = line.substring(0, line.indexOf("|"));
+
+
+                sortedTerms.add(term);
+
+            }*/
+        } catch (Exception e) {
+        }
+
+
+        return null;
+    }
+
+    /**
+     *
+     * @param letter
+     * @param targetPath
+     * @param path1
+     * @param path2
+     */
+    private void writeToLetterFile(char letter, String targetPath, String path1, String path2){
+
+
+
+
+    }
+
+
+    /**
+     *
+     * @param terms
+     * @param line
+     * @return
+     */
+    private boolean concatenateTerms(HashMap<String,StringBuilder> terms,String line){
+        String term = line.substring(0,line.indexOf("|"));
+        if(terms.containsKey(term)){
+            StringBuilder lineBuilder = terms.get(term);
+            String postingLine = line.substring(line.indexOf("|")+1);
+            lineBuilder.append(postingLine);
+            terms.put(term,lineBuilder);
+            return true;
+        }
+        return false;
+    }
 
 
 }

@@ -4,6 +4,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class Main {
 
@@ -26,17 +29,17 @@ public class Main {
 
 
     public static void main(String[] args) {
-        String content = "Naor is a really big BITCH";
-        File file = new File("C:\\Users\\royj1\\Desktop\\University\\הנדסת מערכות מידע\\שנה ג\\סמסטר ה\\אחזור מידע\\פרויקט\\Test.txt");
-        try {
-            FileWriter fw = new FileWriter(file.getAbsoluteFile());
-            BufferedWriter bw = new BufferedWriter(fw);
-            bw.write(content);
-            bw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        LinkedList<String> a = new LinkedList<>();
+        a.add("435");
+        a.add("ABBC");
+        a.add("baba");
+        a.add("BABA");
+        a.add("abba");
+        Collections.sort(a,String.CASE_INSENSITIVE_ORDER);
+        //a.sort(String::compareTo);
+        for(String b : a){
+            System.out.println(b);
         }
-
     }
 
 }

@@ -22,12 +22,20 @@ public class Parse {
     private static final float THOUSAND = 1000;
     private static final float MILLION = 1000000;
     private static final float BILLION = 1000000000;
-    protected static HashSet<String> stopWords;
+    protected HashSet<String> stopWords;
     protected HashMap<String, HashMap<String, Integer>> capitalLettersWords;
     private HashMap<String,Term> dictionary;
     private int termPositionInDocument;
 
-    //TODO: a constructor to initialize the stop words database and the capital letters database
+
+    //TODO: initialize the capital letters database and fix path for stop words file
+    public Parse(){
+        stopWords = new HashSet<>();
+        fillStopWords("stop_words.txt");
+        termPositionInDocument = 0;
+        dictionary = new HashMap<>();
+    }
+
 
     /**
      * Reads the stop words file and fills the stop words database
@@ -391,9 +399,6 @@ public class Parse {
         ArrayList<String> words = new ArrayList<>(Arrays.asList(line.split(REGEX_BY_WORDS)));
         for (int i = 0; i < words.size(); i++) {
             String word = words.get(i).replaceAll(",", "");
-            /*if(isStopWord(word)){
-                continue;
-            }*/
             if (word.length() > 1) {
                 if (isNumber(word)) {
                     try {
@@ -462,7 +467,7 @@ public class Parse {
      * @param article the given document
      * @return an ArrayList of the parsed words
      */
-    public HashMap<String,Term> parse(Article article) {
+    public HashMap<String,Term> parseWithStemming(Article article) {
         dictionary = new HashMap<>();
         termPositionInDocument = 0;
         ArrayList<String> articleLines = new ArrayList<>(Arrays.asList(article.getContent().split(REGEX_BY_LINES)));
@@ -492,4 +497,16 @@ public class Parse {
         }
         return dictionary;
     }
+
+
+    /**
+     *
+     * @param article
+     * @return
+     */
+    public HashMap<String,Term> parseWithoutStemming(Article article){
+
+        return null;
+    }
+
 }
