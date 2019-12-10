@@ -30,16 +30,22 @@ public class Main {
 
     public static void main(String[] args) {
         LinkedList<String> a = new LinkedList<>();
-        a.add("435");
-        a.add("ABBC");
+        String t = "Hello World how are you there";
+        System.out.println(t.getBytes().length);
+      /*  a.add("435");
+        a.add(t);
         a.add("baba");
         a.add("BABA");
         a.add("abba");
         Collections.sort(a,String.CASE_INSENSITIVE_ORDER);
         //a.sort(String::compareTo);
         for(String b : a){
-            System.out.println(b);
-        }
+            System.out.println(b.codePoints()
+                    .map(cp -> cp<=0x7ff? cp<=0x7f? 1: 2: cp<=0xffff? 3: 4)
+                    .sum());
+        }*/
+
+
     }
 
 }

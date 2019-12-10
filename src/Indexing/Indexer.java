@@ -9,10 +9,12 @@ public class Indexer {
 
     private HashMap<String,StringBuilder> postingLines;
     private int postingFilesCounter;
+    private SortedMap<String,String[]> finalDictionary;
 
     public Indexer(){
         postingFilesCounter = 0;
         postingLines = new HashMap<>();
+        finalDictionary = new TreeMap<>();
     }
 
 
@@ -137,7 +139,7 @@ public class Indexer {
      * @param secondFilePath
      * @param targetPath
      */
-    public void mergeAndSplitByLetter(String firstFilePath, String secondFilePath, String targetPath) {
+    public void mergeAndSplitByLetter(String firstFilePath, String secondFilePath, String targetPath, boolean stem) {
         // create an 27 cells sized array, each cell contains list<String>
         // iterate through
 
@@ -170,10 +172,11 @@ public class Indexer {
 
 
 
-    private List<String>[] createTermsListByLetter(String firstFilePath, String secondFilePath) {
+    public void createTermsListByLetter(String firstFilePath, String secondFilePath, String targetPath, boolean stem) {
         BufferedReader file1Reader, file2Reader;
         boolean foundFirst = false;
         String term, line1, line2;
+        StringBuilder contentToFile = new StringBuilder();
         HashMap<String,StringBuilder> sortedTerms = new HashMap<>();
 
 
@@ -181,11 +184,13 @@ public class Indexer {
             file1Reader = new BufferedReader(new FileReader(firstFilePath));
             file2Reader = new BufferedReader(new FileReader(secondFilePath));
 
+//---------------------------------------------------- Numbers ------------------------------------------------------------
+
             while(!((line1 = file1Reader.readLine()).startsWith("a") || (line1 = file1Reader.readLine()).startsWith("A"))){
                 StringBuilder lineBuilder = new StringBuilder();
                 term = line1.substring(0,line1.indexOf("|"));
                 if(!concatenateTerms(sortedTerms,term)){
-                    lineBuilder.append(line1);
+                    lineBuilder.append(line1 + "\n");
                     sortedTerms.put(term,lineBuilder);
                 }
             }
@@ -193,13 +198,22 @@ public class Indexer {
                 StringBuilder lineBuilder = new StringBuilder();
                 term = line2.substring(0,line2.indexOf("|"));
                 if(!concatenateTerms(sortedTerms,term)){
-                    lineBuilder.append(line2);
+                    lineBuilder.append(line2 + "\n");
                     sortedTerms.put(term,lineBuilder);
                 }
             }
+            //creates a sorted list with all the terms that start with a number and adds the frequent ones to the dictionary
             ArrayList<String> sortedTermsList = new ArrayList<>(sortedTerms.keySet());
             Collections.sort(sortedTermsList,String.CASE_INSENSITIVE_ORDER);
-
+            for(String checkedNumTerm : sortedTermsList){
+                if(!addTermToFinalDictionary(sortedTerms,checkedNumTerm,"NumPostingfile")){
+                    sortedTermsList.remove(checkedNumTerm); //the term is too less frequent so we'll filter it out
+                }else{ //the term was added to the dictionary so we'll add it to the content to be written to the file
+                    contentToFile.append(sortedTerms.get(checkedNumTerm).toString() + "\n");
+                }
+            }
+            sortedTerms.clear();
+            writeContentToLetterFile(contentToFile,"NumPostingfile", targetPath, stem);
 /*
             //iterates over the two files and fills a list with all the terms in them, and sorts the list after that
             while ((line = file1Reader.readLine()) != null) {
@@ -222,21 +236,26 @@ public class Indexer {
         } catch (Exception e) {
         }
 
-
-        return null;
     }
 
     /**
-     *
-     * @param letter
-     * @param targetPath
-     * @param path1
-     * @param path2
+     * Writes a given content to a file
+     * @param content the given content
+     * @param postingFileName the name of the posting file
+     * @param targetPath the directory in which the file will be saved
+     * @param stem determines if the content includes stemming
      */
-    private void writeToLetterFile(char letter, String targetPath, String path1, String path2){
-
-
-
+    private void writeContentToLetterFile(StringBuilder content, String postingFileName, String targetPath, boolean stem){
+        BufferedWriter fileWriter;
+        if(stem)
+            postingFileName += "Stem";
+        try{
+            fileWriter = new BufferedWriter(new FileWriter(targetPath + "/" + postingFileName));
+            fileWriter.write(content.toString());
+            fileWriter.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
 
@@ -260,4 +279,38 @@ public class Indexer {
     }
 
 
+    /**
+     * Collects all the details in the corpus about a specific term and adds it to the final dictionary,
+     * unless the term appears less than 10 times in the whole corpus
+     * @param sortedTerms dictionary of the terms and their posting lines
+     * @param term the checked term
+     * @param postingFileName the name of the posting file it will be saved in
+     * @return true if the term was added to the dictionary, false otherwise
+     */
+    private boolean addTermToFinalDictionary(HashMap<String,StringBuilder> sortedTerms, String term, String postingFileName){
+        StringBuilder postingLineWithTerm = sortedTerms.get(term);
+        String postingLine = postingLineWithTerm.substring(postingLineWithTerm.toString().indexOf("|")+1);
+        String[] termDetails = new String[4];
+        String[] tfSum = postingLine.split("_");
+        int sumOfTfTerm = 0, dfTerm=0;
+
+        //Check how many times the term appears in the corpus and in how many documents
+        for(int i=1; i<tfSum.length; i+=2){
+            sumOfTfTerm += Integer.parseInt(tfSum[i]);
+            dfTerm++;
+        }
+
+        //If the term appears less than 10 times in the corpus we filter it out
+        if(sumOfTfTerm < 10){
+            return false;
+        }
+        //In case the term is common enough, we collect its details into the final dictionary
+        termDetails[0] = sumOfTfTerm + ""; //how many times the term appears in the corpus
+        termDetails[1] = dfTerm + ""; //in how many documents the term appears
+        termDetails[2] = postingFileName;
+        termDetails[3] = postingLineWithTerm.toString().getBytes().length + ""; //the posting line size in memory
+        finalDictionary.put(term,termDetails);
+
+        return true;
+    }
 }
