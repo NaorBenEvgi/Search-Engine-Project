@@ -179,7 +179,6 @@ public class Indexer {
         StringBuilder contentToFile = new StringBuilder();
         HashMap<String,StringBuilder> sortedTerms = new HashMap<>();
 
-
         try {
             file1Reader = new BufferedReader(new FileReader(firstFilePath));
             file2Reader = new BufferedReader(new FileReader(secondFilePath));
