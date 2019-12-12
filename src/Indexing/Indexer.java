@@ -138,45 +138,13 @@ public class Indexer {
      * @param firstFilePath
      * @param secondFilePath
      * @param targetPath
+     * @param stem
      */
-    public void mergeAndSplitByLetter(String firstFilePath, String secondFilePath, String targetPath, boolean stem) {
-        // create an 27 cells sized array, each cell contains list<String>
-        // iterate through
-
-
-
-            /*while((line = file2Reader.readLine()) != null){
-                term = line.substring(0,line.indexOf("|"));
-                sortedTerms.add(term);
-            }
-            sortedTerms.sort(String::compareTo);
-            file1Reader = new BufferedReader(new FileReader(path1));
-            file2Reader = new BufferedReader(new FileReader(path2));
-            Iterator<String> sortedTermsIterator = sortedTerms.iterator();
-            while(sortedTermsIterator.hasNext()){
-                term = sortedTermsIterator.next();
-                line1 = file1Reader.readLine();
-                line2 = file2Reader.readLine();
-                if(line1.startsWith(term)){
-                    letterFileWriter.write(line1);
-                    letterFileWriter.flush();
-                    line1 = file1Reader.readLine();
-                } else{
-                    letterFileWriter.write(line2);
-                    letterFileWriter.flush();
-                    line2 = file1Reader.readLine();
-                }*/
-
-
-    }
-
-
-
-    public void createTermsListByLetter(String firstFilePath, String secondFilePath, String targetPath, boolean stem) {
+    public void createTermsListByLetter(String firstFilePath, String secondFilePath, String targetPath, boolean stem){
         BufferedReader file1Reader, file2Reader;
-        boolean foundFirst = false;
-        String term, line1, line2;
+        String term, lastLine1, lastLine2;
         StringBuilder contentToFile = new StringBuilder();
+        StringBuilder lineBuilder;
         HashMap<String,StringBuilder> sortedTerms = new HashMap<>();
 
         try {
@@ -185,19 +153,19 @@ public class Indexer {
 
 //---------------------------------------------------- Numbers ------------------------------------------------------------
 
-            while(!((line1 = file1Reader.readLine()).startsWith("a") || (line1 = file1Reader.readLine()).startsWith("A"))){
-                StringBuilder lineBuilder = new StringBuilder();
-                term = line1.substring(0,line1.indexOf("|"));
-                if(!concatenateTerms(sortedTerms,term)){
-                    lineBuilder.append(line1 + "\n");
-                    sortedTerms.put(term,lineBuilder);
-                }
+            while(!((lastLine1 = file1Reader.readLine()).startsWith("a") || (lastLine1 = file1Reader.readLine()).startsWith("A"))){
+                lineBuilder = new StringBuilder();
+                term = lastLine1.substring(0,lastLine1.indexOf("|"));
+                //if(!concatenateTerms(sortedTerms,term)){
+                lineBuilder.append(lastLine1 + "\n");
+                sortedTerms.put(term,lineBuilder);
+                //}
             }
-            while(!((line2 = file2Reader.readLine()).startsWith("a") || (line2 = file2Reader.readLine()).startsWith("A"))){
-                StringBuilder lineBuilder = new StringBuilder();
-                term = line2.substring(0,line2.indexOf("|"));
-                if(!concatenateTerms(sortedTerms,term)){
-                    lineBuilder.append(line2 + "\n");
+            while(!((lastLine2 = file2Reader.readLine()).startsWith("a") || (lastLine2 = file2Reader.readLine()).startsWith("A"))){
+                lineBuilder = new StringBuilder();
+                term = lastLine2.substring(0,lastLine2.indexOf("|"));
+                if(!concatenateTerms(sortedTerms,lastLine2)){
+                    lineBuilder.append(lastLine2 + "\n");
                     sortedTerms.put(term,lineBuilder);
                 }
             }
@@ -205,36 +173,87 @@ public class Indexer {
             ArrayList<String> sortedTermsList = new ArrayList<>(sortedTerms.keySet());
             Collections.sort(sortedTermsList,String.CASE_INSENSITIVE_ORDER);
             for(String checkedNumTerm : sortedTermsList){
-                if(!addTermToFinalDictionary(sortedTerms,checkedNumTerm,"NumPostingfile")){
-                    sortedTermsList.remove(checkedNumTerm); //the term is too less frequent so we'll filter it out
+                if(!addTermToFinalDictionary(sortedTerms,checkedNumTerm,"NumPostingFile")){
+                    //sortedTermsList.remove(checkedNumTerm); //the term is too less frequent so we'll filter it out
                 }else{ //the term was added to the dictionary so we'll add it to the content to be written to the file
                     contentToFile.append(sortedTerms.get(checkedNumTerm).toString() + "\n");
                 }
             }
             sortedTerms.clear();
-            writeContentToLetterFile(contentToFile,"NumPostingfile", targetPath, stem);
-/*
-            //iterates over the two files and fills a list with all the terms in them, and sorts the list after that
-            while ((line = file1Reader.readLine()) != null) {
-                if (line.startsWith("" + letter)) {
-                    foundFirst = true;
-                } else {
-                    if (foundFirst) {
-                        break;
-                    } else {
-                        continue;
+            sortedTermsList.clear();
+            writeContentToLetterFile(contentToFile,"NumPostingFile", targetPath, stem);
+            contentToFile = new StringBuilder();
+
+//---------------------------------------------------- Letters ------------------------------------------------------------
+            char[] letters = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
+            boolean startsCorrectly1,startsCorrectly2;
+            for(int i=0; i<letters.length; i++){
+                // appending the current lines in lastLine1 and lastLine2 since they already contain lines with a matching letter from each file
+                startsCorrectly1 = true;
+                startsCorrectly2 = true;
+
+                if(lastLine1 == null || !(lastLine1.startsWith((""+letters[i]).toLowerCase()) || lastLine1.startsWith(""+letters[i]))){
+                    startsCorrectly1 = false;
+                }
+                if(lastLine2 == null || !(lastLine2.startsWith((""+letters[i]).toLowerCase()) || lastLine2.startsWith(""+letters[i]))){
+                    startsCorrectly2 = false;
+                }
+
+                if(!startsCorrectly1 && !startsCorrectly2)
+                    continue;
+
+                if(startsCorrectly1){
+                    lineBuilder = new StringBuilder();
+                    term = lastLine1.substring(0,lastLine1.indexOf("|"));
+                    lineBuilder.append(lastLine1 + "\n");
+                    sortedTerms.put(term,lineBuilder);
+                }
+                if(startsCorrectly2){
+                    term = lastLine2.substring(0,lastLine2.indexOf("|"));
+                    if(!concatenateTerms(sortedTerms,lastLine2)){
+                        lineBuilder = new StringBuilder();
+                        lineBuilder.append(lastLine2 + "\n");
+                        sortedTerms.put(term,lineBuilder);
                     }
                 }
 
-                term = line.substring(0, line.indexOf("|"));
+                if(startsCorrectly1) {
+                    while ((lastLine1 = file1Reader.readLine()) != null && (lastLine1.startsWith(("" + letters[i]).toLowerCase()) || lastLine1.startsWith("" + letters[i]))) {
+                        lineBuilder = new StringBuilder();
+                        term = lastLine1.substring(0, lastLine1.indexOf("|"));
+                        //if(!concatenateTerms(sortedTerms,term)){
+                        lineBuilder.append(lastLine1 + "\n");
+                        sortedTerms.put(term, lineBuilder);
+                        //}
+                    }
+                }
+                if(startsCorrectly2) {
+                    while ((lastLine2 = file2Reader.readLine()) != null && (lastLine2.startsWith(("" + letters[i]).toLowerCase()) || lastLine2.startsWith("" + letters[i]))) {
+                        lineBuilder = new StringBuilder();
+                        term = lastLine2.substring(0, lastLine2.indexOf("|"));
+                        if (!concatenateTerms(sortedTerms, term)) {
+                            lineBuilder.append(lastLine2 + "\n");
+                            sortedTerms.put(term, lineBuilder);
+                        }
+                    }
+                }
 
+                sortedTermsList = new ArrayList<>(sortedTerms.keySet());
+                Collections.sort(sortedTermsList,String.CASE_INSENSITIVE_ORDER);
+                for(String checkedTerm : sortedTermsList){
+                    if(addTermToFinalDictionary(sortedTerms,checkedTerm,letters[i] + "PostingFile")){
+                        contentToFile.append(sortedTerms.get(checkedTerm).toString() + "\n");
+                    }
+                }
+                sortedTermsList.clear();
+                sortedTerms.clear();
+                writeContentToLetterFile(contentToFile,letters[i] + "PostingFile",targetPath,stem);
+                contentToFile = new StringBuilder();
+            }
 
-                sortedTerms.add(term);
-
-            }*/
-        } catch (Exception e) {
+        } catch (Exception e){
+            e.printStackTrace();
         }
-
     }
 
     /**
@@ -305,7 +324,7 @@ public class Indexer {
         }
         //In case the term is common enough, we collect its details into the final dictionary
         termDetails[0] = sumOfTfTerm + ""; //how many times the term appears in the corpus
-        termDetails[1] = dfTerm + ""; //in how many documents the term appears
+        termDetails[1] = dfTerm + ""; //how many documents the term appears in
         termDetails[2] = postingFileName;
         termDetails[3] = postingLineWithTerm.toString().getBytes().length + ""; //the posting line size in memory
         finalDictionary.put(term,termDetails);
