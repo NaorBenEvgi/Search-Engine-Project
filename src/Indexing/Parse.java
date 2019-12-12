@@ -2,6 +2,8 @@ package Indexing;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +34,8 @@ public class Parse {
     public Parse(){
         stopWords = new HashSet<>();
         //TODO: change the path to be not absolute
-        fillStopWords(System.getProperty("user.dir").concat("/src/stop_words.txt"));
+        Path stopWordsPath = Paths.get(System.getProperty("user.dir"), Paths.get("src", "stop_words.txt").toString());
+        fillStopWords(stopWordsPath.toString());
         termPositionInDocument = 0;
         dictionary = new HashMap<>();
     }
