@@ -44,6 +44,7 @@ public class Indexer {
         ArrayList<String> sortedTerms = new ArrayList<>(postingLines.keySet());
         Collections.sort(sortedTerms,String.CASE_INSENSITIVE_ORDER);
         StringBuilder temporaryPostingLinesBuilder = new StringBuilder();
+        //prepares the lines to be written in the file, and removes them from the HashMap
         for(int i=0; i<sortedTerms.size(); i++){
             temporaryPostingLinesBuilder.append(sortedTerms.get(i)).append("|" + postingLines.get(i).toString()+"\n");
             postingLines.remove(sortedTerms.get(i));
@@ -90,6 +91,7 @@ public class Indexer {
         SortedMap<String,StringBuilder> mergedDictionary = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         BufferedReader postingFile1,postingFile2;
         try {
+            //reads the first file and puts the terms and their lines in a HashMap
             postingFile1 = new BufferedReader(new FileReader(firstFilePath));
             String[] linesInFile1 = (String[])postingFile1.lines().toArray();
             for(int i=0; i<linesInFile1.length; i++){
@@ -97,10 +99,12 @@ public class Indexer {
                 mergedDictionary.put(mapEntry.getKey(),mapEntry.getValue());
             }
 
+            //reads the second file and puts the terms and their lines in a HashMap
             postingFile2 = new BufferedReader(new FileReader(secondFilePath));
             String[] linesInFile2 = (String[])postingFile2.lines().toArray();
             for(int i=0; i<linesInFile2.length; i++){
                 Pair<String,StringBuilder> mapEntry = convertLineToTermAndPosting(linesInFile2[i]);
+                //merges terms that already appeared in the HashMap, and regularly adds the rest
                 if(mergedDictionary.containsKey(mapEntry.getKey())){
                     mergedDictionary.get(mapEntry.getKey()).append(mapEntry.getValue().toString().replace(mapEntry.getKey() + "|",""));
                 } else{
@@ -108,6 +112,7 @@ public class Indexer {
                 }
             }
 
+            //creates the content (the posting lines) in a lexicographical order and writes it in a new file
             StringBuilder fileContent = new StringBuilder();
             Iterator<String> termsIterator = mergedDictionary.keySet().iterator();
             while(termsIterator.hasNext()){
@@ -128,7 +133,7 @@ public class Indexer {
      * @return a pair of the term and the line
      */
     private Pair<String,StringBuilder> convertLineToTermAndPosting(String line){
-        String[] termAndPosting = line.split("|");
+        String[] termAndPosting = line.split("|"); //[0] contains the term, [1] contains the rest of the posting line
         StringBuilder postingLine = new StringBuilder();
         postingLine.append(termAndPosting[1]);
         Pair<String,StringBuilder> pair = new Pair<>(termAndPosting[0],postingLine);
@@ -197,6 +202,8 @@ public class Indexer {
                 startsCorrectly1 = true;
                 startsCorrectly2 = true;
 
+                //in case the reading of one or both of the files has finished, or if there is no match between the
+                //letter in the array and the letter that any of the lines begins with
                 if(lastLine1 == null || !(lastLine1.startsWith((""+letters[i]).toLowerCase()) || lastLine1.startsWith(""+letters[i]))){
                     startsCorrectly1 = false;
                 }
