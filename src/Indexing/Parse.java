@@ -31,7 +31,8 @@ public class Parse {
     //TODO: initialize the capital letters database and fix path for stop words file
     public Parse(){
         stopWords = new HashSet<>();
-        fillStopWords("stop_words.txt");
+        //TODO: change the path to be not absolute
+        fillStopWords("C:\\Users\\royj1\\IdeaProjects\\search-engine\\src\\stop_words.txt");
         termPositionInDocument = 0;
         dictionary = new HashMap<>();
     }
@@ -86,6 +87,7 @@ public class Parse {
         }
         return lineWithoutStopWords.toString();
     }
+
     /**
      * Checks if a given string contains a numerical fraction
      * @param strNum the given string
@@ -196,7 +198,7 @@ public class Parse {
     }
 
     /**
-     *Checks if the line contains prices with number larger than million, and parses them accordingly
+     * Checks if the line contains prices with number larger than million, and parses them accordingly
      * @param line the line to parse
      * @return the parsed line
      */
@@ -205,10 +207,10 @@ public class Parse {
         StringBuilder parsedLine = new StringBuilder();
         for (int i = 0; i < words.size(); ++i) {
             String word = words.get(i);
-            if (word.contains("m")) { //#m Dollars -> # M Dollars
+            if (word.endsWith("m") && isNumber(word.substring(0,word.length()-1))) { //#m Dollars -> # M Dollars
                 parsedLine.append(word.replace("m", "")).append(" M");
             }
-            else if (word.contains("bn")) { //#bn Dollars -> #000 M Dollars
+            else if (word.endsWith("bn") && isNumber(word.substring(0,word.length()-2))) { //#bn Dollars -> #000 M Dollars
                 Double wordToMultiply = new Double(word.replace("bn", ""));
                 wordToMultiply *= 1000;
                 String multipliedWord = wordToMultiply.toString().substring(0,wordToMultiply.toString().length()-2);
@@ -465,9 +467,10 @@ public class Parse {
      * Parses the content of a given document, according to the rules that are defined in this class's functions.
      * The words are being parsed and added to the returned ArrayList.
      * @param article the given document
+     * @param stem an indicator of activating stemming on each term
      * @return an ArrayList of the parsed words
      */
-    public HashMap<String,Term> parseWithStemming(Article article) {
+    public HashMap<String,Term> parse(Article article, boolean stem) {
         dictionary = new HashMap<>();
         termPositionInDocument = 0;
         ArrayList<String> articleLines = new ArrayList<>(Arrays.asList(article.getContent().split(REGEX_BY_LINES)));
@@ -478,9 +481,11 @@ public class Parse {
             line = pricesOverMillion(line);
             parsedWords.addAll(parseLine(line));
             for(String word : parsedWords){
-                Stemmer.setCurrent(word);
-                Stemmer.stem();
-                word = Stemmer.getCurrent();
+                if(stem) {
+                    Stemmer.setCurrent(word);
+                    Stemmer.stem();
+                    word = Stemmer.getCurrent();
+                }
                 Term term;
                 if(!dictionary.containsKey(word)){
                     term = new Term(word);
@@ -492,21 +497,8 @@ public class Parse {
                 term.addPositionInDoc(article,termPositionInDocument);
                 termPositionInDocument++;
             }
-
-
         }
         return dictionary;
-    }
-
-
-    /**
-     *
-     * @param article
-     * @return
-     */
-    public HashMap<String,Term> parseWithoutStemming(Article article){
-
-        return null;
     }
 
 }

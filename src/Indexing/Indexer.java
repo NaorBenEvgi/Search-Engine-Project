@@ -36,7 +36,8 @@ public class Indexer {
 
 
     /**
-     *
+     * Writes the terms that are currently stored in the class's HashMap of posting lines into a temporary posting file,
+     * and removes them from the HashMap.
      * @param path the path of the directory in which the temporary file will be saved
      */
     public void createTemporaryPosting(String path){
@@ -54,7 +55,8 @@ public class Indexer {
 
 
     /**
-     * Given a path and content that contains the posting lines, the function writes the content into a file it creates and saves it in the given path
+     * Given a path and content that contains the posting lines, the function writes the content into a file it creates
+     * and saves it in the given path
      * @param path the given path to save the file in
      * @param content the content of the file
      */
@@ -120,9 +122,10 @@ public class Indexer {
 
 
     /**
-     *
-     * @param line
-     * @return
+     * Converts a line from a posting file into a pair of the term and the rest of the line.
+     * The term is the key in the pair, and the line (without the term in it) is the value (stored in a StringBuilder).
+     * @param line a line from a temporary posting file, that contains the term and its details in the corpus
+     * @return a pair of the term and the line
      */
     private Pair<String,StringBuilder> convertLineToTermAndPosting(String line){
         String[] termAndPosting = line.split("|");
@@ -134,11 +137,13 @@ public class Indexer {
 
 
     /**
-     *
-     * @param firstFilePath
-     * @param secondFilePath
-     * @param targetPath
-     * @param stem
+     * Iterates over two final temporary posting files and splits them in an ordered way into 27 final posting files, one for each letter
+     * and one for numbers. All of these files will be saves in a given directory path, and there will be an indication of whether the terms
+     * have gone through stemming operations or not.
+     * @param firstFilePath the path of the first posting file
+     * @param secondFilePath the path of the second posting file
+     * @param targetPath the path of the directory in which the posting files will be saved
+     * @param stem an indicator of whether the terms have gone through stemming or not
      */
     public void createTermsListByLetter(String firstFilePath, String secondFilePath, String targetPath, boolean stem){
         BufferedReader file1Reader, file2Reader;
@@ -279,10 +284,12 @@ public class Indexer {
 
 
     /**
-     *
-     * @param terms
-     * @param line
-     * @return
+     * Extracts the term from the given posting line, and checks if the given HashMap of terms already contains it.
+     * In case it does, the given posting line is concatenated into the posting line that is already stored in the HashMap, and returns true.
+     * In case it does not exist, the function returns false.
+     * @param terms the HashMap of terms
+     * @param line the line that contains a possibly existing term
+     * @return true if the term exists in the HashMap, false otherwise
      */
     private boolean concatenateTerms(HashMap<String,StringBuilder> terms,String line){
         String term = line.substring(0,line.indexOf("|"));
@@ -330,5 +337,13 @@ public class Indexer {
         finalDictionary.put(term,termDetails);
 
         return true;
+    }
+
+    /**
+     * Returns the final dictionary that was created during the indexing.
+     * @return the final dictionary
+     */
+    public SortedMap<String,String[]> getDctionary(){
+        return this.finalDictionary;
     }
 }
