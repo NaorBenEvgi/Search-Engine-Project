@@ -32,7 +32,7 @@ public class Parse {
     public Parse(){
         stopWords = new HashSet<>();
         //TODO: change the path to be not absolute
-        fillStopWords("C:\\Users\\royj1\\IdeaProjects\\search-engine\\src\\stop_words.txt");
+        fillStopWords(System.getProperty("user.dir").concat("/src/stop_words.txt"));
         termPositionInDocument = 0;
         dictionary = new HashMap<>();
     }
