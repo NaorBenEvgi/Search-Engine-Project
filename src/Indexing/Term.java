@@ -19,13 +19,15 @@ public class Term {
         if (termPositions.containsKey(doc)) {
             line.append(doc.getDocId()).append(":");
             ArrayList<Integer> positionsForCurrentDoc = termPositions.get(doc);
-            for (int i = 0; i < positionsForCurrentDoc.size(); i++) {
-                if (i != 0) {
+            int positionsForCurrentDocSize = positionsForCurrentDoc.size();
+            if(positionsForCurrentDocSize > 0){
+                line.append(positionsForCurrentDoc.get(0));
+                for (int i = 1; i < positionsForCurrentDocSize; i++) {
                     line.append(",");
+                    line.append(positionsForCurrentDoc.get(i));
                 }
-                line.append(positionsForCurrentDoc.get(i));
+                line.append("_").append(positionsForCurrentDocSize).append("_");
             }
-            line.append("_").append(positionsForCurrentDoc.size()).append("_");
         }
         return line.toString();
     }

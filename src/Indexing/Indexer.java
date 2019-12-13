@@ -3,14 +3,18 @@ package Indexing;
 import javafx.util.Pair;
 
 import java.io.*;
-import java.util.*;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class Indexer {
 
     private HashMap<String,StringBuilder> postingLines;
     private int postingFilesCounter;
     private SortedMap<String,String[]> finalDictionary;
-
+    private String BY_VERTICLE_BAR = "\\|";
     public Indexer(){
         postingFilesCounter = 0;
         postingLines = new HashMap<>();
@@ -24,12 +28,12 @@ public class Indexer {
      * @param documentDictionary the HashMap of all the terms in the document
      * @param doc the given document
      */
-    public void collectTermPostingLines(HashMap<String,Term> documentDictionary, Article doc){
+    public void collectTermPostingLines(HashMap<String, Term> documentDictionary, Article doc){
         for(String term : documentDictionary.keySet()){
             if(postingLines.containsKey(term)){
                 postingLines.get(term).append(documentDictionary.get(term).getPostingLineInDoc(doc));
             }else{
-                postingLines.put(term,new StringBuilder(documentDictionary.get(term).getPostingLineInDoc(doc)));
+                postingLines.put(term, new StringBuilder(documentDictionary.get(term).getPostingLineInDoc(doc)));
             }
         }
     }
@@ -42,14 +46,17 @@ public class Indexer {
      */
     public void createTemporaryPosting(String path){
         ArrayList<String> sortedTerms = new ArrayList<>(postingLines.keySet());
-        Collections.sort(sortedTerms,String.CASE_INSENSITIVE_ORDER);
+        sortedTerms.sort(String.CASE_INSENSITIVE_ORDER);
         StringBuilder temporaryPostingLinesBuilder = new StringBuilder();
         //prepares the lines to be written in the file, and removes them from the HashMap
-        for(int i=0; i<sortedTerms.size(); i++){
-            temporaryPostingLinesBuilder.append(sortedTerms.get(i)).append("|" + postingLines.get(i).toString()+"\n");
-            postingLines.remove(sortedTerms.get(i));
+        for(String term: sortedTerms){
+            temporaryPostingLinesBuilder
+                    .append(term).append("|")
+                    .append(postingLines.get(term).toString())
+                    .append("\n");
         }
-        String pathToTemporaryFile = path + "\\tempPostingFile" + postingFilesCounter;
+        postingLines = new HashMap<>(); // Clear the posting Lines (More effective then clear because the garbage collector will free the memory)
+        String pathToTemporaryFile = Paths.get(path, String.valueOf(postingFilesCounter)).toString(); // TODO: Recreate the path
         writePostingLinesToTempFile(pathToTemporaryFile,temporaryPostingLinesBuilder.toString());
         postingFilesCounter++;
     }
@@ -71,7 +78,9 @@ public class Indexer {
             e.printStackTrace();
         } finally {
             try {
-                postingLinesWriter.close();
+                if (postingLinesWriter != null) {
+                    postingLinesWriter.close();
+                }
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -94,29 +103,28 @@ public class Indexer {
             //reads the first file and puts the terms and their lines in a HashMap
             postingFile1 = new BufferedReader(new FileReader(firstFilePath));
             String[] linesInFile1 = (String[])postingFile1.lines().toArray();
-            for(int i=0; i<linesInFile1.length; i++){
-                Pair<String,StringBuilder> mapEntry = convertLineToTermAndPosting(linesInFile1[i]);
-                mergedDictionary.put(mapEntry.getKey(),mapEntry.getValue());
+            for (String item : linesInFile1) {
+                Pair<String, StringBuilder> mapEntry = convertLineToTermAndPosting(item);
+                mergedDictionary.put(mapEntry.getKey(), mapEntry.getValue());
             }
 
             //reads the second file and puts the terms and their lines in a HashMap
             postingFile2 = new BufferedReader(new FileReader(secondFilePath));
             String[] linesInFile2 = (String[])postingFile2.lines().toArray();
-            for(int i=0; i<linesInFile2.length; i++){
-                Pair<String,StringBuilder> mapEntry = convertLineToTermAndPosting(linesInFile2[i]);
+            for (String value : linesInFile2) {
+                Pair<String, StringBuilder> mapEntry = convertLineToTermAndPosting(value);
                 //merges terms that already appeared in the HashMap, and regularly adds the rest
-                if(mergedDictionary.containsKey(mapEntry.getKey())){
-                    mergedDictionary.get(mapEntry.getKey()).append(mapEntry.getValue().toString().replace(mapEntry.getKey() + "|",""));
-                } else{
-                    mergedDictionary.put(mapEntry.getKey(),mapEntry.getValue());
+                if (mergedDictionary.containsKey(mapEntry.getKey())) {
+                    mergedDictionary.get(mapEntry.getKey()).append(mapEntry.getValue().toString().replace(mapEntry.getKey() + "|", ""));
+                } else {
+                    mergedDictionary.put(mapEntry.getKey(), mapEntry.getValue());
                 }
             }
 
             //creates the content (the posting lines) in a lexicographical order and writes it in a new file
             StringBuilder fileContent = new StringBuilder();
-            Iterator<String> termsIterator = mergedDictionary.keySet().iterator();
-            while(termsIterator.hasNext()){
-                fileContent.append(mergedDictionary.get(termsIterator.next())).append("\n");
+            for (String s : mergedDictionary.keySet()) {
+                fileContent.append(mergedDictionary.get(s)).append("\n");
             }
             writePostingLinesToTempFile(mergedPostingFilePath,fileContent.toString());
 
@@ -133,11 +141,10 @@ public class Indexer {
      * @return a pair of the term and the line
      */
     private Pair<String,StringBuilder> convertLineToTermAndPosting(String line){
-        String[] termAndPosting = line.split("|"); //[0] contains the term, [1] contains the rest of the posting line
+        String[] termAndPosting = line.split(BY_VERTICLE_BAR); //[0] contains the term, [1] contains the rest of the posting line
         StringBuilder postingLine = new StringBuilder();
         postingLine.append(termAndPosting[1]);
-        Pair<String,StringBuilder> pair = new Pair<>(termAndPosting[0],postingLine);
-        return pair;
+        return new Pair<>(termAndPosting[0],postingLine);
     }
 
 
@@ -167,7 +174,7 @@ public class Indexer {
                 lineBuilder = new StringBuilder();
                 term = lastLine1.substring(0,lastLine1.indexOf("|"));
                 //if(!concatenateTerms(sortedTerms,term)){
-                lineBuilder.append(lastLine1 + "\n");
+                lineBuilder.append(lastLine1).append("\n");
                 sortedTerms.put(term,lineBuilder);
                 //}
             }
@@ -175,18 +182,18 @@ public class Indexer {
                 lineBuilder = new StringBuilder();
                 term = lastLine2.substring(0,lastLine2.indexOf("|"));
                 if(!concatenateTerms(sortedTerms,lastLine2)){
-                    lineBuilder.append(lastLine2 + "\n");
+                    lineBuilder.append(lastLine2).append("\n");
                     sortedTerms.put(term,lineBuilder);
                 }
             }
             //creates a sorted list with all the terms that start with a number and adds the frequent ones to the dictionary
             ArrayList<String> sortedTermsList = new ArrayList<>(sortedTerms.keySet());
-            Collections.sort(sortedTermsList,String.CASE_INSENSITIVE_ORDER);
+            sortedTermsList.sort(String.CASE_INSENSITIVE_ORDER);
             for(String checkedNumTerm : sortedTermsList){
                 if(!addTermToFinalDictionary(sortedTerms,checkedNumTerm,"NumPostingFile")){
                     //sortedTermsList.remove(checkedNumTerm); //the term is too less frequent so we'll filter it out
                 }else{ //the term was added to the dictionary so we'll add it to the content to be written to the file
-                    contentToFile.append(sortedTerms.get(checkedNumTerm).toString() + "\n");
+                    contentToFile.append(sortedTerms.get(checkedNumTerm).toString()).append("\n");
                 }
             }
             sortedTerms.clear();
@@ -217,14 +224,14 @@ public class Indexer {
                 if(startsCorrectly1){
                     lineBuilder = new StringBuilder();
                     term = lastLine1.substring(0,lastLine1.indexOf("|"));
-                    lineBuilder.append(lastLine1 + "\n");
+                    lineBuilder.append(lastLine1).append("\n");
                     sortedTerms.put(term,lineBuilder);
                 }
                 if(startsCorrectly2){
                     term = lastLine2.substring(0,lastLine2.indexOf("|"));
                     if(!concatenateTerms(sortedTerms,lastLine2)){
                         lineBuilder = new StringBuilder();
-                        lineBuilder.append(lastLine2 + "\n");
+                        lineBuilder.append(lastLine2).append("\n");
                         sortedTerms.put(term,lineBuilder);
                     }
                 }
@@ -234,7 +241,7 @@ public class Indexer {
                         lineBuilder = new StringBuilder();
                         term = lastLine1.substring(0, lastLine1.indexOf("|"));
                         //if(!concatenateTerms(sortedTerms,term)){
-                        lineBuilder.append(lastLine1 + "\n");
+                        lineBuilder.append(lastLine1).append("\n");
                         sortedTerms.put(term, lineBuilder);
                         //}
                     }
@@ -244,17 +251,17 @@ public class Indexer {
                         lineBuilder = new StringBuilder();
                         term = lastLine2.substring(0, lastLine2.indexOf("|"));
                         if (!concatenateTerms(sortedTerms, term)) {
-                            lineBuilder.append(lastLine2 + "\n");
+                            lineBuilder.append(lastLine2).append("\n");
                             sortedTerms.put(term, lineBuilder);
                         }
                     }
                 }
 
                 sortedTermsList = new ArrayList<>(sortedTerms.keySet());
-                Collections.sort(sortedTermsList,String.CASE_INSENSITIVE_ORDER);
+                sortedTermsList.sort(String.CASE_INSENSITIVE_ORDER);
                 for(String checkedTerm : sortedTermsList){
                     if(addTermToFinalDictionary(sortedTerms,checkedTerm,letters[i] + "PostingFile")){
-                        contentToFile.append(sortedTerms.get(checkedTerm).toString() + "\n");
+                        contentToFile.append(sortedTerms.get(checkedTerm).toString()).append("\n");
                     }
                 }
                 sortedTermsList.clear();
@@ -300,14 +307,14 @@ public class Indexer {
      */
     private boolean concatenateTerms(HashMap<String,StringBuilder> terms,String line){
         String term = line.substring(0,line.indexOf("|"));
-        if(terms.containsKey(term)){
-            StringBuilder lineBuilder = terms.get(term);
-            String postingLine = line.substring(line.indexOf("|")+1);
-            lineBuilder.append(postingLine);
-            terms.put(term,lineBuilder);
-            return true;
+        if(!terms.containsKey(term)){
+            return false;
         }
-        return false;
+        StringBuilder lineBuilder = terms.get(term);
+        String postingLine = line.substring(line.indexOf("|")+1);
+        lineBuilder.append(postingLine);
+        terms.put(term,lineBuilder);
+        return true;
     }
 
 
@@ -333,14 +340,14 @@ public class Indexer {
         }
 
         //If the term appears less than 10 times in the corpus we filter it out
-        if(sumOfTfTerm < 10){
+        if(sumOfTfTerm < 3){
             return false;
         }
         //In case the term is common enough, we collect its details into the final dictionary
-        termDetails[0] = sumOfTfTerm + ""; //how many times the term appears in the corpus
-        termDetails[1] = dfTerm + ""; //how many documents the term appears in
+        termDetails[0] = String.valueOf(sumOfTfTerm); //how many times the term appears in the corpus
+        termDetails[1] = String.valueOf(dfTerm); //how many documents the term appears in
         termDetails[2] = postingFileName;
-        termDetails[3] = postingLineWithTerm.toString().getBytes().length + ""; //the posting line size in memory
+        termDetails[3] = String.valueOf(postingLineWithTerm.toString().getBytes().length); //the posting line size in memory
         finalDictionary.put(term,termDetails);
 
         return true;

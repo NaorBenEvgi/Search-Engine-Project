@@ -28,6 +28,7 @@ public class Parse {
     protected HashMap<String, HashMap<String, Integer>> capitalLettersWords;
     private HashMap<String,Term> dictionary;
     private int termPositionInDocument;
+    private boolean skipNextWord = false;
 
 
     //TODO: initialize the capital letters database and fix path for stop words file
@@ -65,30 +66,23 @@ public class Parse {
      * @return true if the word is a stop word, false otherwise
      */
     private boolean isStopWord(String word){
-        if(stopWords.contains(word)){
-            return true;
-        }
-        return false;
+       return stopWords.contains(word);
     }
 
 
     /**
      * Iterates over a line and removes all the stop words in it.
-     * @param line the given line
+     * @param words the given article words
      * @return the line without stop words
      */
-    private String eliminateStopWords(String line){
-        StringBuilder lineWithoutStopWords = new StringBuilder();
-        ArrayList<String> words = new ArrayList<>(Arrays.asList(line.split("\\s+")));
-        for(int i=0; i<words.size(); i++){
-            if(!isStopWord(words.get(i))){
-                if(i != 0){
-                    lineWithoutStopWords.append(" ");
-                }
-                lineWithoutStopWords.append(words.get(i));
+    private ArrayList<String> eliminateStopWords(ArrayList<String> words){
+        ArrayList<String> lineWithoutStopWords = new ArrayList<>();
+        for (String word : words) {
+            if (!isStopWord(word)) {
+                lineWithoutStopWords.add(word);
             }
         }
-        return lineWithoutStopWords.toString();
+        return lineWithoutStopWords;
     }
 
     /**
@@ -164,60 +158,62 @@ public class Parse {
 
     /**
      * Parses the words that contain the dollar sign in a given line.
-     * @param line the given line
+     * @param words the given line
      * @return the line with the $'s replaced with "Dollars"
      */
-    private String handleDollarCases(String line) {
-        ArrayList<String> words = new ArrayList<>(Arrays.asList(line.split("\\s+")));
-        StringBuilder parsedLine = new StringBuilder();
+    private ArrayList<String> handleDollarCases(ArrayList<String> words) {
+        ArrayList<String> parsedWords = new ArrayList<>();
         for (int i = 0; i < words.size(); ++i) {
             String word = words.get(i);
             if (word.contains("$")) {
                 try {
                     String nextWord = words.get(i+1);
                     if (nextWord.equalsIgnoreCase("million")) {
-                        parsedLine.append(word.replace("$", "")).append(" M").append(" Dollars");
+                        parsedWords.add(word.replace("$", ""));
+                        parsedWords.add("M");
+                        parsedWords.add("Dollars");
                         i++;
                     }
                     else if(nextWord.equalsIgnoreCase("billion")){
-                        parsedLine.append(word.replace("$", "")).append("000").append(" M").append(" Dollars");
+                        parsedWords.add(word.replace("$", "") + "000");
+                        parsedWords.add("M");
+                        parsedWords.add("Dollars");
                         i++;
                     }
                     else { //in case the number should stay as it is
-                        parsedLine.append(word.replace("$", "")).append(" Dollars");
+                        parsedWords.add(word.replace("$", ""));
+                        parsedWords.add("Dollars");
                     }
                 }
                 catch (Exception e){
-                    parsedLine.append(word.replace("$", "")).append(" Dollars");
+                    parsedWords.add(word.replace("$", ""));
+                    parsedWords.add("Dollars");
                 }
             } else {
-                if (i != 0) {
-                    parsedLine.append(" ");
-                }
-                parsedLine.append(word);
+                parsedWords.add(word);
             }
         }
-        return parsedLine.toString();
+        return parsedWords;
     }
 
     /**
      * Checks if the line contains prices with number larger than million, and parses them accordingly
-     * @param line the line to parse
+     * @param words the line to parse
      * @return the parsed line
      */
-    private String pricesOverMillion(String line){
-        ArrayList<String> words = new ArrayList<>(Arrays.asList(line.split("\\s+")));
-        StringBuilder parsedLine = new StringBuilder();
+    private ArrayList<String> pricesOverMillion(ArrayList<String> words){
+        ArrayList<String> parsedLine = new ArrayList<>();
         for (int i = 0; i < words.size(); ++i) {
             String word = words.get(i);
             if (word.endsWith("m") && isNumber(word.substring(0,word.length()-1))) { //#m Dollars -> # M Dollars
-                parsedLine.append(word.replace("m", "")).append(" M");
+                parsedLine.add(word.replace("m", "")+"M");
             }
             else if (word.endsWith("bn") && isNumber(word.substring(0,word.length()-2))) { //#bn Dollars -> #000 M Dollars
                 Double wordToMultiply = new Double(word.replace("bn", ""));
                 wordToMultiply *= 1000;
                 String multipliedWord = wordToMultiply.toString().substring(0,wordToMultiply.toString().length()-2);
-                parsedLine.append(multipliedWord).append(" M");
+                parsedLine.add(multipliedWord);
+                parsedLine.add("M");
             }
             else if(isNumber(word)) { // # million / billion U.S. dollars -> # M Dollars
                 try {
@@ -228,34 +224,33 @@ public class Parse {
                             String nextNextNextWord = words.get(i + 3);
                             if (nextNextNextWord.equalsIgnoreCase("dollars")) {
                                 if (nextWord.equalsIgnoreCase("million")) {
-                                    parsedLine.append(word).append(" M Dollars");
+                                    parsedLine.add(word);
+                                    parsedLine.add("M");
+                                    parsedLine.add("Dollars");
                                 }
                                 else {
                                     Double wordToMultiply = new Double(word);
                                     wordToMultiply *= 1000;
                                     String multipliedWord = wordToMultiply.toString().substring(0,wordToMultiply.toString().length()-2);
-                                    parsedLine.append(word).append(multipliedWord).append(" M Dollars");
+                                    parsedLine.add(word);
+                                    parsedLine.add(multipliedWord);
+                                    parsedLine.add("M");
+                                    parsedLine.add("Dollars");
                                 }
                                 i += 3;
                             }
                         }
                     }
                 } catch (Exception e) { // doesn't satisfy the pattern
-                    if (i != 0) {
-                        parsedLine.append(" ");
-                    }
-                    parsedLine.append(word);
+                    parsedLine.add(word);
                 }
             }
             else{ // not a price
-                if (i != 0) {
-                    parsedLine.append(" ");
-                }
-                parsedLine.append(word);
+                parsedLine.add(word);
             }
         }
 
-        return parsedLine.toString();
+        return parsedLine;
     }
 
 
@@ -394,63 +389,77 @@ public class Parse {
     }
 
 
+    private String parseNumber(String word, String nextWord){
+        try {
+            String character = convertNumberFromTextToChar(nextWord); //checks the pattern # thousand / million / billion - step one
+            this.skipNextWord = true;
+            if (isPercent(nextWord)) { // checks the percentage pattern
+               return word + "%";
+            } else if(nextWord.equals("M")){ //checks the prices over million pattern
+                return word + nextWord;
+            } else if (character != null) { //checks the pattern # thousand / million / billion - next two
+                return word + character;
+            } else if (!convertMonthToNumber(nextWord).equals("")) { //covers cases of: DD MM
+                return parseDates(word, nextWord);
+            }
+            throw new Exception("Next word doesnt belong to the number");
+        } catch (Exception e) { // if there is no extra word after "word" or nextWord doesnt belong to any special case
+            this.skipNextWord = false;
+            return parseNumber(word);
+        }
+    }
+
+
     /**
-     * Parses the words in a given line.
-     * @param line the given line
-     * @return an ArrayList that contains the parsed words in the line
+     * Parses the words in a given articleWords.
+     * @param articleWords the given articleWords
+     * @return an ArrayList that contains the parsed words in the articleWords
      */
-    private ArrayList<String> parseLine(String line) {
+    private ArrayList<String> parseArticleWords(ArrayList<String> articleWords) {
         ArrayList<String> parsedWords = new ArrayList<>();
-        ArrayList<String> words = new ArrayList<>(Arrays.asList(line.split(REGEX_BY_WORDS)));
-        for (int i = 0; i < words.size(); i++) {
-            String word = words.get(i).replaceAll(",", "");
+
+        // Add hash
+        int wordsNumber = articleWords.size();
+        for (int i = 0; i < wordsNumber ; i++) {
+            String word = articleWords.get(i).replaceAll(",", "");
+            if(word.startsWith("-") || word.endsWith("-")){
+                word = word.replace("-", "");
+            }
+            String nextWord = i + 1 < wordsNumber ? articleWords.get(i + 1).replaceAll(",", ""): "";
             if (word.length() > 1) {
                 if (isNumber(word)) {
-                    try {
-                        String nextWord = words.get(i + 1).replaceAll(",", "");
-                        String character = convertNumberFromTextToChar(nextWord); //checks the pattern # thousand / million / billion - step one
-                        if (isPercent(nextWord)) { // checks the percentage pattern
-                            parsedWords.add(word + "%");
-                            i++;
-                        } else if(nextWord.equals("M")){ //checks the prices over million pattern
-                            parsedWords.add(word + nextWord);
-                            i++;
-                        } else if (character != null) { //checks the pattern # thousand / million / billion - next two
-                            parsedWords.add(word + character);
-                            i++;
-                        }else if (!convertMonthToNumber(nextWord).equals("")) { //covers cases of: DD MM
-                            parseDates(word,nextWord);
-                            i++;
-                        }
-                        else { //there number doesn't belong to any special case
-                            parsedWords.add(parseNumber(word));
-                        }
-                    } catch (Exception e) { // if there is no extra word after "word"
-                        parsedWords.add(parseNumber(word));
-                    }
+                    parsedWords.add(parseNumber(word, nextWord));
                 }
                 else if (!convertMonthToNumber(word).equals("")){ //checks the date formats
                     try{
-                        String nextWord = words.get(i + 1).replaceAll(",", "");
                         if(isNumber(nextWord)){
-                            parseDates(word,nextWord);
+                            String newWord = parseDates(word, nextWord);
+                            if(newWord != null) {
+                                this.skipNextWord = true;
+                            }
+                            parsedWords.add(word);
+                            this.skipNextWord = false;
                         }
                         else{
                             parsedWords.add(word);
+                            this.skipNextWord = false;
+
                         }
                     }
                     catch (Exception e){
                         parsedWords.add(word);
+                        this.skipNextWord = false;
                     }
                 }
                 else if(word.equalsIgnoreCase("between")){
                     try{
-                        String nextWord = words.get(i+1), doubleNextWord = words.get(i+2);
+                        String doubleNextWord = articleWords.get(i+2);
                         if (isNumber(nextWord) && isNumber(doubleNextWord)){ //if the next two words after "between" are actually numbers (ignoring stop words)
                             parsedWords.add(nextWord + "-" + doubleNextWord);
                             parsedWords.add(parseNumber(nextWord));
                             parsedWords.add(parseNumber(doubleNextWord));
-                            i+=2;
+                            i+=1;
+                            this.skipNextWord = true;
                         }
                     }catch(Exception e){
                         parsedWords.add(word);
@@ -458,6 +467,9 @@ public class Parse {
                 }
                 else{
                     parsedWords.add(word);
+                }
+                if(this.skipNextWord){
+                    i++;
                 }
             }
         }
@@ -476,20 +488,19 @@ public class Parse {
     public HashMap<String,Term> parse(Article article, boolean stem) {
         dictionary = new HashMap<>();
         termPositionInDocument = 0;
-        ArrayList<String> articleLines = new ArrayList<>(Arrays.asList(article.getContent().split(REGEX_BY_LINES)));
-        ArrayList<String> parsedWords = new ArrayList<>();
-        for (String line : articleLines) {
-            line = eliminateStopWords(line);
-            line = handleDollarCases(line);
-            line = pricesOverMillion(line);
-            parsedWords.addAll(parseLine(line));
-            for(String word : parsedWords){
+        ArrayList<String> words = new ArrayList<>(Arrays.asList(article.getContent().replace("--", ", ").split(REGEX_BY_WORDS)));
+        words = eliminateStopWords(words);
+        words = handleDollarCases(words);
+        words = pricesOverMillion(words);
+        ArrayList<String> parsedWords = parseArticleWords(words);
+        for(String word : parsedWords){
                 if(stem) {
                     Stemmer.setCurrent(word);
                     Stemmer.stem();
                     word = Stemmer.getCurrent();
                 }
                 Term term;
+
                 if(!dictionary.containsKey(word)){
                     term = new Term(word);
                     dictionary.put(word,term);
@@ -499,7 +510,6 @@ public class Parse {
                 }
                 term.addPositionInDoc(article,termPositionInDocument);
                 termPositionInDocument++;
-            }
         }
         return dictionary;
     }
