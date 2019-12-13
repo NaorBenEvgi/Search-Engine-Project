@@ -499,14 +499,27 @@ public class Parse {
                     Stemmer.stem();
                     word = Stemmer.getCurrent();
                 }
+
                 Term term;
 
-                if(!dictionary.containsKey(word)){
-                    term = new Term(word);
-                    dictionary.put(word,term);
-                }
-                else{
-                    term = dictionary.get(word);
+                if(Character.isDigit(word.charAt(0))){
+                    if (!dictionary.containsKey(word)){
+                        term = new Term(word);
+                    }
+                    else{
+                        term = dictionary.get(word);
+                    }
+                }else {
+                    //checks if the dic contains this word and how the word should be indexed
+                    if (!dictionary.containsKey(word.toLowerCase())) {
+                        if (Character.isUpperCase(word.charAt(0)))
+                            term = new Term(word.toUpperCase());
+                        else
+                            term = new Term(word);
+                        dictionary.put(word.toLowerCase(), term);
+                    } else {
+                        term = removeDuplicatesTerms(word);
+                    }
                 }
                 term.addPositionInDoc(article,termPositionInDocument);
                 termPositionInDocument++;
@@ -514,4 +527,20 @@ public class Parse {
         return dictionary;
     }
 
+    /**
+     * Gets a word from the parse function and updates the term's name if needed
+     * @param word the given word as appeared in the doc
+     * @return the updated object of the term
+     */
+    private Term removeDuplicatesTerms(String word){
+        if(Character.isDigit(word.charAt(0))){
+            return dictionary.get(word);
+        }
+        Term termInDic = dictionary.get(word.toLowerCase());
+        if(Character.isLowerCase(word.charAt(0))) {
+            termInDic.setTerm(word);
+        }
+        return termInDic;
+
+    }
 }

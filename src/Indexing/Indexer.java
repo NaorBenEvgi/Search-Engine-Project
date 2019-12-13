@@ -4,10 +4,7 @@ import javafx.util.Pair;
 
 import java.io.*;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Indexer {
 
@@ -56,7 +53,7 @@ public class Indexer {
                     .append("\n");
         }
         postingLines = new HashMap<>(); // Clear the posting Lines (More effective then clear because the garbage collector will free the memory)
-        String pathToTemporaryFile = Paths.get(path, String.valueOf(postingFilesCounter)).toString();
+        String pathToTemporaryFile = Paths.get(path, String.valueOf(postingFilesCounter)).toString() + ".txt";
         writePostingLinesToTempFile(pathToTemporaryFile,temporaryPostingLinesBuilder.toString());
         postingFilesCounter++;
     }
@@ -102,7 +99,12 @@ public class Indexer {
         try {
             //reads the first file and puts the terms and their lines in a HashMap
             postingFile1 = new BufferedReader(new FileReader(firstFilePath));
-            String[] linesInFile1 = (String[])postingFile1.lines().toArray();
+            //String[] linesInFile1 = Arrays.copyOf(postingFile1.lines().toArray(), postingFile1.lines().toArray().length, String[].class);
+            ArrayList<String> linesInFile1 = new ArrayList<>();
+            String tempLine;
+            while((tempLine = postingFile1.readLine()) != null){
+                linesInFile1.add(tempLine);
+            }
             for (String item : linesInFile1) {
                 Pair<String, StringBuilder> mapEntry = convertLineToTermAndPosting(item);
                 mergedDictionary.put(mapEntry.getKey(), mapEntry.getValue());
@@ -110,7 +112,10 @@ public class Indexer {
 
             //reads the second file and puts the terms and their lines in a HashMap
             postingFile2 = new BufferedReader(new FileReader(secondFilePath));
-            String[] linesInFile2 = (String[])postingFile2.lines().toArray();
+            ArrayList<String> linesInFile2 = new ArrayList<>();
+            while((tempLine = postingFile2.readLine()) != null){
+                linesInFile2.add(tempLine);
+            }
             for (String value : linesInFile2) {
                 Pair<String, StringBuilder> mapEntry = convertLineToTermAndPosting(value);
                 //merges terms that already appeared in the HashMap, and regularly adds the rest
@@ -124,7 +129,7 @@ public class Indexer {
             //creates the content (the posting lines) in a lexicographical order and writes it in a new file
             StringBuilder fileContent = new StringBuilder();
             for (String s : mergedDictionary.keySet()) {
-                fileContent.append(mergedDictionary.get(s)).append("\n");
+                fileContent.append(s).append("|").append(mergedDictionary.get(s)).append("\n");
             }
             writePostingLinesToTempFile(mergedPostingFilePath,fileContent.toString());
 
@@ -307,13 +312,35 @@ public class Indexer {
      */
     private boolean concatenateTerms(HashMap<String,StringBuilder> terms,String line){
         String term = line.substring(0,line.indexOf("|"));
-        if(!terms.containsKey(term)){
+        StringBuilder lineBuilder;
+        //------------------------- Numbers ---------------------------------
+        if(Character.isDigit(term.charAt(0))){
+            if(!terms.containsKey(term)){
+                return false;
+            }
+            String postingLine = line.substring(line.indexOf("|")+1);
+            lineBuilder = terms.get(term);
+            lineBuilder.append(postingLine);
+            terms.put(term,lineBuilder);
+            return true;
+        }
+
+        //------------------------- Words -----------------------------------
+        String termLower = term.toLowerCase(), termUpper = term.toUpperCase();
+        if(!((terms.containsKey(termLower)) || terms.containsKey(termUpper))) {
             return false;
         }
-        StringBuilder lineBuilder = terms.get(term);
-        String postingLine = line.substring(line.indexOf("|")+1);
-        lineBuilder.append(postingLine);
-        terms.put(term,lineBuilder);
+        if(terms.containsKey(termLower)){
+            lineBuilder = terms.get(termLower);
+            String postingLine = line.substring(line.indexOf("|")+1);
+            lineBuilder.append(postingLine);
+            terms.put(termLower,lineBuilder);
+        }else{
+            lineBuilder = terms.get(termUpper);
+            String postingLine = lineBuilder.toString().substring(line.indexOf("|")+1);
+            lineBuilder = (new StringBuilder()).append(line).append(postingLine);
+            terms.put(term,lineBuilder);
+        }
         return true;
     }
 

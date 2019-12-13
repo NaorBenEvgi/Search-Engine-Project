@@ -64,8 +64,8 @@ public class Term {
         return term;
     }
 
-    /*public void setTerm(String term) {
+    public void setTerm(String term) {
         this.term = term;
-    }*/
+    }
 
 }
