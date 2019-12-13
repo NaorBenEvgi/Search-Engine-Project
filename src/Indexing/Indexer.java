@@ -56,7 +56,7 @@ public class Indexer {
                     .append("\n");
         }
         postingLines = new HashMap<>(); // Clear the posting Lines (More effective then clear because the garbage collector will free the memory)
-        String pathToTemporaryFile = Paths.get(path, String.valueOf(postingFilesCounter)).toString(); // TODO: Recreate the path
+        String pathToTemporaryFile = Paths.get(path, String.valueOf(postingFilesCounter)).toString();
         writePostingLinesToTempFile(pathToTemporaryFile,temporaryPostingLinesBuilder.toString());
         postingFilesCounter++;
     }
