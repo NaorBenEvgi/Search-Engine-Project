@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public class Parse {
 
     private static final String REGEX_BY_LINES = "\\r?\\n";
-    private static final String REGEX_BY_WORDS = "[^\\w($/%)-]+";
+    private static final String REGEX_BY_WORDS = "[^\\w$/%-]+";
     private static final String DECIMAL_FORMAT = "#.###";
     private static final String REGEX_SEARCH_FOR_NUMBER = "-?\\d+(\\.\\d+)?";
     private static final String REGEX_SEARCH_FOR_FRACTION = "-?\\d+/(\\d+)?";
@@ -438,9 +438,11 @@ public class Parse {
                             String newWord = parseDates(word, nextWord);
                             if(newWord != null) {
                                 this.skipNextWord = true;
+                                parsedWords.add(newWord);
+                            }else{
+                                parsedWords.add(word);
+                                this.skipNextWord = false;
                             }
-                            parsedWords.add(word);
-                            this.skipNextWord = false;
                         }
                         else{
                             parsedWords.add(word);
@@ -469,6 +471,7 @@ public class Parse {
                 }
                 else{
                     parsedWords.add(word);
+                    this.skipNextWord = false;
                 }
                 if(this.skipNextWord){
                     i++;
