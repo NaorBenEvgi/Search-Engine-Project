@@ -144,14 +144,39 @@ public class Indexer {
             }
             for (String value : linesInFile2) {
                 Pair<String, StringBuilder> mapEntry = convertLineToTermAndPosting(value);
-                //merges terms that already appeared in the HashMap, and regularly adds the rest
-                if (mergedDictionary.containsKey(mapEntry.getKey().toLowerCase()) || mergedDictionary.containsKey(mapEntry.getKey().toUpperCase())) {
-                    if(Character.isLowerCase(mapEntry.getKey().charAt(0))){
-
+                String mapKey = mapEntry.getKey();
+                StringBuilder mapValue = mapEntry.getValue();
+                if(Character.isDigit(mapKey.charAt(0))){
+                    if(mergedDictionary.containsKey(mapKey)){
+                        mergedDictionary.get(mapKey).append(mapValue);
                     }
-                    mergedDictionary.get(mapEntry.getKey()).append(mapEntry.getValue().toString().replace(mapEntry.getKey() + "|", ""));
+                    else{
+                        mergedDictionary.put(mapKey, mapValue);
+                    }
+                    continue;
+                }
+                //merges terms that already appeared in the HashMap, and regularly adds the rest
+                if (mergedDictionary.containsKey(mapKey.toLowerCase()) || mergedDictionary.containsKey(mapKey.toUpperCase())) {
+                    if(Character.isLowerCase(mapKey.charAt(0))){ // the term we are checking is written with small letters
+                       if(mergedDictionary.containsKey(mapKey)) { //the term in the dictionary appears with small letters
+                           mergedDictionary.get(mapKey).append(mapValue);
+                        }
+                       else{ //the term in the dictionary appears with capital letters
+                           mergedDictionary.put(mapKey,mergedDictionary.get(mapKey.toUpperCase()).append(mapValue));
+                           mergedDictionary.remove(mapKey.toUpperCase());
+                       }
+                    }
+                    else{ //the checked term is written with capital letters, so the form of the term that appears in the dictionary remains
+                        if(mergedDictionary.containsKey(mapKey)) { //the term in the dictionary appears with capital letters
+                            mergedDictionary.get(mapKey).append(mapValue);
+                        }
+                        else{ //the term in the dictionary appears with small letters
+                            mergedDictionary.get(mapKey.toLowerCase()).append(mapValue);
+                        }
+                    }
+                    //mergedDictionary.get(mapKey).append(mapValue.toString().replace(mapKey + "|", ""));
                 } else {
-                    mergedDictionary.put(mapEntry.getKey(), mapEntry.getValue());
+                    mergedDictionary.put(mapKey, mapValue);
                 }
             }
 

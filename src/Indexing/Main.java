@@ -20,15 +20,14 @@ public class Main {
             indexer.collectTermPostingLines(terms, article);
             indexer.createTemporaryPosting(Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles").toString()).toString());
         }
-/*        indexer.mergePostingFiles(Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles","0.txt").toString()).toString()
+        indexer.mergePostingFiles(Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles","0.txt").toString()).toString()
         ,Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles","1.txt").toString()).toString(),
-                Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles").toString()).toString());*/
+                Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles").toString()).toString());
 //        for(String term: terms.keySet()){
 //            System.out.println(terms.get(term).getTerm());
 //        }
 //        System.out.println(terms.size());
     }
-
 
 
 
