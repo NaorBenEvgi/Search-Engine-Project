@@ -156,7 +156,18 @@ public class Indexer {
                     continue;
                 }
                 //merges terms that already appeared in the HashMap, and regularly adds the rest
-                if (mergedDictionary.containsKey(mapKey.toLowerCase()) || mergedDictionary.containsKey(mapKey.toUpperCase())) {
+                if (mergedDictionary.containsKey(mapKey)) {
+                    mergedDictionary.get(mapKey).append(mapValue);
+                    if (Character.isLowerCase(mapKey.charAt(0))) { // the term we are checking is written with small letters
+                        mergedDictionary.put(mapKey, mergedDictionary.get(mapKey));
+                    } else {
+                        continue;
+                    }
+                }
+                else {
+                    mergedDictionary.put(mapKey, mapValue);
+                }
+                   /*
                     if(Character.isLowerCase(mapKey.charAt(0))){ // the term we are checking is written with small letters
                        if(mergedDictionary.containsKey(mapKey)) { //the term in the dictionary appears with small letters
                            mergedDictionary.get(mapKey).append(mapValue);
@@ -177,7 +188,7 @@ public class Indexer {
                     //mergedDictionary.get(mapKey).append(mapValue.toString().replace(mapKey + "|", ""));
                 } else {
                     mergedDictionary.put(mapKey, mapValue);
-                }
+                }*/
             }
 
             //creates the content (the posting lines) in a lexicographical order and writes it in a new file
