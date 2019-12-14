@@ -28,13 +28,38 @@ public class Indexer {
     public void collectTermPostingLines(HashMap<String, Term> documentDictionary, Article doc){
         for(String term : documentDictionary.keySet()){
             if(postingLines.containsKey(term)){
-                postingLines.get(term).append(documentDictionary.get(term).getPostingLineInDoc(doc));
+                String correctTerm = removeDuplicatesTermsIndexer(documentDictionary.get(term).getTerm());
+                String currentTermInDic = postingLines.get(term).toString().substring(0,postingLines.get(term).toString().indexOf("|"));
+                if(!correctTerm.equals(currentTermInDic)){
+                    String tempPL = postingLines.get(term).toString();
+                    tempPL.replace(currentTermInDic,correctTerm);
+                    StringBuilder postingLineAfterReplaceTermAndConcat = new StringBuilder(tempPL).append(documentDictionary.get(term).getPostingLineInDoc(doc));
+                    postingLines.put(term, postingLineAfterReplaceTermAndConcat);
+                }else{
+                    postingLines.get(term).append(documentDictionary.get(term).getPostingLineInDoc(doc));
+                }
             }else{
-                postingLines.put(term, new StringBuilder(documentDictionary.get(term).getPostingLineInDoc(doc)));
+                postingLines.put(term, new StringBuilder(documentDictionary.get(term).getTerm()).append("|").append(documentDictionary.get(term).getPostingLineInDoc(doc)));
             }
         }
     }
 
+
+    private String removeDuplicatesTermsIndexer(String word){
+        if(Character.isDigit(word.charAt(0))){
+            return word;
+        }
+        String wordInLower = word.toLowerCase();
+        String postingLine = postingLines.get(wordInLower).toString();
+        String termInPostingLines = postingLines.get(wordInLower).substring(0,postingLine.indexOf("|"));
+
+
+        if(Character.isLowerCase(word.charAt(0))) {
+            return word;
+        }
+        return termInPostingLines;
+
+    }
 
     /**
      * Writes the terms that are currently stored in the class's HashMap of posting lines into a temporary posting file,
@@ -48,7 +73,7 @@ public class Indexer {
         //prepares the lines to be written in the file, and removes them from the HashMap
         for(String term: sortedTerms){
             temporaryPostingLinesBuilder
-                    .append(term).append("|")
+//                    .append(term).append("|")
                     .append(postingLines.get(term).toString())
                     .append("\n");
         }
@@ -57,6 +82,7 @@ public class Indexer {
         writePostingLinesToTempFile(pathToTemporaryFile,temporaryPostingLinesBuilder.toString());
         postingFilesCounter++;
     }
+
 
 
     /**
@@ -119,7 +145,10 @@ public class Indexer {
             for (String value : linesInFile2) {
                 Pair<String, StringBuilder> mapEntry = convertLineToTermAndPosting(value);
                 //merges terms that already appeared in the HashMap, and regularly adds the rest
-                if (mergedDictionary.containsKey(mapEntry.getKey())) {
+                if (mergedDictionary.containsKey(mapEntry.getKey().toLowerCase()) || mergedDictionary.containsKey(mapEntry.getKey().toUpperCase())) {
+                    if(Character.isLowerCase(mapEntry.getKey().charAt(0))){
+
+                    }
                     mergedDictionary.get(mapEntry.getKey()).append(mapEntry.getValue().toString().replace(mapEntry.getKey() + "|", ""));
                 } else {
                     mergedDictionary.put(mapEntry.getKey(), mapEntry.getValue());

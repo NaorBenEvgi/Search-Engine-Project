@@ -518,7 +518,7 @@ public class Parse {
                             term = new Term(word);
                         dictionary.put(word.toLowerCase(), term);
                     } else {
-                        term = removeDuplicatesTerms(word);
+                        term = removeDuplicatesTermsParser(word);
                     }
                 }
                 term.addPositionInDoc(article,termPositionInDocument);
@@ -532,7 +532,7 @@ public class Parse {
      * @param word the given word as appeared in the doc
      * @return the updated object of the term
      */
-    private Term removeDuplicatesTerms(String word){
+    private Term removeDuplicatesTermsParser(String word){
         if(Character.isDigit(word.charAt(0))){
             return dictionary.get(word);
         }

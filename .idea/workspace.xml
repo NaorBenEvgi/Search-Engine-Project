@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="99826e6b-4d06-4c50-91f4-a3ecdd3902a0" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="99826e6b-4d06-4c50-91f4-a3ecdd3902a0" name="Default Changelist" comment="finished the capital letters issue but there is a problem with the numbers in the posting file">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/corpus/FB396001/FB396001" beforeDir="false" afterPath="$PROJECT_DIR$/corpus/FB396001/FB396001" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Indexing/Indexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Indexing/Indexer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Indexing/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Indexing/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Indexing/Parse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Indexing/Parse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Indexing/Term.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Indexing/Term.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -27,11 +26,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Indexing/Parse.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="318">
-              <caret line="538" column="60" lean-forward="true" selection-start-line="538" selection-start-column="60" selection-end-line="538" selection-end-column="60" />
+            <state relative-caret-position="331">
+              <caret line="520" column="58" selection-start-line="520" selection-start-column="58" selection-end-line="520" selection-end-column="58" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#2456#2457#0" expanded="true" />
@@ -42,10 +41,13 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Indexing/Article.java">
+        <entry file="file://$PROJECT_DIR$/src/Indexing/Indexer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="527">
-              <caret line="31" column="76" selection-start-line="31" selection-start-column="76" selection-end-line="31" selection-end-column="76" />
+            <state relative-caret-position="452">
+              <caret line="149" selection-start-line="149" selection-end-line="149" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -53,17 +55,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/postingFiles/tempPostingFile0">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="733" column="9" selection-start-line="733" selection-start-column="9" selection-end-line="733" selection-end-column="16" />
+            <state relative-caret-position="252">
+              <caret line="674" column="12" lean-forward="true" selection-start-line="674" selection-start-column="12" selection-end-line="674" selection-end-column="12" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/postingFiles/0">
+        <entry file="file://$PROJECT_DIR$/src/Indexing/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="140">
-              <caret line="10" column="14" selection-start-line="10" selection-start-column="14" selection-end-line="10" selection-end-column="14" />
+            <state relative-caret-position="391">
+              <caret line="23" column="108" selection-start-line="23" selection-start-column="108" selection-end-line="23" selection-end-column="108" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -71,8 +76,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/postingFiles/0.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="303">
-              <caret line="159" column="6" selection-start-line="159" selection-end-line="159" selection-end-column="6" />
+            <state relative-caret-position="3780">
+              <caret line="189" column="8" selection-start-line="189" selection-end-line="189" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -80,17 +85,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/postingFiles/1.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="232">
-              <caret line="797" column="6" selection-start-line="797" selection-start-column="6" selection-end-line="797" selection-end-column="6" />
+            <state relative-caret-position="14331">
+              <caret line="843" column="4" selection-start-line="843" selection-end-line="843" selection-end-column="4" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/corpus/FB396001/FB396001">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="164">
-              <caret line="176" column="59" lean-forward="true" selection-start-line="176" selection-start-column="59" selection-end-line="176" selection-end-column="59" />
+            <state relative-caret-position="153">
+              <caret line="12" column="9" lean-forward="true" selection-start-line="12" selection-start-column="9" selection-end-line="12" selection-end-column="9" />
             </state>
           </provider>
         </entry>
@@ -98,8 +103,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/postingFiles/tempPostingFile49">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="698" column="4" lean-forward="true" selection-start-line="698" selection-start-column="4" selection-end-line="698" selection-end-column="4" />
+            <state relative-caret-position="133">
+              <caret line="697" column="21" selection-end-line="1091" />
             </state>
           </provider>
         </entry>
@@ -150,6 +155,11 @@
       <find>ple</find>
       <find>plea</find>
       <find>please</find>
+      <find>ON</find>
+      <find>NOT</find>
+      <find>RESEARCH</find>
+      <find>OF</find>
+      <find>TYPE</find>
     </findStrings>
     <replaceStrings>
       <replace>lastLine1</replace>
@@ -165,19 +175,25 @@
         <option value="$PROJECT_DIR$/src/Document.java" />
         <option value="$PROJECT_DIR$/src/Main.java" />
         <option value="$PROJECT_DIR$/src/ReadFile.java" />
-        <option value="$PROJECT_DIR$/corpus/FB396001/FB396001" />
         <option value="$PROJECT_DIR$/src/Article.java" />
         <option value="$PROJECT_DIR$/src/Parse.java" />
         <option value="$PROJECT_DIR$/src/GUI/Controller.java" />
         <option value="$PROJECT_DIR$/src/Indexing/Stemmer.java" />
         <option value="$PROJECT_DIR$/src/Indexing/ReadFile.java" />
         <option value="$PROJECT_DIR$/postingFiles/tempPostingFile0" />
-        <option value="$PROJECT_DIR$/src/Indexing/Indexer.java" />
         <option value="$PROJECT_DIR$/src/Indexing/Term.java" />
-        <option value="$PROJECT_DIR$/src/Indexing/Main.java" />
         <option value="$PROJECT_DIR$/src/Indexing/Parse.java" />
+        <option value="$PROJECT_DIR$/src/Indexing/Main.java" />
+        <option value="$PROJECT_DIR$/corpus/FB396001/FB396001" />
+        <option value="$PROJECT_DIR$/src/Indexing/Indexer.java" />
       </list>
     </option>
+  </component>
+  <component name="MavenProjectNavigator">
+    <treeState>
+      <expand />
+      <select />
+    </treeState>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="1912" />
@@ -191,7 +207,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -231,6 +246,7 @@
         </subPane>
       </pane>
       <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="CatdeaLogs" />
     </panes>
   </component>
@@ -238,7 +254,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1576275045140" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1576325479460" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15" />
@@ -293,6 +309,7 @@
       <workItem from="1575106937012" duration="2734000" />
       <workItem from="1575117551813" duration="22112000" />
       <workItem from="1575538111711" duration="5665000" />
+      <workItem from="1576319352714" duration="5912000" />
     </task>
     <task id="LOCAL-00001" summary="Added JavaDoc to the Parser class">
       <created>1575329423222</created>
@@ -385,11 +402,18 @@
       <option name="project" value="LOCAL" />
       <updated>1576165778146</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="small or big letters representations">
+      <created>1576275193059</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1576275193059</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="58044000" />
+    <option name="totallyTimeSpent" value="64163000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -404,7 +428,7 @@
     <frame x="1912" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.4991119" visible="true" weight="0.12260128" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.4991119" visible="true" weight="0.123667374" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -428,10 +452,10 @@
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Maven" order="3" />
-      <window_info anchor="right" id="Palette" order="4" />
-      <window_info anchor="right" id="Capture Analysis" order="5" />
-      <window_info anchor="right" id="Theme Preview" order="6" />
+      <window_info anchor="right" id="Palette" order="3" />
+      <window_info anchor="right" id="Capture Analysis" order="4" />
+      <window_info anchor="right" id="Theme Preview" order="5" />
+      <window_info anchor="right" id="Maven" order="6" weight="0.32995737" />
       <window_info anchor="right" id="Database" order="7" />
       <window_info anchor="right" id="Palette&#9;" order="8" />
       <window_info anchor="right" id="News Feed" order="9" />
@@ -453,28 +477,36 @@
     <MESSAGE value="continued indexer (merge function)" />
     <MESSAGE value="finished merge function" />
     <MESSAGE value="fixed prices over million function, and added stemming indication for the parse function" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed prices over million function, and added stemming indication for the parse function" />
+    <MESSAGE value="small or big letters representations" />
+    <MESSAGE value="finished the capital letters issue but there is a problem with the numbers in the posting file" />
+    <option name="LAST_COMMIT_MESSAGE" value="finished the capital letters issue but there is a problem with the numbers in the posting file" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Indexing/Indexer.java</url>
-          <line>56</line>
+          <line>81</line>
           <properties />
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Indexing/Indexer.java</url>
-          <line>100</line>
+          <line>126</line>
           <properties />
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Indexing/Indexer.java</url>
-          <line>108</line>
+          <line>134</line>
           <properties />
           <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/Indexing/Indexer.java</url>
+          <line>15</line>
+          <properties />
+          <option name="timeStamp" value="8" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -582,28 +614,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Indexing/Indexer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-151">
-          <caret line="329" column="37" selection-start-line="329" selection-start-column="37" selection-end-line="329" selection-end-column="37" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#18892#18893#0" expanded="true" />
-            <element signature="e#18935#18936#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Indexing/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="18" selection-start-line="18" selection-end-line="18" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Indexing/Article.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="527">
@@ -611,10 +621,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/postingFiles/tempPostingFile49">
+    <entry file="file://$PROJECT_DIR$/postingFiles/0">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="698" column="4" lean-forward="true" selection-start-line="698" selection-start-column="4" selection-end-line="698" selection-end-column="4" />
+        <state relative-caret-position="170">
+          <caret line="10" column="14" selection-start-line="10" selection-start-column="14" selection-end-line="10" selection-end-column="14" />
         </state>
       </provider>
     </entry>
@@ -624,50 +634,70 @@
     <entry file="file://$PROJECT_DIR$/postingFiles/43.txt">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/postingFiles/tempPostingFile0">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="733" column="9" selection-start-line="733" selection-start-column="9" selection-end-line="733" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/postingFiles/0">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
-          <caret line="10" column="14" selection-start-line="10" selection-start-column="14" selection-end-line="10" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/postingFiles/0.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="303">
-          <caret line="159" column="6" selection-start-line="159" selection-end-line="159" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/postingFiles/1.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="232">
-          <caret line="797" column="6" selection-start-line="797" selection-start-column="6" selection-end-line="797" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/corpus/FB396001/FB396001">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="164">
-          <caret line="176" column="59" lean-forward="true" selection-start-line="176" selection-start-column="59" selection-end-line="176" selection-end-column="59" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Indexing/Parse.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="318">
-          <caret line="538" column="60" lean-forward="true" selection-start-line="538" selection-start-column="60" selection-end-line="538" selection-end-column="60" />
+        <state relative-caret-position="331">
+          <caret line="520" column="58" selection-start-line="520" selection-start-column="58" selection-end-line="520" selection-end-column="58" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#2456#2457#0" expanded="true" />
             <element signature="e#2502#2503#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/postingFiles/tempPostingFile49">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="133">
+          <caret line="697" column="21" selection-end-line="1091" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Indexing/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="23" column="108" selection-start-line="23" selection-start-column="108" selection-end-line="23" selection-end-column="108" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/postingFiles/tempPostingFile0">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="252">
+          <caret line="674" column="12" lean-forward="true" selection-start-line="674" selection-start-column="12" selection-end-line="674" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Indexing/Indexer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="452">
+          <caret line="149" selection-start-line="149" selection-end-line="149" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/postingFiles/0.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3780">
+          <caret line="189" column="8" selection-start-line="189" selection-end-line="189" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/postingFiles/1.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="14331">
+          <caret line="843" column="4" selection-start-line="843" selection-end-line="843" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/corpus/FB396001/FB396001">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="12" column="9" lean-forward="true" selection-start-line="12" selection-start-column="9" selection-end-line="12" selection-end-column="9" />
         </state>
       </provider>
     </entry>
