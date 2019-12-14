@@ -221,22 +221,25 @@ public class Indexer {
             file2Reader = new BufferedReader(new FileReader(secondFilePath));
 
 //---------------------------------------------------- Numbers ------------------------------------------------------------
-
-            while(!((lastLine1 = file1Reader.readLine()).startsWith("a") || (lastLine1 = file1Reader.readLine()).startsWith("A"))){
+            lastLine1 = file1Reader.readLine();
+            while(!(lastLine1.startsWith("a") || lastLine1.startsWith("A"))){
                 lineBuilder = new StringBuilder();
                 term = lastLine1.substring(0,lastLine1.indexOf("|"));
                 //if(!concatenateTerms(sortedTerms,term)){
-                lineBuilder.append(lastLine1).append("\n");
+                lineBuilder.append(lastLine1);
                 sortedTerms.put(term,lineBuilder);
+                lastLine1 = file1Reader.readLine();
                 //}
             }
-            while(!((lastLine2 = file2Reader.readLine()).startsWith("a") || (lastLine2 = file2Reader.readLine()).startsWith("A"))){
+            lastLine2 = file2Reader.readLine();
+            while(!(lastLine2.startsWith("a") || lastLine2.startsWith("A"))){
                 lineBuilder = new StringBuilder();
                 term = lastLine2.substring(0,lastLine2.indexOf("|"));
                 if(!concatenateTerms(sortedTerms,lastLine2)){
-                    lineBuilder.append(lastLine2).append("\n");
+                    lineBuilder.append(lastLine2);
                     sortedTerms.put(term,lineBuilder);
                 }
+                lastLine2 = file2Reader.readLine();
             }
             //creates a sorted list with all the terms that start with a number and adds the frequent ones to the dictionary
             ArrayList<String> sortedTermsList = new ArrayList<>(sortedTerms.keySet());
@@ -276,36 +279,38 @@ public class Indexer {
                 if(startsCorrectly1){
                     lineBuilder = new StringBuilder();
                     term = lastLine1.substring(0,lastLine1.indexOf("|"));
-                    lineBuilder.append(lastLine1).append("\n");
+                    lineBuilder.append(lastLine1);
                     sortedTerms.put(term,lineBuilder);
                 }
                 if(startsCorrectly2){
                     term = lastLine2.substring(0,lastLine2.indexOf("|"));
                     if(!concatenateTerms(sortedTerms,lastLine2)){
                         lineBuilder = new StringBuilder();
-                        lineBuilder.append(lastLine2).append("\n");
+                        lineBuilder.append(lastLine2);
                         sortedTerms.put(term,lineBuilder);
                     }
                 }
 
                 if(startsCorrectly1) {
-                    while ((lastLine1 = file1Reader.readLine()) != null && (lastLine1.startsWith(("" + letters[i]).toLowerCase()) || lastLine1.startsWith("" + letters[i]))) {
+                    while (lastLine1 != null && (lastLine1.startsWith(("" + letters[i]).toLowerCase()) || lastLine1.startsWith("" + letters[i]))) {
                         lineBuilder = new StringBuilder();
                         term = lastLine1.substring(0, lastLine1.indexOf("|"));
                         //if(!concatenateTerms(sortedTerms,term)){
-                        lineBuilder.append(lastLine1).append("\n");
+                        lineBuilder.append(lastLine1);
                         sortedTerms.put(term, lineBuilder);
                         //}
+                        lastLine1 = file1Reader.readLine();
                     }
                 }
                 if(startsCorrectly2) {
-                    while ((lastLine2 = file2Reader.readLine()) != null && (lastLine2.startsWith(("" + letters[i]).toLowerCase()) || lastLine2.startsWith("" + letters[i]))) {
+                    while (lastLine2 != null && (lastLine2.startsWith(("" + letters[i]).toLowerCase()) || lastLine2.startsWith("" + letters[i]))) {
                         lineBuilder = new StringBuilder();
                         term = lastLine2.substring(0, lastLine2.indexOf("|"));
-                        if (!concatenateTerms(sortedTerms, term)) {
-                            lineBuilder.append(lastLine2).append("\n");
+                        if (!concatenateTerms(sortedTerms, lastLine2)) {
+                            lineBuilder.append(lastLine2);
                             sortedTerms.put(term, lineBuilder);
                         }
+                        lastLine2 = file2Reader.readLine();
                     }
                 }
 
@@ -414,9 +419,9 @@ public class Indexer {
         }
 
         //If the term appears less than 10 times in the corpus we filter it out
-        if(sumOfTfTerm < 3){
+       /* if(sumOfTfTerm < 3){
             return false;
-        }
+        }*/
         //In case the term is common enough, we collect its details into the final dictionary
         termDetails[0] = String.valueOf(sumOfTfTerm); //how many times the term appears in the corpus
         termDetails[1] = String.valueOf(dfTerm); //how many documents the term appears in
