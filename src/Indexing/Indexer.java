@@ -158,8 +158,11 @@ public class Indexer {
                 //merges terms that already appeared in the HashMap, and regularly adds the rest
                 if (mergedDictionary.containsKey(mapKey)) {
                     mergedDictionary.get(mapKey).append(mapValue);
+                    //Checks what kind of term we take - lower or upper case
                     if (Character.isLowerCase(mapKey.charAt(0))) { // the term we are checking is written with small letters
-                        mergedDictionary.put(mapKey, mergedDictionary.get(mapKey));
+                        StringBuilder updatedPostingLine = mergedDictionary.get(mapKey);
+                        mergedDictionary.remove(mapKey);
+                        mergedDictionary.put(mapKey,updatedPostingLine);
                     } else {
                         continue;
                     }
@@ -167,28 +170,7 @@ public class Indexer {
                 else {
                     mergedDictionary.put(mapKey, mapValue);
                 }
-                   /*
-                    if(Character.isLowerCase(mapKey.charAt(0))){ // the term we are checking is written with small letters
-                       if(mergedDictionary.containsKey(mapKey)) { //the term in the dictionary appears with small letters
-                           mergedDictionary.get(mapKey).append(mapValue);
-                        }
-                       else{ //the term in the dictionary appears with capital letters
-                           mergedDictionary.put(mapKey,mergedDictionary.get(mapKey.toUpperCase()).append(mapValue));
-                           mergedDictionary.remove(mapKey.toUpperCase());
-                       }
-                    }
-                    else{ //the checked term is written with capital letters, so the form of the term that appears in the dictionary remains
-                        if(mergedDictionary.containsKey(mapKey)) { //the term in the dictionary appears with capital letters
-                            mergedDictionary.get(mapKey).append(mapValue);
-                        }
-                        else{ //the term in the dictionary appears with small letters
-                            mergedDictionary.get(mapKey.toLowerCase()).append(mapValue);
-                        }
-                    }
-                    //mergedDictionary.get(mapKey).append(mapValue.toString().replace(mapKey + "|", ""));
-                } else {
-                    mergedDictionary.put(mapKey, mapValue);
-                }*/
+
             }
 
             //creates the content (the posting lines) in a lexicographical order and writes it in a new file
