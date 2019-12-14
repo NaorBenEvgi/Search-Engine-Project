@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public class Parse {
 
     private static final String REGEX_BY_LINES = "\\r?\\n";
-    private static final String REGEX_BY_WORDS = "[^\\w/-]+";
+    private static final String REGEX_BY_WORDS = "[^\\w($/%)-]+";
     private static final String DECIMAL_FORMAT = "#.###";
     private static final String REGEX_SEARCH_FOR_NUMBER = "-?\\d+(\\.\\d+)?";
     private static final String REGEX_SEARCH_FOR_FRACTION = "-?\\d+/(\\d+)?";
@@ -240,6 +240,8 @@ public class Parse {
                                 i += 3;
                             }
                         }
+                    }else{
+                        parsedLine.add(word);
                     }
                 } catch (Exception e) { // doesn't satisfy the pattern
                     parsedLine.add(word);
@@ -505,6 +507,7 @@ public class Parse {
                 if(Character.isDigit(word.charAt(0))){
                     if (!dictionary.containsKey(word)){
                         term = new Term(word);
+                        dictionary.put(word,term);
                     }
                     else{
                         term = dictionary.get(word);
