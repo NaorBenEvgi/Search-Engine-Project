@@ -12,10 +12,12 @@ public class Indexer {
     private int postingFilesCounter;
     private SortedMap<String,String[]> finalDictionary;
     private String BY_VERTICLE_BAR = "\\|";
+    private HashMap<Integer,String[]> documentDetails;
     public Indexer(){
         postingFilesCounter = 0;
         postingLines = new HashMap<>();
         finalDictionary = new TreeMap<>();
+        documentDetails = new HashMap<>();
     }
 
 
@@ -26,7 +28,12 @@ public class Indexer {
      * @param doc the given document
      */
     public void collectTermPostingLines(HashMap<String, Term> documentDictionary, Article doc){
+        int maxTF = 0;
         for(String term : documentDictionary.keySet()){
+            int termFrequency = documentDictionary.get(term).getTermFrequency(doc);
+            if(termFrequency > maxTF){
+               maxTF = termFrequency;
+            }
             if(postingLines.containsKey(term)){
                 String correctTerm = removeDuplicatesTermsIndexer(documentDictionary.get(term).getTerm());
                 String currentTermInDic = postingLines.get(term).toString().substring(0,postingLines.get(term).toString().indexOf("|"));
@@ -42,6 +49,11 @@ public class Indexer {
                 postingLines.put(term, new StringBuilder(documentDictionary.get(term).getTerm()).append("|").append(documentDictionary.get(term).getPostingLineInDoc(doc)));
             }
         }
+        String[] details = new String[3];
+        details[0] = doc.getDocId();
+        details[1] = String.valueOf(maxTF);
+        details[2] = String.valueOf(documentDictionary.size());
+        documentDetails.put(doc.getDocNum(),details);
     }
 
 

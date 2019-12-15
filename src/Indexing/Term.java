@@ -17,7 +17,7 @@ public class Term {
     private String lineInPostingFile(Article doc) {
         StringBuilder line = new StringBuilder();
         if (termPositions.containsKey(doc)) {
-            line.append(doc.getDocId()).append(":");
+            line.append(doc.getDocNum()).append(":");
             ArrayList<Integer> positionsForCurrentDoc = termPositions.get(doc);
             int positionsForCurrentDocSize = positionsForCurrentDoc.size();
             if(positionsForCurrentDocSize > 0){

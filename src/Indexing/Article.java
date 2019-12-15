@@ -6,9 +6,12 @@ package Indexing;
 public class Article {
 
     private String docId;
-    private String date;
-    private String title;
+    /*private String date;
+    private String title;*/
     private String content;
+    private static Integer numCounter = 0;
+    private Integer docNum;
+
 
     /**
      * A constructor that initializes the document using only its ID and content, and assigns null to the other fields.
@@ -17,9 +20,11 @@ public class Article {
      */
     public Article(String docId, String content) {
         this.docId = docId;
-        this.date = null;
-        this.title = null;
+       /* this.date = null;
+        this.title = null;*/
         this.content = content;
+        docNum = numCounter;
+        numCounter++;
     }
 
     /**
@@ -31,8 +36,8 @@ public class Article {
      */
     public Article(String docID, String title, String date, String content){
         this.docId = docID;
-        this.title = title;
-        this.date = date;
+        /*this.title = title;
+        this.date = date;*/
         this.content = content;
     }
 
@@ -41,17 +46,18 @@ public class Article {
         return docId;
     }
 
-    public String getDate() {
+    /*public String getDate() {
         return date == null ? "No date": this.date;
     }
 
     public String getTitle() {
         return title == null ? "No title": this.title;
-    }
+    }*/
 
     public String getContent() {
         return content;
     }
+    public Integer getDocNum(){ return docNum;}
 
 
     //setters
@@ -61,19 +67,19 @@ public class Article {
     public void setDocId(String docId){
         this.docId = docId;
     }
-    public void setDate(String date){
+   /* public void setDate(String date){
         this.date = date;
     }
     public void setTitle(String title){
         this.title = title;
-    }
+    }*/
 
 
     @Override
     public String toString() {
         return "docID:\n" + this.getDocId() + "\n" +
-                "date:\n" + this.getDate() + "\n" +
-                "title:\n" + this.getTitle() + "\n" +
+              /*  "date:\n" + this.getDate() + "\n" +
+                "title:\n" + this.getTitle() + "\n" +*/
                 "content:\n" + this.getContent() + "\n";
     }
 }
