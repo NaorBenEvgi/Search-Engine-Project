@@ -15,6 +15,17 @@ import java.util.ArrayList;
 
 public class ReadFile {
 
+    private long corpusSize;
+
+    public ReadFile(){
+        corpusSize = 0;
+    }
+
+
+    public long getCorpusSize() {
+        return corpusSize;
+    }
+
     private Document convertToValidXML(String input) {
         try{
             String xml = "<wrapper>" + input.replaceAll("”","\"") + "</wrapper>";
@@ -79,6 +90,7 @@ public class ReadFile {
                     }
                     else {
                        container.add(f);
+                       corpusSize += f.length();
                     }
                 }
             }
