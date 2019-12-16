@@ -1,10 +1,6 @@
 package Indexing;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Comparator;
+import GUI.Controller;
 
 public class Main {
 
@@ -33,9 +29,13 @@ public class Main {
         Path path = Paths.get(file.getPath());
         System.out.println(path.resolve("aaa.txt").toString());*/
 
+/*
         new File(Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles11").toString()).toString()).mkdir();
         Files.walk(Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles11").toString())).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+*/
 
+        Controller contri = new Controller();
+        contri.runEngine("C:\\Users\\Naor\\Desktop\\לימודים\\שנה ג\\סמסטר א\\אחזור\\Search-Engine-Project\\search-engine\\corpus","C:\\Users\\Naor\\Desktop\\target",false);
 
 //        for(String term: terms.keySet()){
 //            System.out.println(terms.get(term).getTerm());

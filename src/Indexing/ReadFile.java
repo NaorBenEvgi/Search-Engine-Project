@@ -1,7 +1,9 @@
 package Indexing;
 
-import org.w3c.dom.*;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 public class ReadFile {
 
     private long corpusSize;
+    private static final String DELETE_NULLS = "[\\000]*";
 
     public ReadFile(){
         corpusSize = 0;
@@ -28,13 +31,18 @@ public class ReadFile {
 
     private Document convertToValidXML(String input) {
         try{
-            String xml = "<wrapper>" + input.replaceAll("”","\"") + "</wrapper>";
+            //String content = Pattern.compile(DELETE_NULLS).matcher(input).replaceAll("");
+            String content = input.replaceAll(DELETE_NULLS, "").replaceAll("P=[0-9]*", "");
+            //String content = input.replaceAll("p=[0-9]*", "")
+            String xml = "<wrapper>" + content.replaceAll("”","\"") + "</wrapper>";
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(new InputSource(new StringReader(xml)));
             doc.getDocumentElement().normalize();
             return doc;
         } catch (Exception e){
+/*            System.out.println(input.substring(0,100) + "\n");
+            System.out.println("----------------------------------------------");*/
             return null;
         }
 
@@ -76,6 +84,7 @@ public class ReadFile {
             articles = extractArticlesFromFile(inputFile);
         } catch (Exception e) {
             e.printStackTrace();
+         //   System.out.println(filePath);
         }
         return articles;
     }
