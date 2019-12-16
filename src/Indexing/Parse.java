@@ -25,13 +25,11 @@ public class Parse {
     private static final float MILLION = 1000000;
     private static final float BILLION = 1000000000;
     protected HashSet<String> stopWords;
-    protected HashMap<String, HashMap<String, Integer>> capitalLettersWords;
     private HashMap<String,Term> dictionary;
     private int termPositionInDocument;
     private boolean skipNextWord = false;
 
 
-    //TODO: initialize the capital letters database and fix path for stop words file
     public Parse(String corpusPath){
         stopWords = new HashSet<>();
         //Path stopWordsPath = Paths.get(System.getProperty("user.dir"), Paths.get("src", "stop_words.txt").toString());
@@ -66,7 +64,7 @@ public class Parse {
      * @return true if the word is a stop word, false otherwise
      */
     private boolean isStopWord(String word){
-       return stopWords.contains(word);
+        return stopWords.contains(word);
     }
 
 
@@ -116,10 +114,11 @@ public class Parse {
     private float parseFraction(String ratio) {
         if (ratio.contains("/")) {
             String[] rat = ratio.split("/");
+            if(rat.length == 1)
+                return Float.parseFloat(rat[0]);
             return Float.parseFloat(rat[0]) / Float.parseFloat(rat[1]);
-        } else {
-            return Float.parseFloat(ratio);
         }
+        return Float.parseFloat(ratio);
     }
 
     /**
@@ -131,7 +130,6 @@ public class Parse {
         DecimalFormat df = new DecimalFormat(DECIMAL_FORMAT);
         float parsedNumber = parseFraction(number);
         String formattedNumber;
-        //TODO: check if after the nubmer there is the letter "M"
         if (parsedNumber >= THOUSAND) {
             if (parsedNumber >= MILLION) {
                 if (parsedNumber >= BILLION) {
@@ -352,22 +350,22 @@ public class Parse {
         return null;
     }
 
-
-    /**
+/*
+    *//**
      * Iterates over a line and collects all the words that start with a capital letter.
      * All these words are put in a HashMap, with the ID's of the documents and the amount of times it appears in them.
      * @param line the line to iterate over
      * @param docID the ID of the document in which the line is taken from
-     */
+     *//*
     private void collectCapitalLetterWords(String line, String docID){
         String[] wordsInLine = line.split(" ");
         HashMap<String,Integer> termFrequencyInDoc;
         for(int i=0; i<wordsInLine.length; i++){
             if(Character.isUpperCase(wordsInLine[i].charAt(0))){
                 if(isStopWord(wordsInLine[i].toLowerCase())){
-                    /*try{
+                    *//*try{
                         String nextWord = wordsInLine[i+1];
-                    }*/
+                    }*//*
                 }
 
                 if(!capitalLettersWords.containsKey(wordsInLine[i])){ //Checks if this is the first time we encounter that capital-letter-starting word
@@ -388,7 +386,7 @@ public class Parse {
                 }
             }
         }
-    }
+    }*/
 
 
     private String parseNumber(String word, String nextWord){
@@ -396,7 +394,7 @@ public class Parse {
             String character = convertNumberFromTextToChar(nextWord); //checks the pattern # thousand / million / billion - step one
             this.skipNextWord = true;
             if (isPercent(nextWord)) { // checks the percentage pattern
-               return word + "%";
+                return word + "%";
             } else if(nextWord.equals("M")){ //checks the prices over million pattern
                 return word + nextWord;
             } else if (character != null) { //checks the pattern # thousand / million / billion - next two
@@ -427,6 +425,10 @@ public class Parse {
             if(word.startsWith("-") || word.endsWith("-")){
                 word = word.replace("-", "");
             }
+            /*if(word.startsWith("/") || word.endsWith("/")){
+                word = word.replace("-", "");
+            }*/
+
             String nextWord = i + 1 < wordsNumber ? articleWords.get(i + 1).replaceAll(",", ""): "";
             if (word.length() > 1) {
                 if (isNumber(word)) {
@@ -499,36 +501,36 @@ public class Parse {
         words = pricesOverMillion(words);
         ArrayList<String> parsedWords = parseArticleWords(words);
         for(String word : parsedWords){
-                if(stem) {
-                    Stemmer.setCurrent(word);
-                    Stemmer.stem();
-                    word = Stemmer.getCurrent();
+            if(stem) {
+                Stemmer.setCurrent(word);
+                Stemmer.stem();
+                word = Stemmer.getCurrent();
+            }
+
+            Term term;
+
+            if(Character.isDigit(word.charAt(0))){
+                if (!dictionary.containsKey(word)){
+                    term = new Term(word);
+                    dictionary.put(word,term);
                 }
-
-                Term term;
-
-                if(Character.isDigit(word.charAt(0))){
-                    if (!dictionary.containsKey(word)){
+                else{
+                    term = dictionary.get(word);
+                }
+            }else {
+                //checks if the dic contains this word and how the word should be indexed
+                if (!dictionary.containsKey(word.toLowerCase())) {
+                    if (Character.isUpperCase(word.charAt(0)))
+                        term = new Term(word.toUpperCase());
+                    else
                         term = new Term(word);
-                        dictionary.put(word,term);
-                    }
-                    else{
-                        term = dictionary.get(word);
-                    }
-                }else {
-                    //checks if the dic contains this word and how the word should be indexed
-                    if (!dictionary.containsKey(word.toLowerCase())) {
-                        if (Character.isUpperCase(word.charAt(0)))
-                            term = new Term(word.toUpperCase());
-                        else
-                            term = new Term(word);
-                        dictionary.put(word.toLowerCase(), term);
-                    } else {
-                        term = removeDuplicatesTermsParser(word);
-                    }
+                    dictionary.put(word.toLowerCase(), term);
+                } else {
+                    term = removeDuplicatesTermsParser(word);
                 }
-                term.addPositionInDoc(article,termPositionInDocument);
-                termPositionInDocument++;
+            }
+            term.addPositionInDoc(article,termPositionInDocument);
+            termPositionInDocument++;
         }
         return dictionary;
     }

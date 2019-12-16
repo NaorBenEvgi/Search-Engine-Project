@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.SortedMap;
 
+/**
+ * This class is a controller that runs the search engine behind the scenes, following the commands sent by the user-interface.
+ */
 public class Controller {
 
     private Indexer indexer;
@@ -18,10 +21,11 @@ public class Controller {
     private HashMap<Integer,String[]> documentDetails;
 
     /**
-     *
-     * @param corpusPath
-     * @param targetPath
-     * @param stem
+     * Activates the indexing process of the search engine. The function gets the path to the corpus,
+     * reads all the documents stored in it, and indexes the corpus using a dictionary and posting files.
+     * @param corpusPath the path to the corpus
+     * @param targetPath the path of the directory in which the dictionary and posting files will be stored
+     * @param stem an indicator of whether the indexing process will include stemming or not
      */
     public void runEngine(String corpusPath, String targetPath, boolean stem){
         corpusReader = new ReadFile();
@@ -90,9 +94,9 @@ public class Controller {
     }
 
     /**
-     *
-     * @param sourceFolderPath
-     * @param destinationFolderPath
+     * Merges all the temporary posting files stored in the directories.
+     * @param sourceFolderPath the path of the directory that contains the temporary posting files
+     * @param destinationFolderPath the path of the directory that will store the merged posting files
      */
     private void mergeFiles(String sourceFolderPath, String destinationFolderPath){
         ArrayList<File> filesInSourceFolder = new ArrayList<>();
@@ -100,20 +104,16 @@ public class Controller {
         corpusReader.extractFilesFromFolder(sourceFolder,filesInSourceFolder);
 
         try {
-            int startIndex = 0;
             if (filesInSourceFolder.size() % 2 != 0) {
                 String fileName = filesInSourceFolder.get(0).getName();
                 Path newFilePath = Paths.get(destinationFolderPath).resolve(fileName);
                 Files.move(Paths.get(filesInSourceFolder.get(0).getPath()), newFilePath);
                 filesInSourceFolder.remove(0);
-               // startIndex = 1;
             }
             int arraySize = filesInSourceFolder.size();
             for(int i=0; i<arraySize; i+=2){
                 File file1 = filesInSourceFolder.get(i), file2 = filesInSourceFolder.get(i+1);
                 indexer.mergePostingFiles(file1.getPath(),file2.getPath(),destinationFolderPath);
-/*                file1.delete();
-                file2.delete();*/
             }
             deleteDirectoryFiles(sourceFolderPath);
         }catch (Exception e){
@@ -122,9 +122,9 @@ public class Controller {
     }
 
     /**
-     *
-     * @param directoryPath
-     * @return
+     * Deletes a directory that has files in it.
+     * @param directoryPath the path of the directory
+     * @return true if the deletion was completed, false if not
      */
     private boolean deleteDirectoryWithFiles(String directoryPath){
         File directory = new File(directoryPath);
@@ -141,6 +141,11 @@ public class Controller {
         return false;
     }
 
+    /**
+     * Deletes all the files in a given directory.
+     * @param directoryPath the path to the directory
+     * @return true if the deletion was completed, false if not
+     */
     private boolean deleteDirectoryFiles(String directoryPath){
         File directory = new File(directoryPath);
         if(directory.exists()){
@@ -157,17 +162,18 @@ public class Controller {
         }
         return false;
     }
+
     /**
-     *
-     * @return
+     * Returns the amount of documents in the corpus that were indexed
+     * @return the amount of documents in the corpus that were indexed
      */
     public int getAmountOfIndexedDocs(){
         return documentDetails.size();
     }
 
     /**
-     *
-     * @return
+     * Returns the amount of unique terms that were indexed in the dictionary
+     * @return the amount of unique terms that were indexed in the dictionary
      */
     public int getAmountOfUniqueTerms(){
         return finalDictionary.size();

@@ -6,6 +6,9 @@ import java.io.*;
 import java.nio.file.Paths;
 import java.util.*;
 
+/**
+ * This class is responsible for creating posting files and a dictionary for the documents in the corpus.
+ */
 public class Indexer {
 
     private HashMap<String,StringBuilder> postingLines;
@@ -191,7 +194,8 @@ public class Indexer {
                 fileContent.append(s).append("|").append(mergedDictionary.get(s)).append("\n");
             }
             writePostingLinesToTempFile(mergedPostingFilePath,fileContent.toString());
-
+            postingFile1.close();
+            postingFile2.close();
         } catch(Exception e){
             e.printStackTrace();
         }
@@ -338,7 +342,8 @@ public class Indexer {
                 writeContentToLetterFile(contentToFile,letters[i] + "PostingFile",targetPath,stem);
                 contentToFile = new StringBuilder();
             }
-
+            file1Reader.close();
+            file2Reader.close();
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -356,7 +361,7 @@ public class Indexer {
         if(stem)
             postingFileName += "Stem";
         try{
-            fileWriter = new BufferedWriter(new FileWriter(targetPath + "/" + postingFileName));
+            fileWriter = new BufferedWriter(new FileWriter(targetPath + "/" + postingFileName + ".txt"));
             fileWriter.write(content.toString());
             fileWriter.close();
         }catch (Exception e){
@@ -452,6 +457,10 @@ public class Indexer {
         return this.finalDictionary;
     }
 
+    /**
+     * Returns the HashMap that contains all the docIds and the details about each document
+     * @return the documents details HashMap
+     */
     public HashMap<Integer,String[]> getDocumentDetails(){
         return documentDetails;
     }

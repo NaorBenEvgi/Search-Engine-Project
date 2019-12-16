@@ -33,10 +33,10 @@ public class Main {
         new File(Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles11").toString()).toString()).mkdir();
         Files.walk(Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles11").toString())).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
 */
-
+        long time = System.currentTimeMillis();
         Controller contri = new Controller();
-        contri.runEngine("C:\\Users\\Naor\\Desktop\\לימודים\\שנה ג\\סמסטר א\\אחזור\\Search-Engine-Project\\search-engine\\corpus","C:\\Users\\Naor\\Desktop\\target",false);
-
+        contri.runEngine("C:\\Users\\royj1\\IdeaProjects\\search-engine\\corpus","C:\\Users\\royj1\\Desktop\\a",false);
+        System.out.println((System.currentTimeMillis() - time)/1000);
 //        for(String term: terms.keySet()){
 //            System.out.println(terms.get(term).getTerm());
 //        }

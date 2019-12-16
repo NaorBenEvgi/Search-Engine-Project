@@ -1,6 +1,9 @@
 package Indexing;
 import org.tartarus.snowball.ext.PorterStemmer;
 
+/**
+ * This class is responsible for stemming terms that have gone through parsing. It uses an open code of Porter's algorithm.
+ */
 public class Stemmer {
 
     protected static PorterStemmer stemmer = new PorterStemmer();
