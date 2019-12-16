@@ -82,8 +82,8 @@ public class Controller {
             tempFolderCounter1 = tempDirectory1.listFiles().length;
             tempFolderCounter2 = tempDirectory2.listFiles().length;
         }
-        deleteDirectory(tempFilesFolder1);
-        deleteDirectory(tempFilesFolder2);
+        deleteDirectoryWithFiles(tempFilesFolder1);
+        deleteDirectoryWithFiles(tempFilesFolder2);
         finalDictionary = indexer.getDictionary();
         documentDetails = indexer.getDocumentDetails();
 
@@ -105,15 +105,17 @@ public class Controller {
                 String fileName = filesInSourceFolder.get(0).getName();
                 Path newFilePath = Paths.get(destinationFolderPath).resolve(fileName);
                 Files.move(Paths.get(filesInSourceFolder.get(0).getPath()), newFilePath);
-                startIndex = 1;
+                filesInSourceFolder.remove(0);
+               // startIndex = 1;
             }
             int arraySize = filesInSourceFolder.size();
-            for(int i=startIndex; i<arraySize; i+=2){
+            for(int i=0; i<arraySize; i+=2){
                 File file1 = filesInSourceFolder.get(i), file2 = filesInSourceFolder.get(i+1);
                 indexer.mergePostingFiles(file1.getPath(),file2.getPath(),destinationFolderPath);
-                file1.delete();
-                file2.delete();
+/*                file1.delete();
+                file2.delete();*/
             }
+            deleteDirectoryFiles(sourceFolderPath);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -124,13 +126,13 @@ public class Controller {
      * @param directoryPath
      * @return
      */
-    private boolean deleteDirectory(String directoryPath){
+    private boolean deleteDirectoryWithFiles(String directoryPath){
         File directory = new File(directoryPath);
         if(directory.exists()){
             File[] files = directory.listFiles();
             for(File file : files){
                 if(file.isDirectory()){
-                    deleteDirectory(file.getPath());
+                    deleteDirectoryWithFiles(file.getPath());
                 }
                 file.delete();
             }
@@ -139,6 +141,22 @@ public class Controller {
         return false;
     }
 
+    private boolean deleteDirectoryFiles(String directoryPath){
+        File directory = new File(directoryPath);
+        if(directory.exists()){
+            File[] files = directory.listFiles();
+            for(File file : files){
+                file.delete();
+/*                try{
+                    Files.delete(file.toPath());
+                }catch (Exception e){
+                    e.printStackTrace();
+                }*/
+            }
+            return true;
+        }
+        return false;
+    }
     /**
      *
      * @return

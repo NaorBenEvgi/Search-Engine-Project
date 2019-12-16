@@ -32,7 +32,7 @@ public class ReadFile {
     private Document convertToValidXML(String input) {
         try{
             //String content = Pattern.compile(DELETE_NULLS).matcher(input).replaceAll("");
-            String content = input.replaceAll(DELETE_NULLS, "").replaceAll("P=[0-9]*", "");
+            String content = input.replaceAll(DELETE_NULLS, "").replaceAll("\\s*P=[0-9]*", "");
             //String content = input.replaceAll("p=[0-9]*", "")
             String xml = "<wrapper>" + content.replaceAll("”","\"") + "</wrapper>";
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
