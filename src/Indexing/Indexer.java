@@ -448,7 +448,11 @@ public class Indexer {
      * Returns the final dictionary that was created during the indexing.
      * @return the final dictionary
      */
-    public SortedMap<String,String[]> getDctionary(){
+    public SortedMap<String,String[]> getDictionary(){
         return this.finalDictionary;
+    }
+
+    public HashMap<Integer,String[]> getDocumentDetails(){
+        return documentDetails;
     }
 }

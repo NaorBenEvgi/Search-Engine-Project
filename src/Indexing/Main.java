@@ -1,8 +1,10 @@
 package Indexing;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 
 public class Main {
 
@@ -27,9 +29,13 @@ public class Main {
                ,Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles","1.txt").toString()).toString(),
                Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles").toString()).toString(),false);*/
 
-        File file = new File("C:\\Users\\royj1\\Desktop\\a");
+        /*File file = new File("C:\\Users\\royj1\\Desktop\\a");
         Path path = Paths.get(file.getPath());
-        System.out.println(path.resolve("aaa.txt").toString());
+        System.out.println(path.resolve("aaa.txt").toString());*/
+
+        new File(Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles11").toString()).toString()).mkdir();
+        Files.walk(Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles11").toString())).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+
 
 //        for(String term: terms.keySet()){
 //            System.out.println(terms.get(term).getTerm());

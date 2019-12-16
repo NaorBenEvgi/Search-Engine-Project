@@ -32,10 +32,10 @@ public class Parse {
 
 
     //TODO: initialize the capital letters database and fix path for stop words file
-    public Parse(){
+    public Parse(String corpusPath){
         stopWords = new HashSet<>();
-        //TODO: change the path to be not absolute
-        Path stopWordsPath = Paths.get(System.getProperty("user.dir"), Paths.get("src", "stop_words.txt").toString());
+        //Path stopWordsPath = Paths.get(System.getProperty("user.dir"), Paths.get("src", "stop_words.txt").toString());
+        Path stopWordsPath = Paths.get(corpusPath).resolve("\\stop_words.txt");
         fillStopWords(stopWordsPath.toString());
         termPositionInDocument = 0;
         dictionary = new HashMap<>();
