@@ -43,7 +43,7 @@ public class Controller {
         tempDirectory2.mkdir();
 
         corpusReader.extractFilesFromFolder(corpus,filesInCorpus);
-        long threshold = (corpusReader.getCorpusSize()/10)/(corpusReader.getCorpusSize()/filesInCorpus.size());
+        long threshold = (corpusReader.getCorpusSize()/100)/(corpusReader.getCorpusSize()/filesInCorpus.size());
         int fileCounter = 0;
         int tempFolderCounter1, tempFolderCounter2;
 
@@ -152,11 +152,6 @@ public class Controller {
             File[] files = directory.listFiles();
             for(File file : files){
                 file.delete();
-/*                try{
-                    Files.delete(file.toPath());
-                }catch (Exception e){
-                    e.printStackTrace();
-                }*/
             }
             return true;
         }

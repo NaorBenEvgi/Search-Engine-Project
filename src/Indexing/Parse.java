@@ -32,7 +32,6 @@ public class Parse {
 
     public Parse(String corpusPath){
         stopWords = new HashSet<>();
-        //Path stopWordsPath = Paths.get(System.getProperty("user.dir"), Paths.get("src", "stop_words.txt").toString());
         Path stopWordsPath = Paths.get(corpusPath).resolve("stop_words.txt");
         fillStopWords(stopWordsPath.toString());
         termPositionInDocument = 0;
@@ -350,45 +349,12 @@ public class Parse {
         return null;
     }
 
-/*
-    *//**
-     * Iterates over a line and collects all the words that start with a capital letter.
-     * All these words are put in a HashMap, with the ID's of the documents and the amount of times it appears in them.
-     * @param line the line to iterate over
-     * @param docID the ID of the document in which the line is taken from
-     *//*
-    private void collectCapitalLetterWords(String line, String docID){
-        String[] wordsInLine = line.split(" ");
-        HashMap<String,Integer> termFrequencyInDoc;
-        for(int i=0; i<wordsInLine.length; i++){
-            if(Character.isUpperCase(wordsInLine[i].charAt(0))){
-                if(isStopWord(wordsInLine[i].toLowerCase())){
-                    *//*try{
-                        String nextWord = wordsInLine[i+1];
-                    }*//*
-                }
-
-                if(!capitalLettersWords.containsKey(wordsInLine[i])){ //Checks if this is the first time we encounter that capital-letter-starting word
-                    termFrequencyInDoc = new HashMap<>();
-                    termFrequencyInDoc.put(docID,1);
-                    capitalLettersWords.put(wordsInLine[i],termFrequencyInDoc);
-                }
-                else{ //Checks if that word exists in the capital letter words database, but this is the first time we encounter it in a specific document
-                    termFrequencyInDoc = capitalLettersWords.get(wordsInLine[i]);
-                    if(!termFrequencyInDoc.containsKey(docID)){
-                        termFrequencyInDoc.put(docID,1);
-                        capitalLettersWords.put(wordsInLine[i],termFrequencyInDoc);
-                    }
-                    else{ //the case that this is not the first time we encountered that word in this document
-                        termFrequencyInDoc.put(docID,termFrequencyInDoc.get(docID)+1);
-                        capitalLettersWords.put(wordsInLine[i],termFrequencyInDoc);
-                    }
-                }
-            }
-        }
-    }*/
-
-
+    /**
+     *
+     * @param word
+     * @param nextWord
+     * @return
+     */
     private String parseNumber(String word, String nextWord){
         try {
             String character = convertNumberFromTextToChar(nextWord); //checks the pattern # thousand / million / billion - step one
@@ -425,6 +391,7 @@ public class Parse {
             if(word.startsWith("-") || word.endsWith("-")){
                 word = word.replace("-", "");
             }
+            //TODO: try and fix these cases:
             /*if(word.startsWith("/") || word.endsWith("/")){
                 word = word.replace("-", "");
             }*/
@@ -506,9 +473,7 @@ public class Parse {
                 Stemmer.stem();
                 word = Stemmer.getCurrent();
             }
-
             Term term;
-
             if(Character.isDigit(word.charAt(0))){
                 if (!dictionary.containsKey(word)){
                     term = new Term(word);

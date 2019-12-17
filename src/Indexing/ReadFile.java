@@ -42,9 +42,7 @@ public class ReadFile {
      */
     private Document convertToValidXML(String input) {
         try{
-            //String content = Pattern.compile(DELETE_NULLS).matcher(input).replaceAll("");
             String content = input.replaceAll(DELETE_NULLS, "").replaceAll("\\s*P=[0-9]*", "");
-            //String content = input.replaceAll("p=[0-9]*", "")
             String xml = "<wrapper>" + content.replaceAll("”","\"") + "</wrapper>";
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -52,8 +50,6 @@ public class ReadFile {
             doc.getDocumentElement().normalize();
             return doc;
         } catch (Exception e){
-/*            System.out.println(input.substring(0,100) + "\n");
-            System.out.println("----------------------------------------------");*/
             return null;
         }
 
@@ -105,7 +101,7 @@ public class ReadFile {
             articles = extractArticlesFromFile(inputFile);
         } catch (Exception e) {
             e.printStackTrace();
-         //   System.out.println(filePath);
+            //   System.out.println(filePath);
         }
         return articles;
     }
@@ -124,8 +120,10 @@ public class ReadFile {
                         extractFilesFromFolder(f, container);
                     }
                     else {
-                       container.add(f);
-                       corpusSize += f.length();
+                        if(!f.getName().equals("stop_words.txt")) {
+                            container.add(f);
+                            corpusSize += f.length();
+                        }
                     }
                 }
             }

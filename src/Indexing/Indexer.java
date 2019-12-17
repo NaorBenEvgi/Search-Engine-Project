@@ -35,7 +35,7 @@ public class Indexer {
         for(String term : documentDictionary.keySet()){
             int termFrequency = documentDictionary.get(term).getTermFrequency(doc);
             if(termFrequency > maxTF){
-               maxTF = termFrequency;
+                maxTF = termFrequency;
             }
             if(postingLines.containsKey(term)){
                 String correctTerm = removeDuplicatesTermsIndexer(documentDictionary.get(term).getTerm());
@@ -60,6 +60,11 @@ public class Indexer {
     }
 
 
+    /**
+     *
+     * @param word
+     * @return
+     */
     private String removeDuplicatesTermsIndexer(String word){
         if(Character.isDigit(word.charAt(0))){
             return word;
@@ -88,7 +93,6 @@ public class Indexer {
         //prepares the lines to be written in the file, and removes them from the HashMap
         for(String term: sortedTerms){
             temporaryPostingLinesBuilder
-//                    .append(term).append("|")
                     .append(postingLines.get(term).toString())
                     .append("\n");
         }
@@ -140,7 +144,6 @@ public class Indexer {
         try {
             //reads the first file and puts the terms and their lines in a HashMap
             postingFile1 = new BufferedReader(new FileReader(firstFilePath));
-            //String[] linesInFile1 = Arrays.copyOf(postingFile1.lines().toArray(), postingFile1.lines().toArray().length, String[].class);
             ArrayList<String> linesInFile1 = new ArrayList<>();
             String tempLine;
             while((tempLine = postingFile1.readLine()) != null){
@@ -185,44 +188,23 @@ public class Indexer {
                 else {
                     mergedDictionary.put(mapKey, mapValue);
                 }
-
             }
 
             //creates the content (the posting lines) in a lexicographical order and writes it in a new file
             StringBuilder fileContent = new StringBuilder();
-            //BufferedWriter fileWriter = new BufferedWriter(new FileWriter(mergedPostingFilePath));
-            int tempDicSize = mergedDictionary.size()/10, counter = 0;
             for (String s : mergedDictionary.keySet()) {
                 fileContent.append(s).append("|").append(mergedDictionary.get(s)).append("\n");
-                counter++;
-                if(counter >= tempDicSize){
-                    counter = 0;
+                if(fileContent.length() >= 100000000){
                     writePostingLinesToTempFile(mergedPostingFilePath,fileContent.toString());
                     fileContent = new StringBuilder();
                 }
-               /* if(counter < tempDicSize) {
-                    counter++;
-                }
-                else {
-                    counter = 0;
-                    fileWriter.write(fileContent.toString());
-                    fileWriter.newLine();
-                    fileContent = new StringBuilder();
-                }*/
             }
-            /*if(counter != 0){
-                fileWriter.write(fileContent.toString());
-                fileWriter.newLine();
-                fileContent = new StringBuilder();
-            }*/
-            if(counter > 0){
+            if(fileContent.length() > 0){
                 writePostingLinesToTempFile(mergedPostingFilePath,fileContent.toString());
                 fileContent = new StringBuilder();
             }
-            //writePostingLinesToTempFile(mergedPostingFilePath,fileContent.toString());
             postingFile1.close();
             postingFile2.close();
-            /*fileWriter.close();*/
         } catch(Exception e){
             e.printStackTrace();
         }
@@ -268,11 +250,9 @@ public class Indexer {
             while(!(lastLine1.startsWith("a") || lastLine1.startsWith("A"))){
                 lineBuilder = new StringBuilder();
                 term = lastLine1.substring(0,lastLine1.indexOf("|"));
-                //if(!concatenateTerms(sortedTerms,term)){
                 lineBuilder.append(lastLine1);
                 sortedTerms.put(term,lineBuilder);
                 lastLine1 = file1Reader.readLine();
-                //}
             }
             lastLine2 = file2Reader.readLine();
             while(!(lastLine2.startsWith("a") || lastLine2.startsWith("A"))){
@@ -338,10 +318,8 @@ public class Indexer {
                     while (lastLine1 != null && (lastLine1.startsWith(("" + letters[i]).toLowerCase()) || lastLine1.startsWith("" + letters[i]))) {
                         lineBuilder = new StringBuilder();
                         term = lastLine1.substring(0, lastLine1.indexOf("|"));
-                        //if(!concatenateTerms(sortedTerms,term)){
                         lineBuilder.append(lastLine1);
                         sortedTerms.put(term, lineBuilder);
-                        //}
                         lastLine1 = file1Reader.readLine();
                     }
                 }

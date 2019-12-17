@@ -1,8 +1,6 @@
 package Indexing;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import GUI.Controller;
 
 public class Main {
 
@@ -35,13 +33,13 @@ public class Main {
         new File(Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles11").toString()).toString()).mkdir();
         Files.walk(Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles11").toString())).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
 */
-        /*long time = System.currentTimeMillis();
+        long time = System.currentTimeMillis();
         Controller contri = new Controller();
-        contri.runEngine("C:\\Users\\royj1\\IdeaProjects\\search-engine\\corpus","C:\\Users\\royj1\\Desktop\\a",false);
-        System.out.println((System.currentTimeMillis() - time)/1000);*/
+        contri.runEngine(/*"C:\\Users\\royj1\\Desktop\\University\\הנדסת מערכות מידע\\שנה ג\\סמסטר ה\\אחזור מידע\\פרויקט\\corpus"*/"C:\\Users\\royj1\\IdeaProjects\\search-engine\\corpus","C:\\Users\\royj1\\Desktop\\a",false);
+        System.out.println((System.currentTimeMillis() - time)/1000);
 
 
-        File a = new File("C:\\Users\\royj1\\Desktop\\a\\b.txt");
+       /* File a = new File("C:\\Users\\royj1\\Desktop\\a\\b.txt");
         BufferedWriter bw = new BufferedWriter(new FileWriter(a,true));
         try{
             bw.append("hi");
@@ -50,7 +48,7 @@ public class Main {
             bw.close();
         }catch(Exception e){
             System.err.println("fuck");
-        }
+        }*/
     }
 
 
