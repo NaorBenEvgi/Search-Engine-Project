@@ -110,8 +110,8 @@ public class Indexer {
         File file = new File(path);
         BufferedWriter postingLinesWriter = null;
         try{
-            postingLinesWriter = new BufferedWriter(new FileWriter(file));
-            postingLinesWriter.write(content);
+            postingLinesWriter = new BufferedWriter(new FileWriter(file,true));
+            postingLinesWriter.append(content);
         } catch (Exception e){
             e.printStackTrace();
         } finally {
@@ -133,7 +133,7 @@ public class Indexer {
      * @param targetPath the path in which the merged file will be saved
      */
     public void mergePostingFiles(String firstFilePath, String secondFilePath, String targetPath){
-        String mergedPostingFilePath = targetPath + "\\tempPostingFile" + postingFilesCounter;
+        String mergedPostingFilePath = targetPath + "\\tempPostingFile" + postingFilesCounter + ".txt";
         postingFilesCounter++;
         SortedMap<String,StringBuilder> mergedDictionary = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         BufferedReader postingFile1,postingFile2;
@@ -190,11 +190,17 @@ public class Indexer {
 
             //creates the content (the posting lines) in a lexicographical order and writes it in a new file
             StringBuilder fileContent = new StringBuilder();
-            BufferedWriter fileWriter = new BufferedWriter(new FileWriter(mergedPostingFilePath));
+            //BufferedWriter fileWriter = new BufferedWriter(new FileWriter(mergedPostingFilePath));
             int tempDicSize = mergedDictionary.size()/10, counter = 0;
             for (String s : mergedDictionary.keySet()) {
                 fileContent.append(s).append("|").append(mergedDictionary.get(s)).append("\n");
-                if(counter < tempDicSize) {
+                counter++;
+                if(counter >= tempDicSize){
+                    counter = 0;
+                    writePostingLinesToTempFile(mergedPostingFilePath,fileContent.toString());
+                    fileContent = new StringBuilder();
+                }
+               /* if(counter < tempDicSize) {
                     counter++;
                 }
                 else {
@@ -202,16 +208,21 @@ public class Indexer {
                     fileWriter.write(fileContent.toString());
                     fileWriter.newLine();
                     fileContent = new StringBuilder();
-                }
+                }*/
             }
-            if(counter != 0){
+            /*if(counter != 0){
                 fileWriter.write(fileContent.toString());
                 fileWriter.newLine();
                 fileContent = new StringBuilder();
+            }*/
+            if(counter > 0){
+                writePostingLinesToTempFile(mergedPostingFilePath,fileContent.toString());
+                fileContent = new StringBuilder();
             }
-            writePostingLinesToTempFile(mergedPostingFilePath,fileContent.toString());
+            //writePostingLinesToTempFile(mergedPostingFilePath,fileContent.toString());
             postingFile1.close();
             postingFile2.close();
+            /*fileWriter.close();*/
         } catch(Exception e){
             e.printStackTrace();
         }
