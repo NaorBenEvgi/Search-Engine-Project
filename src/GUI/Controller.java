@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * This class is a controller that runs the search engine behind the scenes, following the commands sent by the user-interface.
@@ -173,6 +174,32 @@ public class Controller {
     public int getAmountOfUniqueTerms(){
         return finalDictionary.size();
     }
+
+
+    /**
+     *
+     * @param path
+     */
+    public void deleteIndexes(String path){
+        deleteDirectoryWithFiles(path);
+        //TODO: check if this is considered to be cleaning up the memory, or if we should point to null
+        finalDictionary = new TreeMap<>();
+        documentDetails = new HashMap<>();
+        indexer = new Indexer();
+        corpusReader = new ReadFile();
+    }
+
+
+    /**
+     *
+     * @param path
+     * @param stem
+     */
+    public void loadDictionary(String path, boolean stem){
+        finalDictionary = new TreeMap<>();
+
+    }
+
 }
 
 

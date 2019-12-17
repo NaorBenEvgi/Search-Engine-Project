@@ -3,6 +3,7 @@ package Indexing;
 import javafx.util.Pair;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -31,9 +32,10 @@ public class Indexer {
      * @param doc the given document
      */
     public void collectTermPostingLines(HashMap<String, Term> documentDictionary, Article doc){
-        int maxTF = 0;
+        int maxTF = 0, docLength  = 0;
         for(String term : documentDictionary.keySet()){
             int termFrequency = documentDictionary.get(term).getTermFrequency(doc);
+            docLength += termFrequency; // summing the amount of terms in the document in order to compute its length
             if(termFrequency > maxTF){
                 maxTF = termFrequency;
             }
@@ -52,10 +54,11 @@ public class Indexer {
                 postingLines.put(term, new StringBuilder(documentDictionary.get(term).getTerm()).append("|").append(documentDictionary.get(term).getPostingLineInDoc(doc)));
             }
         }
-        String[] details = new String[3];
+        String[] details = new String[4];
         details[0] = doc.getDocId();
         details[1] = String.valueOf(maxTF);
         details[2] = String.valueOf(documentDictionary.size());
+        details[3] = String.valueOf(docLength);
         documentDetails.put(doc.getDocNum(),details);
     }
 
@@ -349,6 +352,10 @@ public class Indexer {
             }
             file1Reader.close();
             file2Reader.close();
+
+            extractDictionaryToFile(targetPath,stem);
+            extractDocumentDetailsToFile(targetPath,stem);
+
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -468,5 +475,77 @@ public class Indexer {
      */
     public HashMap<Integer,String[]> getDocumentDetails(){
         return documentDetails;
+    }
+
+
+    /**
+     *
+     * @param path
+     * @param stem
+     */
+    private void extractDictionaryToFile(String path, boolean stem){
+        ArrayList<String> terms = new ArrayList<>(finalDictionary.keySet());
+        StringBuilder dictionaryContent = new StringBuilder();
+        String totalTF, documentFrequency, postingFileName, sizeOfPostingLine;
+        String[] termDetails;
+        Path pathToFinalDictionary;
+        if(stem)
+            pathToFinalDictionary = Paths.get(path).resolve("finalDictionaryStem.txt");
+        else
+            pathToFinalDictionary = Paths.get(path).resolve("finalDictionary.txt");
+
+        for(String term : terms){
+            termDetails = finalDictionary.get(term);
+            totalTF = termDetails[0];
+            documentFrequency = termDetails[1];
+           /* postingFileName = termDetails[2];*/
+            sizeOfPostingLine = termDetails[3];
+            dictionaryContent.append(term).append("_" + totalTF).append("_" + documentFrequency).append("_" + sizeOfPostingLine);
+            if(dictionaryContent.length() >= 100000000){
+                writePostingLinesToTempFile(pathToFinalDictionary.toString(),dictionaryContent.toString());
+                dictionaryContent = new StringBuilder();
+            }
+        }
+        if(dictionaryContent.length() > 0){
+            writePostingLinesToTempFile(pathToFinalDictionary.toString(),dictionaryContent.toString());
+            dictionaryContent = new StringBuilder();
+        }
+
+    }
+
+
+    /**
+     *
+     * @param path
+     * @param stem
+     */
+    private void extractDocumentDetailsToFile(String path, boolean stem){
+        ArrayList<Integer> docs = new ArrayList<>(documentDetails.keySet());
+        StringBuilder documentDetailsContent = new StringBuilder();
+        Path pathToDocumentDetails;
+        String[] docDetails;
+        String docName, maxTF, uniqueTerms, docLength;
+
+        if(stem)
+            pathToDocumentDetails = Paths.get(path).resolve("documentDetailsStem.txt");
+        else
+            pathToDocumentDetails = Paths.get(path).resolve("documentDetails.txt");
+
+        for(Integer id : docs){
+            docDetails = documentDetails.get(id);
+            docName = docDetails[0];
+            maxTF = docDetails[1];
+            uniqueTerms = docDetails[2];
+            docLength = docDetails[3];
+            documentDetailsContent.append(id).append("_" + docName).append("_" + maxTF).append("_" + uniqueTerms).append("_" + docLength);
+            if(documentDetailsContent.length() >= 100000000){
+                writePostingLinesToTempFile(pathToDocumentDetails.toString(),documentDetailsContent.toString());
+                documentDetailsContent = new StringBuilder();
+            }
+        }
+        if(documentDetailsContent.length() > 0){
+            writePostingLinesToTempFile(pathToDocumentDetails.toString(),documentDetailsContent.toString());
+            documentDetailsContent = new StringBuilder();
+        }
     }
 }
