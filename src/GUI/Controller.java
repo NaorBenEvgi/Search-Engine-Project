@@ -8,15 +8,12 @@ import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * This class is a controller that runs the search engine behind the scenes, following the commands sent by the user-interface.
  */
-public class Controller {
+public class Controller extends Observable{
 
     private Indexer indexer;
     private ReadFile corpusReader;
@@ -182,8 +179,8 @@ public class Controller {
 
 
     /**
-     *
-     * @param path
+     * Deletes all the posting files and dictionary from the index directory
+     * @param path the path of the index
      */
     public void deleteIndexes(String path){
         deleteDirectoryWithFiles(path);
