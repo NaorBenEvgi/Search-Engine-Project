@@ -190,8 +190,24 @@ public class Indexer {
 
             //creates the content (the posting lines) in a lexicographical order and writes it in a new file
             StringBuilder fileContent = new StringBuilder();
+            BufferedWriter fileWriter = new BufferedWriter(new FileWriter(mergedPostingFilePath));
+            int tempDicSize = mergedDictionary.size()/10, counter = 0;
             for (String s : mergedDictionary.keySet()) {
                 fileContent.append(s).append("|").append(mergedDictionary.get(s)).append("\n");
+                if(counter < tempDicSize) {
+                    counter++;
+                }
+                else {
+                    counter = 0;
+                    fileWriter.write(fileContent.toString());
+                    fileWriter.newLine();
+                    fileContent = new StringBuilder();
+                }
+            }
+            if(counter != 0){
+                fileWriter.write(fileContent.toString());
+                fileWriter.newLine();
+                fileContent = new StringBuilder();
             }
             writePostingLinesToTempFile(mergedPostingFilePath,fileContent.toString());
             postingFile1.close();
