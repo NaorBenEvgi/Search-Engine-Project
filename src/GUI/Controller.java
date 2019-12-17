@@ -2,7 +2,9 @@ package GUI;
 
 import Indexing.*;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,6 +47,9 @@ public class Controller {
 
         corpusReader.extractFilesFromFolder(corpus,filesInCorpus);
         long threshold = (corpusReader.getCorpusSize()/100)/(corpusReader.getCorpusSize()/filesInCorpus.size());
+        if(threshold < 1){
+            threshold = 1;
+        }
         int fileCounter = 0;
         int tempFolderCounter1, tempFolderCounter2;
 
@@ -191,13 +196,50 @@ public class Controller {
 
 
     /**
-     *
-     * @param path
-     * @param stem
+     * Reads the indexed file of the dictionary, and loads it into the HashMap
+     * @param targetPath the path of the indexed files
+     * @param stem an indicator of whether the terms have gone through stemming in the indexing process
      */
-    public void loadDictionary(String path, boolean stem){
+    public void loadDictionary(String targetPath, boolean stem){
         finalDictionary = new TreeMap<>();
+        String innerTargetPath;
+        ArrayList<File> filesInDirectory = new ArrayList<>();
+        File dictionaryFile = null;
+        BufferedReader dictionaryReader;
+        if(stem){
+            innerTargetPath = Paths.get(targetPath).resolve("indexStem").toString();
+        }
+        else{
+            innerTargetPath = Paths.get(targetPath).resolve("index").toString();
+        }
 
+        File innerDirectory = new File(innerTargetPath);
+        corpusReader.extractFilesFromFolder(innerDirectory,filesInDirectory);
+        for(File file : filesInDirectory){
+            if(file.getName().contains("finalDictionary")){
+                dictionaryFile = file;
+                break;
+            }
+        }
+
+        try{
+            if(dictionaryFile == null){
+                throw new NullPointerException();
+            }
+            dictionaryReader = new BufferedReader(new FileReader(dictionaryFile));
+            String[] termDetails = new String[3];
+            String line, term;
+            while((line = dictionaryReader.readLine()) != null){
+               String[] lineComponents = line.split("_");
+               term = lineComponents[0];
+               termDetails[0] = lineComponents[1];
+               termDetails[1] = lineComponents[2];
+               termDetails[2] = lineComponents[3];
+               finalDictionary.put(term,termDetails);
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
 }

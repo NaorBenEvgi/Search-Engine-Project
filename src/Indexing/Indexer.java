@@ -240,9 +240,18 @@ public class Indexer {
     public void createTermsListByLetter(String firstFilePath, String secondFilePath, String targetPath, boolean stem){
         BufferedReader file1Reader, file2Reader;
         String term, lastLine1, lastLine2;
+        String innerTargetPath;
         StringBuilder contentToFile = new StringBuilder();
         StringBuilder lineBuilder;
         HashMap<String,StringBuilder> sortedTerms = new HashMap<>();
+
+        if(stem){
+            innerTargetPath = Paths.get(targetPath).resolve("indexStem").toString();
+        }
+        else{
+            innerTargetPath = Paths.get(targetPath).resolve("index").toString();
+        }
+        new File(innerTargetPath).mkdir();
 
         try {
             file1Reader = new BufferedReader(new FileReader(firstFilePath));
@@ -279,7 +288,7 @@ public class Indexer {
             }
             sortedTerms.clear();
             sortedTermsList.clear();
-            writeContentToLetterFile(contentToFile,"NumPostingFile", targetPath, stem);
+            writeContentToLetterFile(contentToFile,"NumPostingFile", innerTargetPath, stem);
             contentToFile = new StringBuilder();
 
 //---------------------------------------------------- Letters ------------------------------------------------------------
@@ -347,14 +356,14 @@ public class Indexer {
                 }
                 sortedTermsList.clear();
                 sortedTerms.clear();
-                writeContentToLetterFile(contentToFile,letters[i] + "PostingFile",targetPath,stem);
+                writeContentToLetterFile(contentToFile,letters[i] + "PostingFile",innerTargetPath,stem);
                 contentToFile = new StringBuilder();
             }
             file1Reader.close();
             file2Reader.close();
 
-            extractDictionaryToFile(targetPath,stem);
-            extractDocumentDetailsToFile(targetPath,stem);
+            extractDictionaryToFile(innerTargetPath,stem);
+            extractDocumentDetailsToFile(innerTargetPath,stem);
 
         } catch (Exception e){
             e.printStackTrace();
@@ -454,8 +463,8 @@ public class Indexer {
         //In case the term is common enough, we collect its details into the final dictionary
         termDetails[0] = String.valueOf(sumOfTfTerm); //how many times the term appears in the corpus
         termDetails[1] = String.valueOf(dfTerm); //how many documents the term appears in
-        termDetails[2] = postingFileName;
-        termDetails[3] = String.valueOf(postingLineWithTerm.toString().getBytes().length); //the posting line size in memory
+  /*      termDetails[2] = postingFileName;*/
+        termDetails[2] = String.valueOf(postingLineWithTerm.toString().getBytes().length); //the posting line size in memory
         finalDictionary.put(term,termDetails);
 
         return true;
@@ -499,8 +508,8 @@ public class Indexer {
             totalTF = termDetails[0];
             documentFrequency = termDetails[1];
            /* postingFileName = termDetails[2];*/
-            sizeOfPostingLine = termDetails[3];
-            dictionaryContent.append(term).append("_" + totalTF).append("_" + documentFrequency).append("_" + sizeOfPostingLine);
+            sizeOfPostingLine = termDetails[2];
+            dictionaryContent.append(term).append("_" + totalTF).append("_" + documentFrequency).append("_" + sizeOfPostingLine).append("\n");
             if(dictionaryContent.length() >= 100000000){
                 writePostingLinesToTempFile(pathToFinalDictionary.toString(),dictionaryContent.toString());
                 dictionaryContent = new StringBuilder();
@@ -537,7 +546,7 @@ public class Indexer {
             maxTF = docDetails[1];
             uniqueTerms = docDetails[2];
             docLength = docDetails[3];
-            documentDetailsContent.append(id).append("_" + docName).append("_" + maxTF).append("_" + uniqueTerms).append("_" + docLength);
+            documentDetailsContent.append(id).append("_" + docName).append("_" + maxTF).append("_" + uniqueTerms).append("_" + docLength).append("\n");
             if(documentDetailsContent.length() >= 100000000){
                 writePostingLinesToTempFile(pathToDocumentDetails.toString(),documentDetailsContent.toString());
                 documentDetailsContent = new StringBuilder();
