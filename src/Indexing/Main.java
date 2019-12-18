@@ -7,7 +7,7 @@ public class Main {
 
     }
 
-    public static void main(String[] args) throws Exception{
+    public static void bla(){
       /* ReadFile rf = new ReadFile();
         ArrayList<Article> docs = rf.readFiles("corpus");
         Indexer indexer = new Indexer();
@@ -31,14 +31,13 @@ public class Main {
         new File(Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles11").toString()).toString()).mkdir();
         Files.walk(Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles11").toString())).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
 */
- /*       long time = System.currentTimeMillis();
+  /*      long time = System.currentTimeMillis();
         Controller contri = new Controller();
         contri.runEngine("C:\\Users\\royj1\\Desktop\\cor","C:\\Users\\royj1\\Desktop\\b",true);
-        System.out.println((System.currentTimeMillis() - time)/1000);
-*/
+        System.out.println((System.currentTimeMillis() - time)/1000);*/
         /*DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Choose the directory of the corpus");
-        File corpus = chooser.showDialog(null);
+        File corpus = chooser.showDialog(new Stage());
         System.out.println(corpus.getName());*/
 
 

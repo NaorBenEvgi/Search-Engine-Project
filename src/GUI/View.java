@@ -1,15 +1,14 @@
 package GUI;
 
-
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
 
-public class View extends Canvas implements Observer {
+public class View implements Observer {
 
     private ViewController viewController;
     public TextField corpusPathTextField;
@@ -17,7 +16,7 @@ public class View extends Canvas implements Observer {
     public Button corpusPathBrowser;
     public Button indexPathBrowser;
     public javafx.scene.control.CheckBox stemmingCheckbox;
-    boolean stem;
+    private boolean stem;
     public Button runEngineButton;
     public Button loadDictionaryButton;
     public Button displayDictionaryButton;
@@ -28,7 +27,7 @@ public class View extends Canvas implements Observer {
 
     /**
      * Assigns the ViewController of the program with the given ViewController
-     * @param vc
+     * @param vc the given ViewController
      */
     public void setViewController(ViewController vc){
         this.viewController = vc;
@@ -41,7 +40,7 @@ public class View extends Canvas implements Observer {
     public void activateEngine(){
         String corpusPath = corpusPathTextField.getText();
         String targetPath = indexPathTextField.getText();
-        if(corpusPath == null || targetPath == null){
+        if(corpusPath.equals("") || targetPath.equals("")){
             displayAlert("Wrong Input!","One or more of the paths is missing!");
             return;
         }
@@ -102,7 +101,7 @@ public class View extends Canvas implements Observer {
      * Resets the memory and deletes the posting files and the dictionary.
      */
     public void reset(){
-        viewController.reset();
+        viewController.reset(indexPathTextField.getText());
     }
 
 
@@ -112,19 +111,8 @@ public class View extends Canvas implements Observer {
     public void browseCorpusPath(){
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Choose the directory of the corpus");
-        File corpus = chooser.showDialog(null);
-
-
-        /*File compressedMaze = chooser.showOpenDialog((Stage)mazeDisplayer.getScene().getWindow());
-        if(compressedMaze != null){
-            viewModel.loadMaze(compressedMaze);
-            playSong("resources/music/EntranceOriginalSmurfSong.mp3");
-            solveMazeButton.setSelected(false);
-            hintButton.setDisable(false);
-            mazeDisplayer.requestFocus();
-            startedTime = System.currentTimeMillis();
-            timeLabel.setText("");
-        }*/
+        File corpus = chooser.showDialog(new Stage());
+        corpusPathTextField.setText(corpus.getPath());
     }
 
 
@@ -132,12 +120,13 @@ public class View extends Canvas implements Observer {
      * Enables the user to select the path of the index
      */
     public void browseIndexPath(){
-
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Choose the directory of the index files");
+        File index = chooser.showDialog(new Stage());
+        indexPathTextField.setText(index.getPath());
     }
 
 
     @Override
-    public void update(Observable o, Object arg) {
-
-    }
+    public void update(Observable o, Object arg) { }
 }

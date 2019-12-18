@@ -387,14 +387,19 @@ public class Parse {
         // Add hash
         int wordsNumber = articleWords.size();
         for (int i = 0; i < wordsNumber ; i++) {
+            //cleans unnecessary characters from the word
             String word = articleWords.get(i).replaceAll(",", "");
             if(word.startsWith("-") || word.endsWith("-")){
                 word = word.replace("-", "");
             }
-            //TODO: try and fix these cases:
-            /*if(word.startsWith("/") || word.endsWith("/")){
-                word = word.replace("-", "");
-            }*/
+            if(word.startsWith("/")){
+                while(word.charAt(0) == '/')
+                    word = word.substring(1);
+            }
+            if(word.endsWith("/")){
+                while(word.charAt(word.length()-1) == '/')
+                    word = word.substring(0,word.length()-1);
+            }
 
             String nextWord = i + 1 < wordsNumber ? articleWords.get(i + 1).replaceAll(",", ""): "";
             if (word.length() > 1) {

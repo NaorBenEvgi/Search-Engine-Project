@@ -8,8 +8,6 @@ public class ViewController extends Observable implements Observer {
     private Controller controller;
 
 
-
-
     public ViewController(Controller controller){
         this.controller = controller;
     }
@@ -35,15 +33,16 @@ public class ViewController extends Observable implements Observer {
     }
 
 
-    public void reset(){
-
+    public void reset(String path){
+        controller.deleteIndexes(path);
     }
 
 
     @Override
     public void update(Observable o, Object arg) {
         if(o == controller){
-
+            setChanged();
+            notifyObservers();
         }
     }
 }
