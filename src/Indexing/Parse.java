@@ -51,6 +51,21 @@ public class Parse {
             while((word = stopWordsReader.readLine()) != null){
                 stopWords.add(word);
             }
+/*
+
+            //removes the numbers from the stop words in order to parse them numerically
+            stopWords.remove("one");
+            stopWords.remove("two");
+            stopWords.remove("three");
+            stopWords.remove("four");
+            stopWords.remove("five");
+            stopWords.remove("six");
+            stopWords.remove("seven");
+            stopWords.remove("eight");
+            stopWords.remove("nine");
+            stopWords.remove("zero");
+*/
+
             stopWordsReader.close();
         } catch(Exception e){
             e.printStackTrace();
@@ -444,6 +459,42 @@ public class Parse {
                     }catch(Exception e){
                         parsedWords.add(word);
                     }
+                } //parses kilo-metrics
+                else if(word.toLowerCase().startsWith("kilo") && word.length() > 4){
+                    switch (word.substring(4).toLowerCase()){
+                        case "meter":
+                            parsedWords.add("km");
+                            break;
+
+                        case "meters":
+                            parsedWords.add("km");
+                            break;
+
+                        case "gram":
+                            parsedWords.add("kg");
+                            break;
+
+                        case "grams":
+                            parsedWords.add("kg");
+                            break;
+
+                        case "calories":
+                            parsedWords.add("kcal");
+                            break;
+
+                        case "byte":
+                            parsedWords.add("KB");
+                            break;
+
+                        case "bytes":
+                            parsedWords.add("KB");
+                            break;
+
+                        default:
+                            parsedWords.add(word);
+                            break;
+                    }
+                    this.skipNextWord = false;
                 }
                 else{
                     parsedWords.add(word);
@@ -521,6 +572,5 @@ public class Parse {
             termInDic.setTerm(word);
         }
         return termInDic;
-
     }
 }

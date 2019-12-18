@@ -135,7 +135,6 @@ public class View implements Observer {
 
         try{
             dictionaryReader = new BufferedReader(new FileReader(dictionaryFile));
-            String[] termDetails = new String[3];
             String line, term, totalTF;
             while((line = dictionaryReader.readLine()) != null){
                 String[] lineComponents = line.split("_");
