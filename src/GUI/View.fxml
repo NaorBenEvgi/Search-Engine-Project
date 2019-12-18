@@ -10,12 +10,12 @@
 <AnchorPane fx:controller="GUI.View" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="466.0" prefWidth="691.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <CheckBox layoutX="554.0" layoutY="142.0" mnemonicParsing="false" text="Stemming" fx:id="stemmingCheckbox" onAction="#checkStemming"/>
-      <TextField layoutX="131.0" layoutY="137.0" fx:id="indexPathTextField"/>
-      <TextField layoutX="131.0" layoutY="245.0" fx:id="corpusPathTextField"/>
+      <TextField layoutX="131.0" layoutY="137.0" fx:id="corpusPathTextField"/>
+      <TextField layoutX="131.0" layoutY="245.0" fx:id="indexPathTextField"/>
       <Label layoutX="182.0" layoutY="212.0" prefHeight="21.0" prefWidth="105.0" text="Path to Index" fx:id="indexPathLabel" />
       <Label layoutX="182.0" layoutY="108.0" prefHeight="21.0" prefWidth="105.0" text="Path to Corpus" fx:id="corpusPathLabel" />
-      <Button layoutX="43.0" layoutY="137.0" mnemonicParsing="false" text="Browse" fx:id="indexPathBrowser" onAction="#browseIndexPath"/>
-      <Button layoutX="43.0" layoutY="245.0" mnemonicParsing="false" text="Browse" fx:id="corpusPathBrowser" onAction="#browseCorpusPath"/>
+      <Button layoutX="43.0" layoutY="137.0" mnemonicParsing="false" text="Browse" fx:id="corpusPathBrowser" onAction="#browseCorpusPath"/>
+      <Button layoutX="43.0" layoutY="245.0" mnemonicParsing="false" text="Browse" fx:id="indexPathBrowser" onAction="#browseIndexPath"/>
       <Button layoutX="554.0" layoutY="192.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="96.0" text="Go" fx:id="runEngineButton" onAction="#activateEngine"/>
       <Button layoutX="146.0" layoutY="337.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="96.0" text="Reset" fx:id="clearIndexButton" onAction="#reset"/>
       <Button layoutX="537.0" layoutY="337.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="130.0" text="Load Dictionary" fx:id="loadDictionaryButton" onAction="#loadDictionary"/>

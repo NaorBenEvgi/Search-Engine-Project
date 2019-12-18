@@ -393,14 +393,16 @@ public class Parse {
                 word = word.replace("-", "");
             }
             if(word.startsWith("/")){
-                while(word.charAt(0) == '/')
+                while(!word.equals("") && word.charAt(0) == '/')
                     word = word.substring(1);
             }
-            if(word.endsWith("/")){
+            if(!word.equals("") && word.endsWith("/")){
                 while(word.charAt(word.length()-1) == '/')
                     word = word.substring(0,word.length()-1);
             }
-
+            if(word.equals("")){
+                continue;
+            }
             String nextWord = i + 1 < wordsNumber ? articleWords.get(i + 1).replaceAll(",", ""): "";
             if (word.length() > 1) {
                 if (isNumber(word)) {

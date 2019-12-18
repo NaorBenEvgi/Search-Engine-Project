@@ -1,12 +1,18 @@
 package GUI;
 
+import Indexing.ReadFile;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import java.io.BufferedReader;
 import java.io.File;
-import java.util.Observable;
-import java.util.Observer;
+import java.io.FileReader;
+import java.nio.file.Paths;
+import java.util.*;
 
 public class View implements Observer {
 
@@ -23,6 +29,7 @@ public class View implements Observer {
     public Button clearIndexButton;
     public Label corpusPathLabel;
     public Label indexPathLabel;
+    private ReadFile reader;
 
 
     /**
@@ -63,7 +70,13 @@ public class View implements Observer {
      */
     public void loadDictionary(){
         String indexPath = indexPathTextField.getText();
-        viewController.loadDictionary(indexPath, stem);
+        try{
+            viewController.loadDictionary(indexPath, stem);
+            displayAlert("The dictionary has been loaded successfully","");
+        }
+        catch (Exception e){
+            displayAlert("The dictionary is missing","Please run the search-engine first!");
+        }
     }
 
     /**
@@ -93,7 +106,55 @@ public class View implements Observer {
      * Pops a window that displays the dictionary.
      */
     public void displayDictionary(){
+        reader = new ReadFile();
+        SortedMap<String,String> finalDictionary = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        String innerTargetPath;
+        ArrayList<File> filesInDirectory = new ArrayList<>();
+        File dictionaryFile = null;
+        BufferedReader dictionaryReader;
+        if(stem){
+            innerTargetPath = Paths.get(indexPathTextField.getText()).resolve("indexStem").toString();
+        }
+        else{
+            innerTargetPath = Paths.get(indexPathTextField.getText()).resolve("index").toString();
+        }
 
+        File innerDirectory = new File(innerTargetPath);
+
+        if(!innerDirectory.exists()){
+            displayAlert("The dictionary does not exist","Please run the engine before any try again!");
+            return;
+        }
+        reader.extractFilesFromFolder(innerDirectory,filesInDirectory);
+        for(File file : filesInDirectory){
+            if(file.getName().contains("finalDictionary")){
+                dictionaryFile = file;
+                break;
+            }
+        }
+
+        try{
+            dictionaryReader = new BufferedReader(new FileReader(dictionaryFile));
+            String[] termDetails = new String[3];
+            String line, term, totalTF;
+            while((line = dictionaryReader.readLine()) != null){
+                String[] lineComponents = line.split("_");
+                term = lineComponents[0];
+                totalTF = lineComponents[1];
+                finalDictionary.put(term,totalTF);
+            }
+            dictionaryReader.close();
+        } catch(Exception e){
+            displayAlert("The dictionary does not exist","Please run the engine before any try again!");
+        }
+
+        JTable table=new JTable(convertDictionaryToTable(finalDictionary));
+        JFrame frame=new JFrame();
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.add(new JScrollPane(table));
+        frame.setSize(600,800);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 
 
@@ -101,7 +162,10 @@ public class View implements Observer {
      * Resets the memory and deletes the posting files and the dictionary.
      */
     public void reset(){
-        viewController.reset(indexPathTextField.getText());
+        if(viewController.reset(indexPathTextField.getText()))
+            displayAlert("The memory was cleared successfully", "Hope to see you next time!");
+        else
+            displayAlert("No files were deleted","Couldn't find any files to delete");
     }
 
 
@@ -129,4 +193,15 @@ public class View implements Observer {
 
     @Override
     public void update(Observable o, Object arg) { }
+
+    public static TableModel convertDictionaryToTable(Map<String,String> map) {
+        DefaultTableModel model = new DefaultTableModel(
+                new Object[] { "Term", "Total appearances in corpus" }, 0
+        );
+        for (Map.Entry<String,String> entry : map.entrySet()) {
+            model.addRow(new Object[] { entry.getKey(), entry.getValue() });
+        }
+        return model;
+    }
 }
+

@@ -19,7 +19,7 @@ public class Main extends Application {
         Controller controller = new Controller();
         ViewController viewController = new ViewController(controller);
         controller.addObserver(viewController);
-        primaryStage.setTitle("Fake News Search Engine");
+        primaryStage.setTitle("Our Search Engine - Information Retrieval Course");
         FXMLLoader fxmlLoader = new FXMLLoader();
         Scene scene = new Scene(fxmlLoader.load(getClass().getResource("View.fxml").openStream()),1000,600);
         primaryStage.setScene(scene);

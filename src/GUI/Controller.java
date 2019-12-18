@@ -20,6 +20,13 @@ public class Controller extends Observable{
     private SortedMap<String,String[]> finalDictionary;
     private HashMap<Integer,String[]> documentDetails;
 
+    public Controller() {
+        indexer = new Indexer();
+        corpusReader = new ReadFile();
+        finalDictionary = new TreeMap<>();
+        documentDetails = new HashMap<>();
+    }
+
     /**
      * Activates the indexing process of the search engine. The function gets the path to the corpus,
      * reads all the documents stored in it, and indexes the corpus using a dictionary and posting files.
@@ -182,13 +189,21 @@ public class Controller extends Observable{
      * Deletes all the posting files and dictionary from the index directory
      * @param path the path of the index
      */
-    public void deleteIndexes(String path){
-        deleteDirectoryWithFiles(path);
-        //TODO: check if this is considered to be cleaning up the memory, or if we should point to null
+    public boolean deleteIndexes(String path){
+        boolean ans = false;
+        File[] filesInPath = new File(path).listFiles();
+        for (File file : filesInPath) {
+            if(file.isDirectory() && file.getName().contains("index")){
+                deleteDirectoryWithFiles(file.getPath());
+                ans = true;
+            }
+        }
         finalDictionary = new TreeMap<>();
         documentDetails = new HashMap<>();
         indexer = new Indexer();
         corpusReader = new ReadFile();
+
+        return ans;
     }
 
 
@@ -197,7 +212,7 @@ public class Controller extends Observable{
      * @param targetPath the path of the indexed files
      * @param stem an indicator of whether the terms have gone through stemming in the indexing process
      */
-    public void loadDictionary(String targetPath, boolean stem){
+    public void loadDictionary(String targetPath, boolean stem) throws Exception{
         finalDictionary = new TreeMap<>();
         String innerTargetPath;
         ArrayList<File> filesInDirectory = new ArrayList<>();
@@ -219,7 +234,7 @@ public class Controller extends Observable{
             }
         }
 
-        try{
+
             if(dictionaryFile == null){
                 throw new NullPointerException();
             }
@@ -234,9 +249,6 @@ public class Controller extends Observable{
                termDetails[2] = lineComponents[3];
                finalDictionary.put(term,termDetails);
             }
-        } catch(Exception e){
-            e.printStackTrace();
-        }
     }
 
 }

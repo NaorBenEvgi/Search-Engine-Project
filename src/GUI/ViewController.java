@@ -28,13 +28,13 @@ public class ViewController extends Observable implements Observer {
     }
 
 
-    public void loadDictionary(String indexPath, boolean stem){
+    public void loadDictionary(String indexPath, boolean stem) throws Exception{
         controller.loadDictionary(indexPath,stem);
     }
 
 
-    public void reset(String path){
-        controller.deleteIndexes(path);
+    public boolean reset(String path){
+        return controller.deleteIndexes(path);
     }
 
 
