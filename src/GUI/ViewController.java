@@ -35,6 +35,11 @@ public class ViewController extends Observable implements Observer {
     }
 
 
+    public void reset(){
+
+    }
+
+
     @Override
     public void update(Observable o, Object arg) {
         if(o == controller){

@@ -1,7 +1,5 @@
 package Indexing;
 
-import GUI.Controller;
-
 public class Main {
 
 
@@ -33,11 +31,15 @@ public class Main {
         new File(Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles11").toString()).toString()).mkdir();
         Files.walk(Paths.get(System.getProperty("user.dir"), Paths.get("postingFiles11").toString())).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
 */
-        long time = System.currentTimeMillis();
+ /*       long time = System.currentTimeMillis();
         Controller contri = new Controller();
         contri.runEngine("C:\\Users\\royj1\\Desktop\\cor","C:\\Users\\royj1\\Desktop\\b",true);
         System.out.println((System.currentTimeMillis() - time)/1000);
-
+*/
+        /*DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Choose the directory of the corpus");
+        File corpus = chooser.showDialog(null);
+        System.out.println(corpus.getName());*/
 
 
        /* File a = new File("C:\\Users\\royj1\\Desktop\\a\\b.txt");
