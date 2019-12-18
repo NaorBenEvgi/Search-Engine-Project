@@ -50,6 +50,7 @@ public class Controller extends Observable{
         tempDirectory2.mkdir();
 
         corpusReader.extractFilesFromFolder(corpus,filesInCorpus);
+        //computes a threshold that indicates the amount of files to accumulate before writing a posting files with the terms in them
         long threshold = (corpusReader.getCorpusSize()/100)/(corpusReader.getCorpusSize()/filesInCorpus.size());
         if(threshold < 1){
             threshold = 1;
@@ -74,6 +75,7 @@ public class Controller extends Observable{
             indexer.createTemporaryPosting(tempFilesFolder1);
         }
 
+        //merges all the initial posting files into temporary merged posting files, before eventually splitting them into 27 final posting files
         tempFolderCounter1 = tempDirectory1.listFiles().length;
         tempFolderCounter2 = tempDirectory2.listFiles().length;
         while(true){
@@ -114,7 +116,7 @@ public class Controller extends Observable{
         corpusReader.extractFilesFromFolder(sourceFolder,filesInSourceFolder);
 
         try {
-            if (filesInSourceFolder.size() % 2 != 0) {
+            if (filesInSourceFolder.size() % 2 != 0) { //in case there is an odd number of posting files, one is moved to the other temporary folder and the rest are merged
                 String fileName = filesInSourceFolder.get(0).getName();
                 Path newFilePath = Paths.get(destinationFolderPath).resolve(fileName);
                 Files.move(Paths.get(filesInSourceFolder.get(0).getPath()), newFilePath);
@@ -218,7 +220,7 @@ public class Controller extends Observable{
         ArrayList<File> filesInDirectory = new ArrayList<>();
         File dictionaryFile = null;
         BufferedReader dictionaryReader;
-        if(stem){
+        if(stem){ //computes the path of the directory in which the wanted dictionary is stored
             innerTargetPath = Paths.get(targetPath).resolve("indexStem").toString();
         }
         else{
@@ -227,30 +229,29 @@ public class Controller extends Observable{
 
         File innerDirectory = new File(innerTargetPath);
         corpusReader.extractFilesFromFolder(innerDirectory,filesInDirectory);
-        for(File file : filesInDirectory){
+        for(File file : filesInDirectory){ //searches for the dictionary file
             if(file.getName().contains("finalDictionary")){
                 dictionaryFile = file;
                 break;
             }
         }
 
-
-            if(dictionaryFile == null){
-                throw new NullPointerException();
-            }
-            dictionaryReader = new BufferedReader(new FileReader(dictionaryFile));
-            String[] termDetails = new String[3];
-            String line, term;
-            while((line = dictionaryReader.readLine()) != null){
-               String[] lineComponents = line.split("_");
-               term = lineComponents[0];
-               termDetails[0] = lineComponents[1];
-               termDetails[1] = lineComponents[2];
-               termDetails[2] = lineComponents[3];
-               finalDictionary.put(term,termDetails);
-            }
+        //reads the dictionary file and fills the final dictionary HashMap with the content
+        if(dictionaryFile == null){
+            throw new NullPointerException();
+        }
+        dictionaryReader = new BufferedReader(new FileReader(dictionaryFile));
+        String[] termDetails = new String[3];
+        String line, term;
+        while((line = dictionaryReader.readLine()) != null){
+            String[] lineComponents = line.split("_");
+            term = lineComponents[0];
+            termDetails[0] = lineComponents[1];
+            termDetails[1] = lineComponents[2];
+            termDetails[2] = lineComponents[3];
+            finalDictionary.put(term,termDetails);
+        }
         dictionaryReader.close();
-
     }
 
 }
