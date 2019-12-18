@@ -46,7 +46,7 @@ public class View implements Observer {
      */
     public void activateEngine(){
         String corpusPath = corpusPathTextField.getText();
-        String targetPath = indexPathTextField.getText();
+       String targetPath = indexPathTextField.getText();
         if(corpusPath.equals("") || targetPath.equals("")){
             displayAlert("Wrong Input!","One or more of the paths is missing!");
             return;

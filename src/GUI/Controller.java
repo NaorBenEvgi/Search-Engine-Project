@@ -249,6 +249,8 @@ public class Controller extends Observable{
                termDetails[2] = lineComponents[3];
                finalDictionary.put(term,termDetails);
             }
+        dictionaryReader.close();
+
     }
 
 }
