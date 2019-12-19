@@ -197,7 +197,7 @@ public class Indexer {
             StringBuilder fileContent = new StringBuilder();
             for (String s : mergedDictionary.keySet()) {
                 fileContent.append(s).append("|").append(mergedDictionary.get(s)).append("\n");
-                if(fileContent.length() >= 100000000){
+                if(fileContent.length() >= 50000000){
                     writePostingLinesToTempFile(mergedPostingFilePath,fileContent.toString());
                     fileContent = new StringBuilder();
                 }

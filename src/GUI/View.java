@@ -107,7 +107,7 @@ public class View implements Observer {
      */
     public void displayDictionary(){
         reader = new ReadFile();
-        SortedMap<String,String> finalDictionary = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        SortedMap<String,String> finalDictionary = new TreeMap<>();
         String innerTargetPath;
         ArrayList<File> filesInDirectory = new ArrayList<>();
         File dictionaryFile = null;
