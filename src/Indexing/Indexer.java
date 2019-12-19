@@ -64,9 +64,10 @@ public class Indexer {
 
 
     /**
-     *
-     * @param word
-     * @return
+     * Checks a term that is stored in the data structure of this class and a given term, which both are the same term,
+     * and returns the form in which it should be kept in the index.
+     * @param word the checked term
+     * @return the correct form of the term
      */
     private String removeDuplicatesTermsIndexer(String word){
         if(Character.isDigit(word.charAt(0))){
@@ -76,12 +77,10 @@ public class Indexer {
         String postingLine = postingLines.get(wordInLower).toString();
         String termInPostingLines = postingLines.get(wordInLower).substring(0,postingLine.indexOf("|"));
 
-
         if(Character.isLowerCase(word.charAt(0))) {
             return word;
         }
         return termInPostingLines;
-
     }
 
     /**
@@ -488,12 +487,13 @@ public class Indexer {
 
 
     /**
-     *
-     * @param path
-     * @param stem
+     * Writes the content of the final dictionary into a file.
+     * @param path the path in which to store the dictionary file
+     * @param stem indicates whether the terms in the dictionary have gone through stemming or not
      */
     private void extractDictionaryToFile(String path, boolean stem){
         ArrayList<String> terms = new ArrayList<>(finalDictionary.keySet());
+        terms.sort(String.CASE_INSENSITIVE_ORDER);
         StringBuilder dictionaryContent = new StringBuilder();
         String totalTF, documentFrequency, postingFileName, sizeOfPostingLine;
         String[] termDetails;
@@ -510,7 +510,7 @@ public class Indexer {
            /* postingFileName = termDetails[2];*/
             sizeOfPostingLine = termDetails[2];
             dictionaryContent.append(term).append("_" + totalTF).append("_" + documentFrequency).append("_" + sizeOfPostingLine).append("\n");
-            if(dictionaryContent.length() >= 100000000){
+            if(dictionaryContent.length() >= 70000000){
                 writePostingLinesToTempFile(pathToFinalDictionary.toString(),dictionaryContent.toString());
                 dictionaryContent = new StringBuilder();
             }
@@ -524,9 +524,9 @@ public class Indexer {
 
 
     /**
-     *
-     * @param path
-     * @param stem
+     * Writes the content of the documents details data structure into a file.
+     * @param path the path in which to store the documents details file
+     * @param stem indicates whether the terms in the documents have gone through stemming or not
      */
     private void extractDocumentDetailsToFile(String path, boolean stem){
         ArrayList<Integer> docs = new ArrayList<>(documentDetails.keySet());
@@ -547,7 +547,7 @@ public class Indexer {
             uniqueTerms = docDetails[2];
             docLength = docDetails[3];
             documentDetailsContent.append(id).append("_" + docName).append("_" + maxTF).append("_" + uniqueTerms).append("_" + docLength).append("\n");
-            if(documentDetailsContent.length() >= 100000000){
+            if(documentDetailsContent.length() >= 70000000){
                 writePostingLinesToTempFile(pathToDocumentDetails.toString(),documentDetailsContent.toString());
                 documentDetailsContent = new StringBuilder();
             }

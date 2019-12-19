@@ -14,6 +14,9 @@ import java.io.FileReader;
 import java.nio.file.Paths;
 import java.util.*;
 
+/**
+ * This class is responsible for managing the user interface of the search engine.
+ */
 public class View implements Observer {
 
     private ViewController viewController;

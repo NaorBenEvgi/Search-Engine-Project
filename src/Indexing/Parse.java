@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public class Parse {
 
     private static final String REGEX_BY_LINES = "\\r?\\n";
-    private static final String REGEX_BY_WORDS = "[^\\w$/%-]+";
+    private static final String REGEX_BY_WORDS = "[^\\w,$/%-]+";
     private static final String DECIMAL_FORMAT = "#.###";
     private static final String REGEX_SEARCH_FOR_NUMBER = "-?\\d+(\\.\\d+)?";
     private static final String REGEX_SEARCH_FOR_FRACTION = "-?\\d+/(\\d+)?";
@@ -51,20 +51,6 @@ public class Parse {
             while((word = stopWordsReader.readLine()) != null){
                 stopWords.add(word);
             }
-/*
-
-            //removes the numbers from the stop words in order to parse them numerically
-            stopWords.remove("one");
-            stopWords.remove("two");
-            stopWords.remove("three");
-            stopWords.remove("four");
-            stopWords.remove("five");
-            stopWords.remove("six");
-            stopWords.remove("seven");
-            stopWords.remove("eight");
-            stopWords.remove("nine");
-            stopWords.remove("zero");
-*/
 
             stopWordsReader.close();
         } catch(Exception e){
@@ -365,10 +351,10 @@ public class Parse {
     }
 
     /**
-     *
-     * @param word
-     * @param nextWord
-     * @return
+     * Parses the numerical string with dependency in what the word after it is.
+     * @param word the numerical term
+     * @param nextWord the following word
+     * @return the parsed form of the number
      */
     private String parseNumber(String word, String nextWord){
         try {
@@ -411,9 +397,12 @@ public class Parse {
                 while(!word.equals("") && word.charAt(0) == '/')
                     word = word.substring(1);
             }
-            if(!word.equals("") && word.endsWith("/")){
-                while(word.charAt(word.length()-1) == '/')
+            if(word.endsWith("/")){
+                while(!word.equals("") && word.charAt(word.length()-1) == '/')
                     word = word.substring(0,word.length()-1);
+            }
+            if(word.contains(",")){
+                word = word.replace(",","");
             }
             if(word.equals("")){
                 continue;
@@ -496,10 +485,10 @@ public class Parse {
                     }
                     this.skipNextWord = false;
                 }
-                else{
+                else{ //no special parsing rule for the word
                     parsedWords.add(word);
                     this.skipNextWord = false;
-                }
+                } //in case the term was parsed along with the word after it
                 if(this.skipNextWord){
                     i++;
                 }

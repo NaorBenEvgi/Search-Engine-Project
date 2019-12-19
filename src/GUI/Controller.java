@@ -19,12 +19,15 @@ public class Controller extends Observable{
     private ReadFile corpusReader;
     private SortedMap<String,String[]> finalDictionary;
     private HashMap<Integer,String[]> documentDetails;
+    private int corpusSize, numOfTerms;
 
     public Controller() {
         indexer = new Indexer();
         corpusReader = new ReadFile();
         finalDictionary = new TreeMap<>();
         documentDetails = new HashMap<>();
+        corpusSize = 0;
+        numOfTerms = 0;
     }
 
     /**
@@ -100,9 +103,9 @@ public class Controller extends Observable{
         }
         deleteDirectoryWithFiles(tempFilesFolder1);
         deleteDirectoryWithFiles(tempFilesFolder2);
-        finalDictionary = indexer.getDictionary();
-        documentDetails = indexer.getDocumentDetails();
-
+        numOfTerms = indexer.getDictionary().size();
+        corpusSize = indexer.getDocumentDetails().size();
+        indexer = new Indexer();
     }
 
     /**
@@ -175,7 +178,7 @@ public class Controller extends Observable{
      * @return the amount of documents in the corpus that were indexed
      */
     public int getAmountOfIndexedDocs(){
-        return documentDetails.size();
+        return corpusSize;
     }
 
     /**
@@ -183,7 +186,7 @@ public class Controller extends Observable{
      * @return the amount of unique terms that were indexed in the dictionary
      */
     public int getAmountOfUniqueTerms(){
-        return finalDictionary.size();
+        return numOfTerms;
     }
 
 
@@ -204,6 +207,8 @@ public class Controller extends Observable{
         documentDetails = new HashMap<>();
         indexer = new Indexer();
         corpusReader = new ReadFile();
+        corpusSize = 0;
+        numOfTerms = 0;
 
         return ans;
     }
@@ -251,6 +256,7 @@ public class Controller extends Observable{
             termDetails[2] = lineComponents[3];
             finalDictionary.put(term,termDetails);
         }
+        numOfTerms = filesInDirectory.size();
         dictionaryReader.close();
     }
 
