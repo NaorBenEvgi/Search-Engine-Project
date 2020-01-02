@@ -3,6 +3,7 @@ package GUI;
 import Indexing.ReadFile;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import javax.swing.*;
@@ -33,6 +34,16 @@ public class View implements Observer {
     public Label corpusPathLabel;
     public Label indexPathLabel;
     private ReadFile reader;
+
+    //partB additions
+    public TextField queryTextField;
+    public Label queryLabel;
+    public Button queryFileBrowser;
+    public Button runQueryButton;
+    public javafx.scene.control.CheckBox semanticTreatmentCheckbox;
+    public Button saveResultsButton;
+    private boolean semanticTreatment;
+    //TODO: need to add entities identification functionality
 
 
     /**
@@ -196,6 +207,11 @@ public class View implements Observer {
     @Override
     public void update(Observable o, Object arg) { }
 
+    /**
+     * Converts the dictionary from a HashMap to a table form, with the term in the left column and its frequency in the corpus on the right column.
+     * @param map the dictionary to display
+     * @return a table that contains the final dictionary
+     */
     public static TableModel convertDictionaryToTable(Map<String,String> map) {
         DefaultTableModel model = new DefaultTableModel(
                 new Object[] { "Term", "Total appearances in corpus" }, 0
@@ -205,5 +221,43 @@ public class View implements Observer {
         }
         return model;
     }
+
+    /**
+     * Runs a query in the engine, according to the words or the file in the query text field.
+     */
+    public void runQuery(){
+
+    }
+
+
+    /**
+     * Saves the results of the engine to a query in a text file.
+     */
+    public void saveResults(){
+
+    }
+
+    /**
+     * Sets the semantic treatment value according to whether the matching checkbox is checked or not
+     */
+    public void checkSemanticTreatment(){
+        semanticTreatment = semanticTreatmentCheckbox.isSelected();
+    }
+
+
+    /**
+     * Enables the user to select the path of a file with queries to run
+     */
+    public void browseQueryPath(){
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Choose the file of the queries");
+        queryTextField.setText(chooser.showOpenDialog(new Stage()).getPath());
+    }
+
+
+
+
+
+
 }
 

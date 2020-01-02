@@ -260,6 +260,12 @@ public class Controller extends Observable{
         dictionaryReader.close();
     }
 
+    /**
+     *
+     */
+    public void runQuery(){
+
+    }
 }
 
 

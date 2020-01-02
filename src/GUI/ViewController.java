@@ -70,4 +70,11 @@ public class ViewController extends Observable implements Observer {
             notifyObservers();
         }
     }
+
+    /**
+     *
+     */
+    public void runQuery(){
+
+    }
 }
