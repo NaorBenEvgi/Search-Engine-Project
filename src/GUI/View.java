@@ -226,6 +226,15 @@ public class View implements Observer {
      * Runs a query in the engine, according to the words or the file in the query text field.
      */
     public void runQuery(){
+        if(queryTextField.getText().isEmpty()){
+            displayAlert("Wrong Input!","The query is missing! Please insert a query in the query text box");
+        }
+        else{
+            String query = queryTextField.getText();
+
+
+
+        }
 
     }
 
