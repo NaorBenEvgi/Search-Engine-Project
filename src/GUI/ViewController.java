@@ -73,8 +73,9 @@ public class ViewController extends Observable implements Observer {
 
     /**
      *
+     * @param query
      */
-    public void runQuery(){
-
+    public void runQuery(String query, String corpusPath, String targetPath, boolean stem){
+        controller.runQuery(query, corpusPath, targetPath, stem);
     }
 }

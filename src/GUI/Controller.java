@@ -1,11 +1,13 @@
 package GUI;
 
 import Indexing.*;
+import Searching.Searcher;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -260,11 +262,48 @@ public class Controller extends Observable{
         dictionaryReader.close();
     }
 
-    /**
-     *
-     */
-    public void runQuery(){
+ //   ---------------------------------------------------------- PART B ADDITIONS-----------------------------------------------------------------------------------
 
+    //TODO: change the functionality in searcher such that it accepts the targetPath and the corpusPath in the constructor / runQuery methods,
+    // and send these parameters accordingly
+    public void runQuery(String query, String corpusPath, String targetPath, boolean stem){
+        Parse parser = new Parse(corpusPath);
+        Searcher searcher = new Searcher(finalDictionary, documentDetails);
+
+        if(isPath(query)){
+            ArrayList<ArrayList<String>> rawQueries = readQueryFile(query); //queries as they appear in the file
+            ArrayList<ArrayList<String>> parsedQueries = new ArrayList<>(); //queries after parsing and stemming
+            for(ArrayList<String> queryToParse : rawQueries){
+                parsedQueries.add(parser.parseQuery(queryToParse,stem));
+            }
+            searcher.runMultipleQueries(parsedQueries);
+        }
+        else{
+            ArrayList<String> queryWords = new ArrayList<>(Arrays.asList(query.split(" ")));
+            queryWords = parser.parseQuery(queryWords, stem);
+            searcher.runSingleQuery(queryWords);
+        }
+    }
+
+
+    /**
+     * Determines whether a given string is a path or not
+     * @param path the given string
+     * @return true if the string is a path, false otherwise
+     */
+    private boolean isPath(String path){
+        try{
+            Paths.get(path);
+            return true;
+        } catch(InvalidPathException | NullPointerException e){
+            return false;
+        }
+    }
+
+
+    private ArrayList<ArrayList<String>> readQueryFile(String queryFilePath){
+
+        return null;
     }
 }
 

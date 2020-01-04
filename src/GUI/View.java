@@ -222,6 +222,9 @@ public class View implements Observer {
         return model;
     }
 
+
+
+    // ------------------------------------------------------------- PART B ADDITIONS --------------------------------------------------------------------------------
     /**
      * Runs a query in the engine, according to the words or the file in the query text field.
      */
@@ -231,7 +234,7 @@ public class View implements Observer {
         }
         else{
             String query = queryTextField.getText();
-
+            viewController.runQuery(query,corpusPathTextField.getText(),indexPathTextField.getText(),stem);
 
 
         }

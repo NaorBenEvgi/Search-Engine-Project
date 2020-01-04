@@ -5,10 +5,7 @@ import java.io.FileReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -561,5 +558,32 @@ public class Parse {
             termInDic.setTerm(word);
         }
         return termInDic;
+    }
+
+// ----------------------------------------------------------------PART B ADDITIONS-----------------------------------------------------------------------------------
+
+    /**
+     * Parses a query, and stems it if required.
+     * @param query the list of the words in the query
+     * @param stem an indicator of whether to stem the parsed words or not
+     * @return a list of the words in the query after parsing (and stemming)
+     */
+    public ArrayList<String> parseQuery(ArrayList<String> query, boolean stem){
+        ArrayList<String> parsedQuery = new ArrayList<>(query);
+        parsedQuery = eliminateStopWords(parsedQuery);
+        parsedQuery = handleDollarCases(parsedQuery);
+        parsedQuery = pricesOverMillion(parsedQuery);
+        parsedQuery = parseArticleWords(parsedQuery);
+
+        if(stem){
+            ArrayList<String> parsedQueryWithStemming = new ArrayList<>();
+            for(String word : parsedQuery){
+                Stemmer.setCurrent(word);
+                Stemmer.stem();
+                parsedQueryWithStemming.add(Stemmer.getCurrent());
+            }
+            return parsedQueryWithStemming;
+        }
+        return parsedQuery;
     }
 }
