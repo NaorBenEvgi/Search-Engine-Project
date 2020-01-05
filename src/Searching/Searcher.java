@@ -25,7 +25,7 @@ public class Searcher {
     }
 
 
-    public void runMultipleQueries(ArrayList<ArrayList<String>> queries){
+    public void runMultipleQueries(HashMap<String,ArrayList<String>> queries){
 
     }
 

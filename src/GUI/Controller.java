@@ -271,10 +271,11 @@ public class Controller extends Observable{
         Searcher searcher = new Searcher(finalDictionary, documentDetails);
 
         if(isPath(query)){
-            ArrayList<ArrayList<String>> rawQueries = readQueryFile(query); //queries as they appear in the file
-            ArrayList<ArrayList<String>> parsedQueries = new ArrayList<>(); //queries after parsing and stemming
-            for(ArrayList<String> queryToParse : rawQueries){
-                parsedQueries.add(parser.parseQuery(queryToParse,stem));
+            HashMap<String,ArrayList<String>> rawQueries = readQueryFile(query); //queries as they appear in the file
+            HashMap<String,ArrayList<String>> parsedQueries = new HashMap<>(); //queries after parsing and stemming
+            ArrayList<String> queryIDs = new ArrayList<>(rawQueries.keySet());
+            for(String queryID : queryIDs){
+                parsedQueries.put(queryID,parser.parseQuery(rawQueries.get(queryID),stem));
             }
             searcher.runMultipleQueries(parsedQueries);
         }
@@ -301,9 +302,27 @@ public class Controller extends Observable{
     }
 
 
-    private ArrayList<ArrayList<String>> readQueryFile(String queryFilePath){
-
-        return null;
+    private HashMap<String,ArrayList<String>> readQueryFile(String queryFilePath){
+        HashMap<String,ArrayList<String>> queries = new HashMap<>();
+        BufferedReader reader;
+        String line, queryID, query;
+        try{
+            reader = new BufferedReader(new FileReader(queryFilePath));
+            while((line = reader.readLine()) != null){ //FIXME: MIGHT THROW NULLPOINTEREXCEPTION BECAUSE OF HOW THE FILE IS BUILT
+                if(line.startsWith("<num>")){
+                    queryID = line.substring(line.indexOf("<num> Number: "));
+                    line = reader.readLine();
+                    query = line.substring(line.indexOf("<title> "));
+                    ArrayList<String> queryWords = new ArrayList<>(Arrays.asList(query.split(" ")));
+                    queries.put(queryID,queryWords);
+                }
+            }
+            reader.close();
+            return queries;
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 }
 
