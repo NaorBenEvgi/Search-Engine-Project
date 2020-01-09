@@ -1,23 +1,16 @@
 package Searching;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.SortedMap;
+import java.util.*;
 
 
 public class Ranker {
 
-    private HashMap<Integer,String[]> documentDetails;
+    private HashMap<String,String[]> documentDetails;
     private HashMap<String,String> termsDF;
     private double averageDocumentLength;
 
 
-    public Ranker(SortedMap<String, String[]> finalDictionary, HashMap<Integer, String[]> documentDetails) {
+    public Ranker(SortedMap<String, String[]> finalDictionary, HashMap<String, String[]> documentDetails) {
         this.documentDetails = documentDetails;
         fillTermsDF(finalDictionary);
         computeAverageDocumentLength();
@@ -30,9 +23,9 @@ public class Ranker {
     private void computeAverageDocumentLength(){
         double corpusSize = documentDetails.size();
         double lengthsSum = 0;
-        ArrayList<Integer> docs = new ArrayList<>(documentDetails.keySet());
+        ArrayList<String> docs = new ArrayList<>(documentDetails.keySet());
 
-        for(Integer doc : docs){
+        for(String doc : docs){
             lengthsSum += Integer.valueOf(documentDetails.get(doc)[3]);
         }
         averageDocumentLength = lengthsSum/corpusSize;
@@ -49,70 +42,133 @@ public class Ranker {
     }
 
 
-    public double rankByBM25(List<String> query, Integer docId, String pathToPostingFiles, boolean stem){
+    private double rankByBM25(List<String> query, String docId, HashMap<String,Integer> queryWordsTFPerDoc){
         int termFrequency, documentFrequency;
         double numOfDocs = documentDetails.size(), idf, rank = 0, k = 1.2, b = 0.75, numerator, denominator;
-        int documentLength = Integer.valueOf(documentDetails.get(docId.toString())[3]);
+        int documentLength = Integer.valueOf(documentDetails.get(docId)[3]);
 
         for(String term : query){
-            termFrequency = Integer.valueOf(getTermFrequencyInDocument(term,docId,pathToPostingFiles,stem));
-            documentFrequency = Integer.valueOf(termsDF.get(term));
-            //TODO: check if this is the right computation for idf
-            idf = Math.log10(numOfDocs/documentFrequency);
+            termFrequency = queryWordsTFPerDoc.getOrDefault(term,0);
 
-            numerator = termFrequency*(k+1);
-            denominator = termFrequency + k*(1-b+b*(documentLength/averageDocumentLength));
+            if(termFrequency != 0) {
+                documentFrequency = Integer.valueOf(termsDF.get(term));
+                //TODO: check if this is the right computation for idf
+                idf = Math.log10(numOfDocs / documentFrequency);
 
-            rank += idf*(numerator/denominator);
+                numerator = termFrequency * (k + 1);
+                denominator = termFrequency + k * (1 - b + b * (documentLength / averageDocumentLength));
+
+                rank += idf * (numerator / denominator);
+            }
         }
 
         return rank;
     }
 
 
-    //TODO: improve efficiency?
-    private String getTermFrequencyInDocument(String term, Integer docId, String pathToPostingFiles, boolean stem){
-        char termInitial = term.toUpperCase().charAt(0);
-        File posting;
-        if(Character.isLetter(termInitial)){
-            if(stem){
-                //TODO: fix the path - need to find the right inner directory before approaching the file
-                posting = new File(Paths.get(pathToPostingFiles).resolve(termInitial + "PostingFileStem").toString());
-            }
-            else{
-                posting = new File(Paths.get(pathToPostingFiles).resolve(termInitial + "PostingFile").toString());
-            }
-        }
-        else{
-            if(stem){
-                posting = new File(Paths.get(pathToPostingFiles).resolve("NumPostingFileStem").toString());
-            }
-            else{
-                posting = new File(Paths.get(pathToPostingFiles).resolve("NumPostingFile").toString());
-            }
-        }
 
-        BufferedReader reader;
-        String line;
-        try{
-            reader = new BufferedReader(new FileReader(posting));
-            line = reader.readLine();
-            while(!line.startsWith(term)){
-                line = reader.readLine();
-            }
+    private double rankByPosition(){
 
-            reader.close();
-            if(!line.contains("_" + docId + ":") && !line.contains("|" + docId + ":"))
-                return "0";
 
-            line = line.substring(line.indexOf(docId + ":"));
-            line = line.substring(line.indexOf("_")+1);
-            return line.substring(0,line.indexOf("_"));
 
-        } catch (Exception e){
-           return "0";
-        }
+
+        return 0;
     }
+
+
+
+    /**
+     *
+     * @param queryPostingLines
+     * @return
+     */
+    private HashMap<String,HashMap<String,Integer>> computeTFForQueryWords(ArrayList<String> queryPostingLines) {
+        HashMap<String,HashMap<String,Integer>> queryWordsTF = new HashMap<>();
+        HashMap<String,HashMap<String,Integer>> queryWordsTFPerDoc = new HashMap<>();
+        String docID,term;
+        Integer tf;
+        HashSet<String> docIDs = new HashSet<>();
+        for(String postingLine : queryPostingLines){
+            HashMap<String,Integer> frequenciesInDocuments = new HashMap<>();
+            term = postingLine.substring(0,postingLine.indexOf("|"));
+            postingLine = postingLine.substring(postingLine.indexOf("|")+1);
+            while(!postingLine.equals("")) {
+                docID = postingLine.substring(0, postingLine.indexOf(":"));
+                docIDs.add(docID);
+                postingLine = postingLine.substring(postingLine.indexOf("_") + 1);
+                tf = Integer.valueOf(postingLine.substring(0, postingLine.indexOf("_")));
+                postingLine = postingLine.substring(postingLine.indexOf("_") + 1);
+                frequenciesInDocuments.put(docID,tf);
+            }
+            queryWordsTF.put(term,frequenciesInDocuments);
+        }
+
+        ArrayList<String> allTermsInQuery = new ArrayList<>(queryWordsTF.keySet());
+        for(String doc : docIDs){
+            HashMap<String,Integer> tfsInDoc = new HashMap<>();
+            for(String termInQuery : allTermsInQuery){
+                HashMap<String,Integer> termsTFInDoc = queryWordsTF.get(termInQuery);
+                if(termsTFInDoc.containsKey(doc)){
+                    tfsInDoc.put(termInQuery,termsTFInDoc.get(doc));
+                }
+            }
+            queryWordsTFPerDoc.put(doc,tfsInDoc);
+        }
+        return queryWordsTFPerDoc;
+    }
+
+
+
+    protected void rank(ArrayList<String> queryPostingLines, ArrayList<String> query){
+        HashMap<String,HashMap<String,Integer>> queryWordsTFPerDoc = computeTFForQueryWords(queryPostingLines);
+        ArrayList<String> retrievedDocuments = new ArrayList<>(queryWordsTFPerDoc.keySet());
+        HashMap<String,Double> rankedDocs = new HashMap<>();
+
+        for(String doc : retrievedDocuments){
+            double rank = rankByBM25(query,doc,queryWordsTFPerDoc.get(doc));
+            rankedDocs.put(doc,rank);
+        }
+        rankedDocs = sortByValue(rankedDocs);
+
+        //TODO: return the highest ranked 50 docs
+    }
+
+
+
+
+    /**
+     * Taken from here: https://www.geeksforgeeks.org/sorting-a-hashmap-according-to-values/
+     * @param rankedDocs
+     * @return
+     */
+    public HashMap<String, Double> sortByValue(HashMap<String, Double> rankedDocs)
+    {
+        // Create a list from elements of HashMap
+        List<Map.Entry<String, Double> > list =
+                new LinkedList<Map.Entry<String, Double> >(rankedDocs.entrySet());
+
+        // Sort the list
+        Collections.sort(list, new Comparator<Map.Entry<String, Double> >() {
+            public int compare(Map.Entry<String, Double> o1,
+                               Map.Entry<String, Double> o2)
+            {
+                return (o2.getValue()).compareTo(o1.getValue());
+            }
+        });
+
+        // put data from sorted list to hashmap
+        HashMap<String, Double> temp = new LinkedHashMap<String, Double>();
+        for (Map.Entry<String, Double> aa : list) {
+            temp.put(aa.getKey(), aa.getValue());
+        }
+        return temp;
+    }
+
+
+
+
+
+
 
 
     // might be unnecessary
@@ -122,11 +178,11 @@ public class Ranker {
     }*/
 
 
-    public HashMap<Integer, String[]> getDocumentDetails() {
+    public HashMap<String, String[]> getDocumentDetails() {
         return documentDetails;
     }
 
-    public void setDocumentDetails(HashMap<Integer, String[]> documentDetails) {
+    public void setDocumentDetails(HashMap<String, String[]> documentDetails) {
         this.documentDetails = documentDetails;
     }
 

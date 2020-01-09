@@ -262,13 +262,13 @@ public class Controller extends Observable{
         dictionaryReader.close();
     }
 
- //   ---------------------------------------------------------- PART B ADDITIONS-----------------------------------------------------------------------------------
+    //   ---------------------------------------------------------- PART B ADDITIONS---------------------------------------------------------------------------------------
 
     //TODO: change the functionality in searcher such that it accepts the targetPath and the corpusPath in the constructor / runQuery methods,
     // and send these parameters accordingly
     public void runQuery(String query, String corpusPath, String targetPath, boolean stem){
         Parse parser = new Parse(corpusPath);
-        Searcher searcher = new Searcher(finalDictionary, documentDetails);
+        Searcher searcher = new Searcher(finalDictionary, documentDetails, targetPath);
 
         if(isPath(query)){
             HashMap<String,ArrayList<String>> rawQueries = readQueryFile(query); //queries as they appear in the file
@@ -282,7 +282,7 @@ public class Controller extends Observable{
         else{
             ArrayList<String> queryWords = new ArrayList<>(Arrays.asList(query.split(" ")));
             queryWords = parser.parseQuery(queryWords, stem);
-            searcher.runSingleQuery(queryWords);
+            searcher.runSingleQuery(queryWords, stem);
         }
     }
 
@@ -308,7 +308,7 @@ public class Controller extends Observable{
         String line, queryID, query;
         try{
             reader = new BufferedReader(new FileReader(queryFilePath));
-            while((line = reader.readLine()) != null){ //FIXME: MIGHT THROW NULLPOINTEREXCEPTION BECAUSE OF HOW THE FILE IS BUILT
+            while((line = reader.readLine()) != null){
                 if(line.startsWith("<num>")){
                     queryID = line.substring(line.indexOf("<num> Number: "));
                     line = reader.readLine();
