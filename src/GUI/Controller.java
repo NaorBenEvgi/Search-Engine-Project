@@ -7,7 +7,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -20,7 +19,7 @@ public class Controller extends Observable{
     private Indexer indexer;
     private ReadFile corpusReader;
     private SortedMap<String,String[]> finalDictionary;
-    private HashMap<Integer,String[]> documentDetails;
+    private HashMap<String,String[]> documentDetails;
     private int corpusSize, numOfTerms;
 
     public Controller() {
@@ -264,42 +263,27 @@ public class Controller extends Observable{
 
     //   ---------------------------------------------------------- PART B ADDITIONS---------------------------------------------------------------------------------------
 
-    //TODO: change the functionality in searcher such that it accepts the targetPath and the corpusPath in the constructor / runQuery methods,
-    // and send these parameters accordingly
-    public void runQuery(String query, String corpusPath, String targetPath, boolean stem){
+    public ArrayList<String> runQuery(String query, String corpusPath, String targetPath, boolean stem) {
         Parse parser = new Parse(corpusPath);
+        //TODO: read the document details file and fill the HashMap
         Searcher searcher = new Searcher(finalDictionary, documentDetails, targetPath);
-
-        if(isPath(query)){
-            HashMap<String,ArrayList<String>> rawQueries = readQueryFile(query); //queries as they appear in the file
-            HashMap<String,ArrayList<String>> parsedQueries = new HashMap<>(); //queries after parsing and stemming
+        ArrayList<String> retrievedDocs = new ArrayList<>();
+        if (new File(query).exists()) {
+            HashMap<String, ArrayList<String>> rawQueries = readQueryFile(query); //queries as they appear in the file
+            HashMap<String, ArrayList<String>> parsedQueries = new HashMap<>(); //queries after parsing and stemming
             ArrayList<String> queryIDs = new ArrayList<>(rawQueries.keySet());
-            for(String queryID : queryIDs){
-                parsedQueries.put(queryID,parser.parseQuery(rawQueries.get(queryID),stem));
+            for (String queryID : queryIDs) {
+                parsedQueries.put(queryID, parser.parseQuery(rawQueries.get(queryID), stem));
             }
             searcher.runMultipleQueries(parsedQueries);
-        }
-        else{
+        } else {
             ArrayList<String> queryWords = new ArrayList<>(Arrays.asList(query.split(" ")));
             queryWords = parser.parseQuery(queryWords, stem);
-            searcher.runSingleQuery(queryWords, stem);
+            retrievedDocs = searcher.runSingleQuery(queryWords, stem);
         }
+        return retrievedDocs;
     }
 
-
-    /**
-     * Determines whether a given string is a path or not
-     * @param path the given string
-     * @return true if the string is a path, false otherwise
-     */
-    private boolean isPath(String path){
-        try{
-            Paths.get(path);
-            return true;
-        } catch(InvalidPathException | NullPointerException e){
-            return false;
-        }
-    }
 
 
     private HashMap<String,ArrayList<String>> readQueryFile(String queryFilePath){

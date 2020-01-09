@@ -20,14 +20,14 @@ public class Searcher {
     }
 
 
-    public void runSingleQuery(ArrayList<String> query, boolean stem){
+    public ArrayList<String> runSingleQuery(ArrayList<String> query, boolean stem){
         ArrayList<String> postingLinesForQuery = new ArrayList<>();
         BufferedReader postingFilesReader;
 
         try {
             query.sort(String.CASE_INSENSITIVE_ORDER);
             String lastPostingFile = "", currentPostingFile, line;
-            postingFilesReader = new BufferedReader(new FileReader(""));
+            postingFilesReader = null;
             for (String word : query) {
                 currentPostingFile = getPathByWord(word, stem);
                 if (!lastPostingFile.equals(currentPostingFile)) {
@@ -46,7 +46,7 @@ public class Searcher {
             e.printStackTrace();
         }
 
-        ranker.rank(postingLinesForQuery, query);
+         return ranker.rank(postingLinesForQuery, query);
     }
 
 

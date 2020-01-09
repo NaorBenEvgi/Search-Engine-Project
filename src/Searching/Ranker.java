@@ -119,7 +119,7 @@ public class Ranker {
 
 
 
-    protected void rank(ArrayList<String> queryPostingLines, ArrayList<String> query){
+    protected ArrayList<String> rank(ArrayList<String> queryPostingLines, ArrayList<String> query){
         HashMap<String,HashMap<String,Integer>> queryWordsTFPerDoc = computeTFForQueryWords(queryPostingLines);
         ArrayList<String> retrievedDocuments = new ArrayList<>(queryWordsTFPerDoc.keySet());
         HashMap<String,Double> rankedDocs = new HashMap<>();
@@ -129,8 +129,16 @@ public class Ranker {
             rankedDocs.put(doc,rank);
         }
         rankedDocs = sortByValue(rankedDocs);
-
-        //TODO: return the highest ranked 50 docs
+        ArrayList<String> docsAfterSort = new ArrayList<>(rankedDocs.keySet());
+        ArrayList<String> docsToRetrieve = new ArrayList<>();
+        int i=0;
+        for(String doc: docsAfterSort){
+            docsToRetrieve.add(documentDetails.get(doc)[0]);
+            i++;
+            if(i == 50)
+                break;
+        }
+        return docsToRetrieve;
     }
 
 

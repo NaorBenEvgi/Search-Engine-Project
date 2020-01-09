@@ -234,9 +234,18 @@ public class View implements Observer {
         }
         else{
             String query = queryTextField.getText();
-            viewController.runQuery(query,corpusPathTextField.getText(),indexPathTextField.getText(),stem);
-
-
+            ArrayList<String> retrievedDocs = viewController.runQuery(query,corpusPathTextField.getText(),indexPathTextField.getText(),stem);
+            HashMap<String,String> docsToDisplay = new HashMap<>();
+            for(int i=0; i<retrievedDocs.size();i++){
+                docsToDisplay.put(""+i+1,retrievedDocs.get(i));
+            }
+            JTable table=new JTable(convertDictionaryToTable(docsToDisplay));
+            JFrame frame=new JFrame();
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.add(new JScrollPane(table));
+            frame.setSize(600,800);
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
         }
 
     }

@@ -1,5 +1,6 @@
 package GUI;
 
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -75,7 +76,7 @@ public class ViewController extends Observable implements Observer {
      *
      * @param query
      */
-    public void runQuery(String query, String corpusPath, String targetPath, boolean stem){
-        controller.runQuery(query, corpusPath, targetPath, stem);
+    public ArrayList<String> runQuery(String query, String corpusPath, String targetPath, boolean stem){
+        return controller.runQuery(query, corpusPath, targetPath, stem);
     }
 }
