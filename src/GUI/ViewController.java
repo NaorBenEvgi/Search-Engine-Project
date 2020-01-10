@@ -1,6 +1,6 @@
 package GUI;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -55,6 +55,16 @@ public class ViewController extends Observable implements Observer {
     }
 
     /**
+     *
+     * @param indexPath
+     * @param stem
+     * @throws Exception
+     */
+    public void loadDocumentDetails(String indexPath, boolean stem) throws Exception{
+        controller.loadDocumentDetails(indexPath,stem);
+    }
+
+    /**
      * Deletes all the posting files and dictionary and the directories they are stored in.
      * @param path the path of the index
      * @return true if the deletion was successful, false otherwise
@@ -76,7 +86,7 @@ public class ViewController extends Observable implements Observer {
      *
      * @param query
      */
-    public ArrayList<String> runQuery(String query, String corpusPath, String targetPath, boolean stem){
-        return controller.runQuery(query, corpusPath, targetPath, stem);
+    public HashMap<String,HashMap<String,Double>> runQuery(String query, String targetPath, boolean stem){
+        return controller.runQuery(query, targetPath, stem);
     }
 }

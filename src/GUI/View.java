@@ -1,6 +1,7 @@
 package GUI;
 
 import Indexing.ReadFile;
+import Searching.Ranker;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -43,6 +44,7 @@ public class View implements Observer {
     public javafx.scene.control.CheckBox semanticTreatmentCheckbox;
     public Button saveResultsButton;
     private boolean semanticTreatment;
+
     //TODO: need to add entities identification functionality
 
 
@@ -86,6 +88,7 @@ public class View implements Observer {
         String indexPath = indexPathTextField.getText();
         try{
             viewController.loadDictionary(indexPath, stem);
+            viewController.loadDocumentDetails(indexPath,stem);
             displayAlert("The dictionary has been loaded successfully","");
         }
         catch (Exception e){
@@ -234,20 +237,49 @@ public class View implements Observer {
         }
         else{
             String query = queryTextField.getText();
-            ArrayList<String> retrievedDocs = viewController.runQuery(query,corpusPathTextField.getText(),indexPathTextField.getText(),stem);
-            HashMap<String,String> docsToDisplay = new HashMap<>();
-            for(int i=0; i<retrievedDocs.size();i++){
-                docsToDisplay.put(""+i+1,retrievedDocs.get(i));
+            HashMap<String,HashMap<String,Double>> retrievedDocs = viewController.runQuery(query,indexPathTextField.getText(),stem);
+            ArrayList<String> queryIDs = new ArrayList<>(retrievedDocs.keySet());
+
+           ArrayList<String[]> docsToDisplay = new ArrayList<>();
+            for(String queryID : queryIDs) {
+                HashMap<String,Double> sortedRetrievedDocs;
+                sortedRetrievedDocs = Ranker.sortByValue(retrievedDocs.get(queryID));
+                ArrayList<String> docs = new ArrayList<>(sortedRetrievedDocs.keySet());
+
+                for (int i = 0; i < sortedRetrievedDocs.size(); i++) {
+                    String[] values = new String[4];
+                    values[0] = String.valueOf(i+1);
+                    values[1] = queryID; //queryID
+                    values[2] = docs.get(i); //docID
+                    values[3] = String.valueOf(sortedRetrievedDocs.get(values[2])); //rank
+                    docsToDisplay.add(values);
+                }
             }
-            JTable table=new JTable(convertDictionaryToTable(docsToDisplay));
+
+            JTable table=new JTable(convertQueryResultsToTable(docsToDisplay));
             JFrame frame=new JFrame();
             frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             frame.add(new JScrollPane(table));
             frame.setSize(600,800);
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
+
         }
 
+    }
+
+    /**
+     *
+     * @param
+     * @return
+     */
+    public static TableModel convertQueryResultsToTable(ArrayList<String[]> results) {
+        DefaultTableModel model = new DefaultTableModel(
+                new Object[] { "#", "Query Number", "DocID", "Rank"}, 0);
+        for (String[] entry : results) {
+            model.addRow(new Object[] { entry[0], entry[1], entry[2], entry[3]});
+        }
+        return model;
     }
 
 

@@ -119,7 +119,7 @@ public class Ranker {
 
 
 
-    protected ArrayList<String> rank(ArrayList<String> queryPostingLines, ArrayList<String> query){
+    protected HashMap<String,Double> rank(ArrayList<String> queryPostingLines, ArrayList<String> query){
         HashMap<String,HashMap<String,Integer>> queryWordsTFPerDoc = computeTFForQueryWords(queryPostingLines);
         ArrayList<String> retrievedDocuments = new ArrayList<>(queryWordsTFPerDoc.keySet());
         HashMap<String,Double> rankedDocs = new HashMap<>();
@@ -130,10 +130,10 @@ public class Ranker {
         }
         rankedDocs = sortByValue(rankedDocs);
         ArrayList<String> docsAfterSort = new ArrayList<>(rankedDocs.keySet());
-        ArrayList<String> docsToRetrieve = new ArrayList<>();
+        HashMap<String,Double> docsToRetrieve = new HashMap<>();
         int i=0;
         for(String doc: docsAfterSort){
-            docsToRetrieve.add(documentDetails.get(doc)[0]);
+            docsToRetrieve.put(documentDetails.get(doc)[0],rankedDocs.get(doc));
             i++;
             if(i == 50)
                 break;
@@ -149,7 +149,7 @@ public class Ranker {
      * @param rankedDocs
      * @return
      */
-    public HashMap<String, Double> sortByValue(HashMap<String, Double> rankedDocs)
+    public static HashMap<String, Double> sortByValue(HashMap<String, Double> rankedDocs)
     {
         // Create a list from elements of HashMap
         List<Map.Entry<String, Double> > list =

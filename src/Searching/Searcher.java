@@ -20,7 +20,7 @@ public class Searcher {
     }
 
 
-    public ArrayList<String> runSingleQuery(ArrayList<String> query, boolean stem){
+    public HashMap<String,Double> runSingleQuery(ArrayList<String> query, boolean stem){
         ArrayList<String> postingLinesForQuery = new ArrayList<>();
         BufferedReader postingFilesReader;
 
@@ -34,7 +34,7 @@ public class Searcher {
                     postingFilesReader = new BufferedReader(new FileReader(currentPostingFile));
                 }
                 while ((line = postingFilesReader.readLine()) != null) {
-                    if (line.startsWith(word)) {
+                    if (line.substring(0,line.indexOf("|")).equalsIgnoreCase(word)) {
                         postingLinesForQuery.add(line);
                         break;
                     }
@@ -50,8 +50,14 @@ public class Searcher {
     }
 
 
-    public void runMultipleQueries(HashMap<String,ArrayList<String>> queries){
-
+    public HashMap<String,HashMap<String,Double>> runMultipleQueries(HashMap<String,ArrayList<String>> queries, boolean stem){
+        HashMap<String,HashMap<String,Double>> resultsForAllQueries = new HashMap<>();
+        ArrayList<String> queriesIDs = new ArrayList<>(queries.keySet());
+        for(String queryID : queriesIDs){
+            HashMap<String,Double> queryResults = runSingleQuery(queries.get(queryID),stem);
+            resultsForAllQueries.put(queryID,queryResults);
+        }
+        return resultsForAllQueries;
     }
 
 

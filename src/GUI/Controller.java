@@ -6,6 +6,7 @@ import Searching.Searcher;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,6 +22,7 @@ public class Controller extends Observable{
     private SortedMap<String,String[]> finalDictionary;
     private HashMap<String,String[]> documentDetails;
     private int corpusSize, numOfTerms;
+    private static int singleQueryID = 100;
 
     public Controller() {
         indexer = new Indexer();
@@ -107,6 +109,15 @@ public class Controller extends Observable{
         numOfTerms = indexer.getDictionary().size();
         corpusSize = indexer.getDocumentDetails().size();
         indexer = new Indexer();
+
+        //copies the stop words file to the index directory
+        try{
+            Path source = Paths.get(corpusPath).resolve("stop_words.txt");
+            Path target = Paths.get(targetPath).resolve("stop_words.txt");
+            Files.copy(source,target);
+        } catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -247,27 +258,74 @@ public class Controller extends Observable{
             throw new NullPointerException();
         }
         dictionaryReader = new BufferedReader(new FileReader(dictionaryFile));
-        String[] termDetails = new String[3];
         String line, term;
         while((line = dictionaryReader.readLine()) != null){
+            String[] termDetails = new String[2];
             String[] lineComponents = line.split("_");
             term = lineComponents[0];
             termDetails[0] = lineComponents[1];
             termDetails[1] = lineComponents[2];
-            termDetails[2] = lineComponents[3];
+            //termDetails[2] = lineComponents[3];  this is the size of the posting line - might want to remove this
             finalDictionary.put(term,termDetails);
         }
         numOfTerms = filesInDirectory.size();
         dictionaryReader.close();
     }
 
+    /**
+     *
+     * @param targetPath
+     * @param stem
+     * @throws Exception
+     */
+    public void loadDocumentDetails(String targetPath, boolean stem) throws Exception{
+        documentDetails = new HashMap<>();
+        String innerTargetPath;
+        ArrayList<File> filesInDirectory = new ArrayList<>();
+        File documentDetailsFile = null;
+        BufferedReader documentDetailsReader;
+        if(stem){ //computes the path of the directory in which the wanted dictionary is stored
+            innerTargetPath = Paths.get(targetPath).resolve("indexStem").toString();
+        }
+        else{
+            innerTargetPath = Paths.get(targetPath).resolve("index").toString();
+        }
+
+        File innerDirectory = new File(innerTargetPath);
+        corpusReader.extractFilesFromFolder(innerDirectory,filesInDirectory);
+        for(File file : filesInDirectory){ //searches for the dictionary file
+            if(file.getName().contains("documentDetails")){
+                documentDetailsFile = file;
+                break;
+            }
+        }
+
+        //reads the dictionary file and fills the final dictionary HashMap with the content
+        if(documentDetailsFile == null){
+            throw new NullPointerException();
+        }
+        documentDetailsReader = new BufferedReader(new FileReader(documentDetailsFile));
+        String line, docID;
+        while((line = documentDetailsReader.readLine()) != null){
+            String[] detailsAboutDocs = new String[4];
+            String[] lineComponents = line.split("_");
+            docID = lineComponents[0];
+            detailsAboutDocs[0] = lineComponents[1];
+            detailsAboutDocs[1] = lineComponents[2];
+            detailsAboutDocs[2] = lineComponents[3];
+            detailsAboutDocs[3] = lineComponents[4];
+            documentDetails.put(docID,detailsAboutDocs);
+        }
+        /*corpusSize = documentDetails.size();*/
+        documentDetailsReader.close();
+    }
+
     //   ---------------------------------------------------------- PART B ADDITIONS---------------------------------------------------------------------------------------
 
-    public ArrayList<String> runQuery(String query, String corpusPath, String targetPath, boolean stem) {
-        Parse parser = new Parse(corpusPath);
-        //TODO: read the document details file and fill the HashMap
+    public HashMap<String,HashMap<String,Double>> runQuery(String query, String targetPath, boolean stem) {
+        Parse parser = new Parse(targetPath);
         Searcher searcher = new Searcher(finalDictionary, documentDetails, targetPath);
-        ArrayList<String> retrievedDocs = new ArrayList<>();
+        HashMap<String,Double> retrievedDocs;
         if (new File(query).exists()) {
             HashMap<String, ArrayList<String>> rawQueries = readQueryFile(query); //queries as they appear in the file
             HashMap<String, ArrayList<String>> parsedQueries = new HashMap<>(); //queries after parsing and stemming
@@ -275,13 +333,17 @@ public class Controller extends Observable{
             for (String queryID : queryIDs) {
                 parsedQueries.put(queryID, parser.parseQuery(rawQueries.get(queryID), stem));
             }
-            searcher.runMultipleQueries(parsedQueries);
+            return searcher.runMultipleQueries(parsedQueries, stem);
         } else {
             ArrayList<String> queryWords = new ArrayList<>(Arrays.asList(query.split(" ")));
             queryWords = parser.parseQuery(queryWords, stem);
             retrievedDocs = searcher.runSingleQuery(queryWords, stem);
+
+            HashMap<String,HashMap<String,Double>> queryResult = new HashMap<>();
+            queryResult.put(String.valueOf(singleQueryID),retrievedDocs);
+            singleQueryID++;
+            return queryResult;
         }
-        return retrievedDocs;
     }
 
 
@@ -294,7 +356,7 @@ public class Controller extends Observable{
             reader = new BufferedReader(new FileReader(queryFilePath));
             while((line = reader.readLine()) != null){
                 if(line.startsWith("<num>")){
-                    queryID = line.substring(line.indexOf("<num> Number: "));
+                    queryID = line.substring(line.indexOf("<num> Number: ")+14);
                     line = reader.readLine();
                     query = line.substring(line.indexOf("<title> "));
                     ArrayList<String> queryWords = new ArrayList<>(Arrays.asList(query.split(" ")));
