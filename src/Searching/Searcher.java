@@ -10,16 +10,26 @@ import java.util.SortedMap;
 public class Searcher {
 
     private static Ranker ranker;
-    private String targetPath; //the path is to the inner
-    // private String corpusPath
+    private String targetPath;
 
-
+    /**
+     * The Searcher constructor. The Object gets the final dictionary, the document details file and the path to the indexed files.
+     * @param finalDictionary the final dictionary
+     * @param documentDetails the document details file
+     * @param targetPath the path to the indexed files
+     */
     public Searcher(SortedMap<String, String[]> finalDictionary, HashMap<String, String[]> documentDetails, String targetPath){
         ranker = new Ranker(finalDictionary,documentDetails);
         this.targetPath = targetPath;
     }
 
 
+    /**
+     * Runs a query and returns the 50 most relevant documents
+     * @param query the query
+     * @param stem indicates whether the indexing process included stemming
+     * @return the 50 most relevant documents and their ranks
+     */
     public HashMap<String,Double> runSingleQuery(ArrayList<String> query, boolean stem){
         ArrayList<String> postingLinesForQuery = new ArrayList<>();
         BufferedReader postingFilesReader;
@@ -50,6 +60,12 @@ public class Searcher {
     }
 
 
+    /**
+     * Runs multiple queries from a query file, and returns the 50 most relevant documents for each document
+     * @param queries the queries that are written in a file
+     * @param stem indicates whether the indexing process included stemming
+     * @return the 50 most relevant documents for each document and their ranks
+     */
     public HashMap<String,HashMap<String,Double>> runMultipleQueries(HashMap<String,ArrayList<String>> queries, boolean stem){
         HashMap<String,HashMap<String,Double>> resultsForAllQueries = new HashMap<>();
         ArrayList<String> queriesIDs = new ArrayList<>(queries.keySet());
@@ -83,23 +99,5 @@ public class Searcher {
 
         return Paths.get(targetPath).resolve(directoryName).resolve(fileName + ".txt").toString();
     }
-
-
-    /*
-        The idea is to iterate over the words in the query, and find the posting line of each one. The line will be put in an arrayList
-        of all the lines, and after the iteration is over, the arrayList will be sent to the Ranker. The Ranker will be responsible
-        for grading each document, according to all the parameters in the posting line, the document details and the final dictionary,
-        and then send back a list of the 50 most relevant documents to the searcher.
-     */
-
-
-
-
-
-
-
-
-
-
 
 }

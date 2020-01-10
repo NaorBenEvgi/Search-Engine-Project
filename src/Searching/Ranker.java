@@ -9,7 +9,12 @@ public class Ranker {
     private HashMap<String,String> termsDF;
     private double averageDocumentLength;
 
-
+    /**
+     * The Ranker's constructor. The object gets the final dictionary and the document details file, and computes the average length of a document in the corpus,
+     * and fills the termsDF data structure.
+     * @param finalDictionary the dictionary
+     * @param documentDetails the document details file
+     */
     public Ranker(SortedMap<String, String[]> finalDictionary, HashMap<String, String[]> documentDetails) {
         this.documentDetails = documentDetails;
         fillTermsDF(finalDictionary);
@@ -31,7 +36,10 @@ public class Ranker {
         averageDocumentLength = lengthsSum/corpusSize;
     }
 
-
+    /**
+     * Fills the data structure that contains the terms and their DF with the data from the final dictionary
+     * @param finalDictionary the dictionary
+     */
     private void fillTermsDF(SortedMap<String, String[]> finalDictionary){
         termsDF = new HashMap<>();
         ArrayList<String> terms = new ArrayList<>(finalDictionary.keySet());
@@ -41,7 +49,13 @@ public class Ranker {
         }
     }
 
-
+    /**
+     * Computes the similarity between a query and a document according to BM25.
+     * @param query the query
+     * @param docId the ID of the document
+     * @param queryWordsTFPerDoc a data structure that contains the terms in the query and their frequencies in the documents they appear in
+     * @return a rank by BM25 indice
+     */
     private double rankByBM25(List<String> query, String docId, HashMap<String,Integer> queryWordsTFPerDoc){
         int termFrequency, documentFrequency;
         double numOfDocs = documentDetails.size(), idf, rank = 0, k = 1.2, b = 0.75, numerator, denominator;
@@ -61,7 +75,6 @@ public class Ranker {
                 rank += idf * (numerator / denominator);
             }
         }
-
         return rank;
     }
 
@@ -102,9 +115,9 @@ public class Ranker {
 
 
     /**
-     *
-     * @param queryPostingLines
-     * @return
+     * Extracts the term and its frequency in each document to a HashMap
+     * @param queryPostingLines a list with the posting lines of the terms
+     * @return a HashMap with a document ID as a key, and a term and its frequency as a value
      */
     private HashMap<String,HashMap<String,Integer>> computeTFForQueryWords(ArrayList<String> queryPostingLines) {
         HashMap<String,HashMap<String,Integer>> queryWordsTF = new HashMap<>();
@@ -143,10 +156,10 @@ public class Ranker {
 
 
     /**
-     *
-     * @param queryPostingLines
-     * @param query
-     * @return
+     * Ranks the similarity between a query and the documents that contain the terms in the query, and returns the 50 highest ranked documents.
+     * @param queryPostingLines a list with the posting lines of the terms in the query
+     * @param query a list with the terms in the query
+     * @return he 50 highest ranked documents with their ranks
      */
     protected HashMap<String,Double> rank(ArrayList<String> queryPostingLines, ArrayList<String> query){
         HashMap<String,HashMap<String,Integer>> queryWordsTFPerDoc = computeTFForQueryWords(queryPostingLines);
@@ -181,11 +194,11 @@ public class Ranker {
      */
     public static HashMap<String, Double> sortByValue(HashMap<String, Double> rankedDocs)
     {
-        // Create a list from elements of HashMap
+        // Creates a list from the elements of the HashMap
         List<Map.Entry<String, Double> > list =
                 new LinkedList<Map.Entry<String, Double> >(rankedDocs.entrySet());
 
-        // Sort the list
+        // Sorts the list
         Collections.sort(list, new Comparator<Map.Entry<String, Double> >() {
             public int compare(Map.Entry<String, Double> o1,
                                Map.Entry<String, Double> o2)
@@ -194,7 +207,7 @@ public class Ranker {
             }
         });
 
-        // put data from sorted list to hashmap
+        // puts the data from the sorted list into the HashMap
         HashMap<String, Double> temp = new LinkedHashMap<String, Double>();
         for (Map.Entry<String, Double> aa : list) {
             temp.put(aa.getKey(), aa.getValue());
