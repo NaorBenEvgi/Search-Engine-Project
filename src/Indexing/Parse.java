@@ -73,7 +73,7 @@ public class Parse {
     private ArrayList<String> eliminateStopWords(ArrayList<String> words){
         ArrayList<String> lineWithoutStopWords = new ArrayList<>();
         for (String word : words) {
-            if (!isStopWord(word)) {
+            if (!isStopWord(word.toLowerCase())) {
                 lineWithoutStopWords.add(word);
             }
         }
@@ -507,6 +507,7 @@ public class Parse {
         dictionary = new HashMap<>();
         termPositionInDocument = 0;
         ArrayList<String> words = new ArrayList<>(Arrays.asList(article.getContent().replace("--", ", ").split(REGEX_BY_WORDS)));
+        words = parseEntities(words);
         words = eliminateStopWords(words);
         words = handleDollarCases(words);
         words = pricesOverMillion(words);
@@ -585,5 +586,45 @@ public class Parse {
             return parsedQueryWithStemming;
         }
         return parsedQuery;
+    }
+
+
+    /**
+     *
+     * @param words
+     * @return
+     */
+    private ArrayList<String> parseEntities(ArrayList<String> words) {
+        ArrayList<String> parsedWords = new ArrayList<>();
+        StringBuilder entity;
+        int counter;
+        for (int i = 0; i < words.size(); ++i) {
+            String word = words.get(i);
+            parsedWords.add(word);
+            if (word.length() > 0 && Character.isUpperCase(word.charAt(0))){
+                entity = new StringBuilder();
+                counter = 0;
+                entity.append(word + " ");
+                try {
+                    String nextWord = words.get(i+1);
+                    while(Character.isUpperCase(nextWord.charAt(0))){
+                        parsedWords.add(nextWord);
+                        i++;
+                        counter++;
+                        entity.append(nextWord + " ");
+                        nextWord = words.get(i+1);
+                    }
+                    if(counter > 0){
+                        parsedWords.add(entity.toString().substring(0,entity.length()-1));
+                    }
+                }
+                catch (Exception e){
+                    if(counter > 0){
+                        parsedWords.add(entity.toString().substring(0,entity.length()-1));
+                    }
+                }
+            }
+        }
+        return parsedWords;
     }
 }

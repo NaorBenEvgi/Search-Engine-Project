@@ -447,7 +447,7 @@ public class Indexer {
         String postingLine = postingLineWithTerm.substring(postingLineWithTerm.toString().indexOf("|")+1);
         String[] termDetails = new String[4];
         String[] tfSum = postingLine.split("_");
-        int sumOfTfTerm = 0, dfTerm=0;
+        int sumOfTfTerm = 0, dfTerm = 0;
 
         //Check how many times the term appears in the corpus and in how many documents
         for(int i=1; i<tfSum.length; i+=2){
@@ -456,9 +456,9 @@ public class Indexer {
         }
 
         //If the term appears less than 10 times in the corpus we filter it out
-       /* if(sumOfTfTerm < 3){
+        if(sumOfTfTerm < 2){
             return false;
-        }*/
+        }
         //In case the term is common enough, we collect its details into the final dictionary
         termDetails[0] = String.valueOf(sumOfTfTerm); //how many times the term appears in the corpus
         termDetails[1] = String.valueOf(dfTerm); //how many documents the term appears in

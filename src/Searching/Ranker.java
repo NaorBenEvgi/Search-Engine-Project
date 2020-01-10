@@ -66,13 +66,37 @@ public class Ranker {
     }
 
 
-
-    private double rankByPosition(){
-
-
-
-
-        return 0;
+    /**
+     * Computes the similarity between the query and a document according to the positions of the terms in the query in the document.
+     * @param query the query
+     * @param docId the ID of the document
+     * @param queryPostingLines a list of the query's terms' lines from each matching posting file
+     * @return the computed rank
+     */
+    private double rankByPosition(List<String> query, String docId, ArrayList<String> queryPostingLines){
+        double rank = 0;
+        for(String word : query){
+            for(String postingLine : queryPostingLines) {
+                if (word.equalsIgnoreCase(postingLine.substring(0, postingLine.indexOf("|")))) { //checks if the posting line matches the current term
+                    if(postingLine.contains("_" + docId + ":") || postingLine.contains("|" + docId + ":" )){ //checks if the term appears in the document
+                        if(postingLine.contains("_" + docId + ":")){
+                            postingLine = postingLine.substring(postingLine.indexOf("_" + docId + ":") + docId.length() + 2);
+                        }
+                        else{ //in case the document is the first one in the term's posting line
+                            postingLine = postingLine.substring(postingLine.indexOf("|" + docId + ":") + docId.length() + 2);
+                        }
+                        postingLine = postingLine.substring(0,postingLine.indexOf("_")); //trims the line only to the positions
+                        double documentLength = Double.valueOf(documentDetails.get(docId)[3]);
+                        String[] positions = postingLine.split(",");
+                        for(int i=0; i<positions.length;i++){ //computes the rank
+                            rank += (1-Double.valueOf(positions[i])/documentLength)/positions.length;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        return rank;
     }
 
 
@@ -118,14 +142,19 @@ public class Ranker {
     }
 
 
-
+    /**
+     *
+     * @param queryPostingLines
+     * @param query
+     * @return
+     */
     protected HashMap<String,Double> rank(ArrayList<String> queryPostingLines, ArrayList<String> query){
         HashMap<String,HashMap<String,Integer>> queryWordsTFPerDoc = computeTFForQueryWords(queryPostingLines);
         ArrayList<String> retrievedDocuments = new ArrayList<>(queryWordsTFPerDoc.keySet());
         HashMap<String,Double> rankedDocs = new HashMap<>();
 
         for(String doc : retrievedDocuments){
-            double rank = rankByBM25(query,doc,queryWordsTFPerDoc.get(doc));
+            double rank = rankByBM25(query,doc,queryWordsTFPerDoc.get(doc)) + rankByPosition(query,doc,queryPostingLines);
             rankedDocs.put(doc,rank);
         }
         rankedDocs = sortByValue(rankedDocs);
@@ -145,9 +174,10 @@ public class Ranker {
 
 
     /**
-     * Taken from here: https://www.geeksforgeeks.org/sorting-a-hashmap-according-to-values/
-     * @param rankedDocs
-     * @return
+     * Sorts a HashMap according to the values in it.
+     * This function is taken from this page: https://www.geeksforgeeks.org/sorting-a-hashmap-according-to-values/
+     * @param rankedDocs The HashMap that is being sorted
+     * @return the HashMap sorted by value
      */
     public static HashMap<String, Double> sortByValue(HashMap<String, Double> rankedDocs)
     {
@@ -173,12 +203,6 @@ public class Ranker {
     }
 
 
-
-
-
-
-
-
     // might be unnecessary
     /*
     private double log2(double number){
@@ -194,8 +218,4 @@ public class Ranker {
         this.documentDetails = documentDetails;
     }
 
-
-    public void setFinalDictionary(SortedMap<String, String[]> finalDictionary) {
-        fillTermsDF(finalDictionary);
-    }
 }
