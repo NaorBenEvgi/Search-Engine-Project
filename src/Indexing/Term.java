@@ -11,10 +11,12 @@ public class Term {
 
     private String term;
     private HashMap<Article, ArrayList<Integer>> termPositions;
+    private boolean isEntity;
 
     public Term(String term) {
         this.term = term;
         termPositions = new HashMap<>();
+        isEntity = false;
     }
 
     /**
@@ -95,6 +97,15 @@ public class Term {
      */
     public void setTerm(String term) {
         this.term = term;
+    }
+
+
+    public void setEntity(){
+        isEntity = true;
+    }
+
+    public boolean isEntity(){
+        return isEntity;
     }
 
 }

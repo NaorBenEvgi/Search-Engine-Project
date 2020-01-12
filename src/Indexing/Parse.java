@@ -5,7 +5,11 @@ import java.io.FileReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -375,8 +379,8 @@ public class Parse {
 
 
     /**
-     * Parses the words in a given articleWords.
-     * @param articleWords the given articleWords
+     * Parses the words in a given words collection in an article.
+     * @param articleWords words collection in an article
      * @return an ArrayList that contains the parsed words in the articleWords
      */
     private ArrayList<String> parseArticleWords(ArrayList<String> articleWords) {
@@ -386,7 +390,9 @@ public class Parse {
         int wordsNumber = articleWords.size();
         for (int i = 0; i < wordsNumber ; i++) {
             //cleans unnecessary characters from the word
-            String word = articleWords.get(i).replaceAll(",", "");
+            //TODO: make sure this is ok
+            String word = articleWords.get(i); //.replaceAll(",", "");
+            /*
             if(word.startsWith("-") || word.endsWith("-")){
                 word = word.replace("-", "");
             }
@@ -403,7 +409,7 @@ public class Parse {
             }
             if(word.equals("")){
                 continue;
-            }
+            }*/
             String nextWord = i + 1 < wordsNumber ? articleWords.get(i + 1).replaceAll(",", ""): "";
             if (word.length() > 1) {
                 if (isNumber(word)) {
@@ -506,8 +512,11 @@ public class Parse {
     public HashMap<String,Term> parse(Article article, boolean stem) {
         dictionary = new HashMap<>();
         termPositionInDocument = 0;
-        ArrayList<String> words = new ArrayList<>(Arrays.asList(article.getContent().replace("--", ", ").split(REGEX_BY_WORDS)));
-        words = parseEntities(words);
+        String content = article.getContent();
+        ArrayList<String> entitiesInDoc = parseEntities(content);
+        ArrayList<String> words = new ArrayList<>(Arrays.asList(content.replace("--", ", ").split(REGEX_BY_WORDS)));
+        //cleanWords
+        //words = parseEntities(words);
         words = eliminateStopWords(words);
         words = handleDollarCases(words);
         words = pricesOverMillion(words);
@@ -589,42 +598,95 @@ public class Parse {
     }
 
 
-    /**
-     *
-     * @param words
-     * @return
-     */
-    private ArrayList<String> parseEntities(ArrayList<String> words) {
-        ArrayList<String> parsedWords = new ArrayList<>();
-        StringBuilder entity;
-        int counter;
-        for (int i = 0; i < words.size(); ++i) {
-            String word = words.get(i);
-            parsedWords.add(word);
-            if (word.length() > 0 && Character.isUpperCase(word.charAt(0))){
-                entity = new StringBuilder();
-                counter = 0;
-                entity.append(word + " ");
-                try {
-                    String nextWord = words.get(i+1);
-                    while(Character.isUpperCase(nextWord.charAt(0))){
-                        parsedWords.add(nextWord);
-                        i++;
-                        counter++;
-                        entity.append(nextWord + " ");
-                        nextWord = words.get(i+1);
+
+    private ArrayList<String> mergeWordsAndEntities(ArrayList<String> words, ArrayList<String> entities) {
+        ArrayList<String> mergedWordsAndEntities = new ArrayList<>();
+        String[] splitEntity;
+        int i=0;
+        boolean isEntity;
+        for(String entity: entities){
+            splitEntity = entity.split(" ");
+            int entitySize = splitEntity.length;
+            while(i<words.size()){
+                String word = words.get(i);
+                if (word.length() > 0 && Character.isUpperCase(word.charAt(0))){
+                    isEntity = true;
+                    for(int j=0; j<entitySize;j++){
+                        if(!Character.isUpperCase(words.get(i+j).charAt(0)) || !words.get(i+j).equalsIgnoreCase(splitEntity[j])){
+                            isEntity = false;
+                            for(int k=0; k<=j; k++){
+                                mergedWordsAndEntities.add(words.get(i+k));
+                            }
+                            i+=j+1;
+                            break;
+                        }
                     }
-                    if(counter > 0){
-                        parsedWords.add(entity.toString().substring(0,entity.length()-1));
+                    if(isEntity){
+                        mergedWordsAndEntities.add(entity);
+                        for(int j=0; j<entitySize;j++){
+                            mergedWordsAndEntities.add(words.get(i));
+                            i++;
+                        }
+                        break;
                     }
+
                 }
-                catch (Exception e){
-                    if(counter > 0){
-                        parsedWords.add(entity.toString().substring(0,entity.length()-1));
-                    }
+                else{
+                    mergedWordsAndEntities.add(word);
+                    i++;
                 }
             }
         }
-        return parsedWords;
+        while(i<words.size()){
+            mergedWordsAndEntities.add(words.get(i));
+            i++;
+        }
+        return mergedWordsAndEntities;
     }
+
+
+    private ArrayList<String> parseEntities(String content){
+        ArrayList<String> entitiesInDoc = new ArrayList<>();
+        Pattern entities = Pattern.compile("(?:[A-Z]+\\w*(?:-[A-Za-z]+)*(?:\\W|\\s+)){2,4}",Pattern.MULTILINE);
+        Matcher foundEntities = entities.matcher(content);
+
+        while (foundEntities.find()) {
+            String entity = foundEntities.group();
+            //FIXME: this
+            entity = Pattern.compile("[,.:;)-?!}\\]\"\'*]").matcher(entity).replaceAll("");
+            entity = Pattern.compile("\n|\\s+").matcher(entity).replaceAll(" ").trim();
+            entity = entity.toUpperCase();
+            entitiesInDoc.add(entity);
+        }
+        return entitiesInDoc;
+    }
+
+
+    private ArrayList<String> cleanWords(ArrayList<String> words){
+        ArrayList<String> results = new ArrayList<>();
+        for(String word : words) {
+            word = word.replaceAll(",", "");
+            if (word.startsWith("-") || word.endsWith("-")) {
+                word = word.replace("-", "");
+            }
+            if (word.startsWith("/")) {
+                while (!word.equals("") && word.charAt(0) == '/')
+                    word = word.substring(1);
+            }
+            if (word.endsWith("/")) {
+                while (!word.equals("") && word.charAt(word.length() - 1) == '/')
+                    word = word.substring(0, word.length() - 1);
+            }
+            if (word.contains(",")) {
+                word = word.replace(",", "");
+            }
+            if (word.equals("")) {
+                continue;
+            }
+            results.add(word);
+        }
+        return results;
+    }
+
+
 }

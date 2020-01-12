@@ -34,24 +34,34 @@ public class Indexer {
     public void collectTermPostingLines(HashMap<String, Term> documentDictionary, Article doc){
         int maxTF = 0, docLength  = 0;
         for(String term : documentDictionary.keySet()){
-            int termFrequency = documentDictionary.get(term).getTermFrequency(doc);
-            docLength += termFrequency; // summing the amount of terms in the document in order to compute its length
-            if(termFrequency > maxTF){
-                maxTF = termFrequency;
+            if(!documentDictionary.get(term).isEntity()) {
+                int termFrequency = documentDictionary.get(term).getTermFrequency(doc);
+                docLength += termFrequency; // summing the amount of terms in the document in order to compute its length
+                if (termFrequency > maxTF) {
+                    maxTF = termFrequency;
+                }
+                if (postingLines.containsKey(term)) {
+                    String correctTerm = removeDuplicateTermsIndexer(documentDictionary.get(term).getTerm());
+                    String currentTermInDic = postingLines.get(term).toString().substring(0, postingLines.get(term).toString().indexOf("|"));
+                    if (!correctTerm.equals(currentTermInDic)) {
+                        String tempPL = postingLines.get(term).toString();
+                        tempPL.replace(currentTermInDic, correctTerm);
+                        StringBuilder postingLineAfterReplaceTermAndConcat = new StringBuilder(tempPL).append(documentDictionary.get(term).getPostingLineInDoc(doc));
+                        postingLines.put(term, postingLineAfterReplaceTermAndConcat);
+                    } else {
+                        postingLines.get(term).append(documentDictionary.get(term).getPostingLineInDoc(doc));
+                    }
+                } else {
+                    postingLines.put(term, new StringBuilder(documentDictionary.get(term).getTerm()).append("|").append(documentDictionary.get(term).getPostingLineInDoc(doc)));
+                }
             }
-            if(postingLines.containsKey(term)){
-                String correctTerm = removeDuplicatesTermsIndexer(documentDictionary.get(term).getTerm());
-                String currentTermInDic = postingLines.get(term).toString().substring(0,postingLines.get(term).toString().indexOf("|"));
-                if(!correctTerm.equals(currentTermInDic)){
-                    String tempPL = postingLines.get(term).toString();
-                    tempPL.replace(currentTermInDic,correctTerm);
-                    StringBuilder postingLineAfterReplaceTermAndConcat = new StringBuilder(tempPL).append(documentDictionary.get(term).getPostingLineInDoc(doc));
-                    postingLines.put(term, postingLineAfterReplaceTermAndConcat);
-                }else{
+            else{ //an entity
+                if(postingLines.containsKey(term)){
                     postingLines.get(term).append(documentDictionary.get(term).getPostingLineInDoc(doc));
                 }
-            }else{
-                postingLines.put(term, new StringBuilder(documentDictionary.get(term).getTerm()).append("|").append(documentDictionary.get(term).getPostingLineInDoc(doc)));
+                else{
+                    postingLines.put(term, new StringBuilder(documentDictionary.get(term).getTerm()).append("|").append(documentDictionary.get(term).getPostingLineInDoc(doc)));
+                }
             }
         }
         String[] details = new String[4];
@@ -69,7 +79,7 @@ public class Indexer {
      * @param word the checked term
      * @return the correct form of the term
      */
-    private String removeDuplicatesTermsIndexer(String word){
+    private String removeDuplicateTermsIndexer(String word){
         if(Character.isDigit(word.charAt(0))){
             return word;
         }

@@ -55,10 +55,10 @@ public class ViewController extends Observable implements Observer {
     }
 
     /**
-     *
-     * @param indexPath
-     * @param stem
-     * @throws Exception
+     * Reads the file of the documents' details and fills the HashMap of it with the content
+     * @param indexPath the path to the directory that contains the file
+     * @param stem indicates whether the wanted dictionary is with or without stemming
+     * @throws Exception in case the document details file doesn't exist
      */
     public void loadDocumentDetails(String indexPath, boolean stem) throws Exception{
         controller.loadDocumentDetails(indexPath,stem);
@@ -83,8 +83,11 @@ public class ViewController extends Observable implements Observer {
     }
 
     /**
-     *
-     * @param query
+     * Calls the runQuery method in the controller. The method runs the query and returns the 50 most relevant documents.
+     * @param query the query
+     * @param targetPath the path to the index
+     * @param stem determines if the content includes stemming
+     * @return the 50 most relevant documents to the query
      */
     public HashMap<String,HashMap<String,Double>> runQuery(String query, String targetPath, boolean stem){
         return controller.runQuery(query, targetPath, stem);

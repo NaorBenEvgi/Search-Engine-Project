@@ -230,6 +230,7 @@ public class Controller extends Observable{
      * Reads the indexed file of the dictionary, and loads it into the HashMap
      * @param targetPath the path of the indexed files
      * @param stem an indicator of whether the terms have gone through stemming in the indexing process
+     * @throws Exception in case the dictionary doesn't exist
      */
     public void loadDictionary(String targetPath, boolean stem) throws Exception{
         finalDictionary = new TreeMap<>();
@@ -272,11 +273,14 @@ public class Controller extends Observable{
         dictionaryReader.close();
     }
 
+
+    // ----------------------------------------------------------------- PART B ADDITIONS----------------------------------------------------------------------------------
+
     /**
-     *
-     * @param targetPath
-     * @param stem
-     * @throws Exception
+     * Reads the indexed file of the documents' details, and loads it into the HashMap
+     * @param targetPath the path of the indexed files
+     * @param stem an indicator of whether the terms have gone through stemming in the indexing process
+     * @throws Exception in case the file doesn't exist
      */
     public void loadDocumentDetails(String targetPath, boolean stem) throws Exception{
         documentDetails = new HashMap<>();
@@ -320,8 +324,14 @@ public class Controller extends Observable{
         documentDetailsReader.close();
     }
 
-    //   ---------------------------------------------------------- PART B ADDITIONS---------------------------------------------------------------------------------------
 
+    /**
+     * Runs a single query or a multiple queries that are stored in a file, and returns the 50 most relevant documents for each query, and the similarity rank of each one.
+     * @param query the query or a path to a file of queries
+     * @param targetPath the path to the directory of the indexed files
+     * @param stem indicates whether the terms in the documents have gone through stemming or not
+     * @return the 50 most relevant documents for each query, and the similarity rank of each one
+     */
     public HashMap<String,HashMap<String,Double>> runQuery(String query, String targetPath, boolean stem) {
         Parse parser = new Parse(targetPath);
         Searcher searcher = new Searcher(finalDictionary, documentDetails, targetPath);
@@ -347,7 +357,11 @@ public class Controller extends Observable{
     }
 
 
-
+    /**
+     * Reads a file of queries and extracts the queries and their IDs into a HashMap.
+     * @param queryFilePath the path to the file of queries
+     * @return a HashMap of the queries' IDs and the list of words in each query
+     */
     private HashMap<String,ArrayList<String>> readQueryFile(String queryFilePath){
         HashMap<String,ArrayList<String>> queries = new HashMap<>();
         BufferedReader reader;
