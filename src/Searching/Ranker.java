@@ -120,6 +120,30 @@ public class Ranker {
 
 
     /**
+     * Computes the similarity between a query and a document according to cosine similarity indice.
+     * @param query the query
+     * @param docId the ID of the document
+     * @param queryWordsTFPerDoc a data structure that contains the terms in the query and their frequencies in the documents they appear in
+     * @return a rank by cosine similarity indice
+     */
+    private double rankByCosSim(List<String> query, String docId, HashMap<String,Integer> queryWordsTFPerDoc){
+        double innerProduct = 0, documentVecLength = 0, queryVecLength = Math.sqrt(query.size());
+        double idf, documentFrequency, termWeight, rank, tf;
+
+        for(String term : query){
+            documentFrequency = Double.valueOf(termsDF.get(term));
+            tf = Double.valueOf(queryWordsTFPerDoc.get(term)) / Double.valueOf(documentDetails.get(docId)[4]);
+            idf = log2(documentDetails.size()/documentFrequency);
+            termWeight = tf*idf;
+            innerProduct += termWeight;
+            documentVecLength += termWeight*termWeight;
+        }
+        documentVecLength = Math.sqrt(documentVecLength);
+
+        return innerProduct/(documentVecLength*queryVecLength);
+    }
+
+    /**
      * Extracts the term and its frequency in each document to a HashMap
      * @param queryPostingLines a list with the posting lines of the terms
      * @return a HashMap with a document ID as a key, and a term and its frequency as a value
@@ -172,7 +196,8 @@ public class Ranker {
         HashMap<String,Double> rankedDocs = new HashMap<>();
 
         for(String doc : retrievedDocuments){
-            double rank = rankByBM25(query,doc,queryWordsTFPerDoc.get(doc)) + rankByPosition(query,doc,queryPostingLines);
+            HashMap<String,Integer> docTFs = queryWordsTFPerDoc.get(doc);
+            double rank = rankByBM25(query,doc,docTFs) + rankByPosition(query,doc,queryPostingLines) + rankByCosSim(query,doc,docTFs);
             if(semanticTreatment){
                 //TODO: add the computation of semantic treatment ranking
                 rank += rankBySemanticTreatment(query,doc,queryPostingLines);
@@ -191,7 +216,6 @@ public class Ranker {
         }
         return docsToRetrieve;
     }
-
 
 
 
@@ -224,20 +248,13 @@ public class Ranker {
         return temp;
     }
 
-
-    // might be unnecessary
-    /*
+    /**
+     * Computes the log in base 2 of a number
+     * @param number the number
+     * @return the log in base 2 of a number
+     */
     private double log2(double number){
         return (Math.log(number) / Math.log(2));
-    }*/
-
-
-    public HashMap<String, String[]> getDocumentDetails() {
-        return documentDetails;
-    }
-
-    public void setDocumentDetails(HashMap<String, String[]> documentDetails) {
-        this.documentDetails = documentDetails;
     }
 
 }
