@@ -89,7 +89,7 @@ public class ViewController extends Observable implements Observer {
      * @param stem determines if the content includes stemming
      * @return the 50 most relevant documents to the query
      */
-    public HashMap<String,HashMap<String,Double>> runQuery(String query, String targetPath, boolean stem){
-        return controller.runQuery(query, targetPath, stem);
+    public HashMap<String,HashMap<String,Double>> runQuery(String query, String targetPath, boolean stem, boolean semanticTreatment){
+        return controller.runQuery(query, targetPath, stem, semanticTreatment);
     }
 }

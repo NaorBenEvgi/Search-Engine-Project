@@ -77,7 +77,7 @@ public class Parse {
     private ArrayList<String> eliminateStopWords(ArrayList<String> words){
         ArrayList<String> lineWithoutStopWords = new ArrayList<>();
         for (String word : words) {
-            if (!isStopWord(word.toLowerCase())) {
+            if (!isStopWord(word)) {
                 lineWithoutStopWords.add(word);
             }
         }
@@ -515,8 +515,8 @@ public class Parse {
         String content = article.getContent();
         ArrayList<String> entitiesInDoc = parseEntities(content);
         ArrayList<String> words = new ArrayList<>(Arrays.asList(content.replace("--", ", ").split(REGEX_BY_WORDS)));
-        //cleanWords
-        //words = parseEntities(words);
+        words = cleanWords(words);
+       // words = mergeWordsAndEntities(words,entitiesInDoc,article.getDocId());
         words = eliminateStopWords(words);
         words = handleDollarCases(words);
         words = pricesOverMillion(words);
@@ -536,8 +536,20 @@ public class Parse {
                 else{
                     term = dictionary.get(word);
                 }
-            }else {
-                //checks if the dic contains this word and how the word should be indexed
+            }/*else if(Character.isUpperCase(word.charAt(0)) && word.contains(" ")){ //in case the term is an entity
+                if(!dictionary.containsKey(word)){
+                    term = new Term(word);
+                    term.setEntity();
+                    dictionary.put(word,term);
+                }
+                else{
+                    term = dictionary.get(word);
+                }
+                term.addPositionInDoc(article,termPositionInDocument);
+                continue;
+            }*/
+            else{
+                //checks if the dictionary contains this word and how the word should be indexed
                 if (!dictionary.containsKey(word.toLowerCase())) {
                     if (Character.isUpperCase(word.charAt(0)))
                         term = new Term(word.toUpperCase());
@@ -551,6 +563,25 @@ public class Parse {
             term.addPositionInDoc(article,termPositionInDocument);
             termPositionInDocument++;
         }
+
+        for(String entity : entitiesInDoc){
+            if(stem) {
+                Stemmer.setCurrent(entity);
+                Stemmer.stem();
+                entity = Stemmer.getCurrent();
+            }
+            Term term;
+            if(!dictionary.containsKey(entity)){
+                term = new Term(entity);
+                term.setEntity();
+                dictionary.put(entity,term);
+            }
+            else{
+                term = dictionary.get(entity);
+            }
+            term.addPositionInDoc(article,0);
+        }
+
         return dictionary;
     }
 
@@ -598,8 +629,8 @@ public class Parse {
     }
 
 
-
-    private ArrayList<String> mergeWordsAndEntities(ArrayList<String> words, ArrayList<String> entities) {
+/*
+    private ArrayList<String> mergeWordsAndEntities(ArrayList<String> words, ArrayList<String> entities, String docID) {
         ArrayList<String> mergedWordsAndEntities = new ArrayList<>();
         String[] splitEntity;
         int i=0;
@@ -611,15 +642,21 @@ public class Parse {
                 String word = words.get(i);
                 if (word.length() > 0 && Character.isUpperCase(word.charAt(0))){
                     isEntity = true;
-                    for(int j=0; j<entitySize;j++){
-                        if(!Character.isUpperCase(words.get(i+j).charAt(0)) || !words.get(i+j).equalsIgnoreCase(splitEntity[j])){
-                            isEntity = false;
-                            for(int k=0; k<=j; k++){
-                                mergedWordsAndEntities.add(words.get(i+k));
+
+                    try {
+                        for (int j = 0; j < entitySize; j++) {
+                            if (!Character.isUpperCase(words.get(i + j).charAt(0)) || !words.get(i + j).equalsIgnoreCase(splitEntity[j])) {
+                                isEntity = false;
+                                for (int k = 0; k <= j; k++) {
+                                    mergedWordsAndEntities.add(words.get(i + k));
+                                }
+                                i += j + 1;
+                                break;
                             }
-                            i+=j+1;
-                            break;
                         }
+                    }
+                    catch(IndexOutOfBoundsException e){
+                        System.out.println(docID);
                     }
                     if(isEntity){
                         mergedWordsAndEntities.add(entity);
@@ -643,18 +680,19 @@ public class Parse {
         }
         return mergedWordsAndEntities;
     }
-
+*/
 
     private ArrayList<String> parseEntities(String content){
         ArrayList<String> entitiesInDoc = new ArrayList<>();
-        Pattern entities = Pattern.compile("(?:[A-Z]+\\w*(?:-[A-Za-z]+)*(?:\\W|\\s+)){2,4}",Pattern.MULTILINE);
+        Pattern entities = Pattern.compile("(?:\\w{0,}[A-Z]+\\w*(?:-[A-Za-z]+)*(?:\\W|\\s+)){2,4}",Pattern.MULTILINE);
         Matcher foundEntities = entities.matcher(content);
 
         while (foundEntities.find()) {
             String entity = foundEntities.group();
-            //FIXME: this
-            entity = Pattern.compile("[,.:;)-?!}\\]\"\'*]").matcher(entity).replaceAll("");
+            entity = Pattern.compile("[:-]").matcher(entity).replaceAll(" ");
+            entity = Pattern.compile("[,.;)?!}\\]\"'*|]").matcher(entity).replaceAll("");
             entity = Pattern.compile("\n|\\s+").matcher(entity).replaceAll(" ").trim();
+            entity = entity.replaceAll("^(?:\\w\\s)+", "");
             entity = entity.toUpperCase();
             entitiesInDoc.add(entity);
         }

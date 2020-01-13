@@ -114,6 +114,11 @@ public class Ranker {
 
 
 
+    private double rankBySemanticTreatment(List<String> query, String docId, ArrayList<String> queryPostingLines){
+        return 0;
+    }
+
+
     /**
      * Extracts the term and its frequency in each document to a HashMap
      * @param queryPostingLines a list with the posting lines of the terms
@@ -161,13 +166,17 @@ public class Ranker {
      * @param query a list with the terms in the query
      * @return he 50 highest ranked documents with their ranks
      */
-    protected HashMap<String,Double> rank(ArrayList<String> queryPostingLines, ArrayList<String> query){
+    protected HashMap<String,Double> rank(ArrayList<String> queryPostingLines, ArrayList<String> query, boolean semanticTreatment){
         HashMap<String,HashMap<String,Integer>> queryWordsTFPerDoc = computeTFForQueryWords(queryPostingLines);
         ArrayList<String> retrievedDocuments = new ArrayList<>(queryWordsTFPerDoc.keySet());
         HashMap<String,Double> rankedDocs = new HashMap<>();
 
         for(String doc : retrievedDocuments){
             double rank = rankByBM25(query,doc,queryWordsTFPerDoc.get(doc)) + rankByPosition(query,doc,queryPostingLines);
+            if(semanticTreatment){
+                //TODO: add the computation of semantic treatment ranking
+                rank += rankBySemanticTreatment(query,doc,queryPostingLines);
+            }
             rankedDocs.put(doc,rank);
         }
         rankedDocs = sortByValue(rankedDocs);

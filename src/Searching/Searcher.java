@@ -30,7 +30,7 @@ public class Searcher {
      * @param stem indicates whether the indexing process included stemming
      * @return the 50 most relevant documents and their ranks
      */
-    public HashMap<String,Double> runSingleQuery(ArrayList<String> query, boolean stem){
+    public HashMap<String,Double> runSingleQuery(ArrayList<String> query, boolean stem, boolean semanticTreatment){
         ArrayList<String> postingLinesForQuery = new ArrayList<>();
         BufferedReader postingFilesReader;
 
@@ -56,7 +56,7 @@ public class Searcher {
             e.printStackTrace();
         }
 
-         return ranker.rank(postingLinesForQuery, query);
+         return ranker.rank(postingLinesForQuery, query, semanticTreatment);
     }
 
 
@@ -66,11 +66,11 @@ public class Searcher {
      * @param stem indicates whether the indexing process included stemming
      * @return the 50 most relevant documents for each document and their ranks
      */
-    public HashMap<String,HashMap<String,Double>> runMultipleQueries(HashMap<String,ArrayList<String>> queries, boolean stem){
+    public HashMap<String,HashMap<String,Double>> runMultipleQueries(HashMap<String,ArrayList<String>> queries, boolean stem, boolean semanticTreatment){
         HashMap<String,HashMap<String,Double>> resultsForAllQueries = new HashMap<>();
         ArrayList<String> queriesIDs = new ArrayList<>(queries.keySet());
         for(String queryID : queriesIDs){
-            HashMap<String,Double> queryResults = runSingleQuery(queries.get(queryID),stem);
+            HashMap<String,Double> queryResults = runSingleQuery(queries.get(queryID),stem, semanticTreatment);
             resultsForAllQueries.put(queryID,queryResults);
         }
         return resultsForAllQueries;

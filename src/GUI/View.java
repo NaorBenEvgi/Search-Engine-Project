@@ -122,7 +122,7 @@ public class View implements Observer {
     /**
      * Pops a window that displays the dictionary.
      */
-    public void displayDictionary(){
+    public void displayDictionary(){ //FIXME: change this to reading from the dictionary in the memory, not in the disk.
         reader = new ReadFile();
         SortedMap<String,String> finalDictionary = new TreeMap<>();
         String innerTargetPath;
@@ -237,7 +237,7 @@ public class View implements Observer {
         }
         else{
             String query = queryTextField.getText();
-            HashMap<String,HashMap<String,Double>> retrievedDocs = viewController.runQuery(query,indexPathTextField.getText(),stem);
+            HashMap<String,HashMap<String,Double>> retrievedDocs = viewController.runQuery(query,indexPathTextField.getText(),stem, semanticTreatment);
             ArrayList<String> queryIDs = new ArrayList<>(retrievedDocs.keySet());
 
            ArrayList<String[]> docsToDisplay = new ArrayList<>();

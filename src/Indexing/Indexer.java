@@ -232,7 +232,12 @@ public class Indexer {
     private Pair<String,StringBuilder> convertLineToTermAndPosting(String line){
         String[] termAndPosting = line.split(BY_VERTICLE_BAR); //[0] contains the term, [1] contains the rest of the posting line
         StringBuilder postingLine = new StringBuilder();
-        postingLine.append(termAndPosting[1]);
+        try {
+            postingLine.append(termAndPosting[1]);
+        }
+        catch (Exception e){
+            System.out.println(line);
+        }
         return new Pair<>(termAndPosting[0],postingLine);
     }
 

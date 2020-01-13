@@ -332,7 +332,7 @@ public class Controller extends Observable{
      * @param stem indicates whether the terms in the documents have gone through stemming or not
      * @return the 50 most relevant documents for each query, and the similarity rank of each one
      */
-    public HashMap<String,HashMap<String,Double>> runQuery(String query, String targetPath, boolean stem) {
+    public HashMap<String,HashMap<String,Double>> runQuery(String query, String targetPath, boolean stem, boolean semanticTreatment) {
         Parse parser = new Parse(targetPath);
         Searcher searcher = new Searcher(finalDictionary, documentDetails, targetPath);
         HashMap<String,Double> retrievedDocs;
@@ -343,11 +343,11 @@ public class Controller extends Observable{
             for (String queryID : queryIDs) {
                 parsedQueries.put(queryID, parser.parseQuery(rawQueries.get(queryID), stem));
             }
-            return searcher.runMultipleQueries(parsedQueries, stem);
+            return searcher.runMultipleQueries(parsedQueries, stem, semanticTreatment);
         } else {
             ArrayList<String> queryWords = new ArrayList<>(Arrays.asList(query.split(" ")));
             queryWords = parser.parseQuery(queryWords, stem);
-            retrievedDocs = searcher.runSingleQuery(queryWords, stem);
+            retrievedDocs = searcher.runSingleQuery(queryWords, stem, semanticTreatment);
 
             HashMap<String,HashMap<String,Double>> queryResult = new HashMap<>();
             queryResult.put(String.valueOf(singleQueryID),retrievedDocs);
