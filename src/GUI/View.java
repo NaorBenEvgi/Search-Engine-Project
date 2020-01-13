@@ -2,6 +2,7 @@ package GUI;
 
 import Indexing.ReadFile;
 import Searching.Ranker;
+import javafx.application.Platform;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -43,7 +44,7 @@ public class View implements Observer {
     public Button runQueryButton;
     public javafx.scene.control.CheckBox semanticTreatmentCheckbox;
     public Button saveResultsButton;
-    private boolean semanticTreatment;
+    private boolean semanticTreatment, mouseClick = false;
 
     //TODO: need to add entities identification functionality
 
@@ -264,9 +265,28 @@ public class View implements Observer {
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
 
+            // http://java-buddy.blogspot.com/2013/12/java-swing-jtable-and.html - taken from Muhsen and Evgeny
+            table.getSelectionModel().addListSelectionListener(event -> {
+                if(!mouseClick) {
+                    Platform.runLater(() -> {
+                        String entities = "";
+                        ArrayList<String> entitiesPerDoc = viewController.getFiveEntitiesPerDoc().get((table.getValueAt(table.getSelectedRow(), 2)));
+                        for (int i = 0; i < entitiesPerDoc.size(); i++) {
+                            entities += entitiesPerDoc.get(i) + "\n";
+                        }
+                        displayAlert("High Five (entities)!", entities.substring(0, entities.length() - 2));
+                        mouseClick = true;
+                    });
+                }
+                else{
+                    mouseClick = false;
+                }
+            });
+
         }
 
     }
+
 
     /**
      *

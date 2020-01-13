@@ -1,5 +1,6 @@
 package GUI;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
@@ -91,5 +92,11 @@ public class ViewController extends Observable implements Observer {
      */
     public HashMap<String,HashMap<String,Double>> runQuery(String query, String targetPath, boolean stem, boolean semanticTreatment){
         return controller.runQuery(query, targetPath, stem, semanticTreatment);
+    }
+
+
+
+    public HashMap<String, ArrayList<String>> getFiveEntitiesPerDoc(){
+        return controller.getFiveEntitiesPerDoc();
     }
 }

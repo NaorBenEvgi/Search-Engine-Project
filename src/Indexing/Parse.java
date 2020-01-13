@@ -27,6 +27,7 @@ public class Parse {
     private static final float BILLION = 1000000000;
     protected HashSet<String> stopWords;
     private HashMap<String,Term> dictionary;
+    private ArrayList<Term> termEntitiesPerDoc;
     private int termPositionInDocument;
     private boolean skipNextWord = false;
 
@@ -37,6 +38,7 @@ public class Parse {
         fillStopWords(stopWordsPath.toString());
         termPositionInDocument = 0;
         dictionary = new HashMap<>();
+        termEntitiesPerDoc = new ArrayList<>();
     }
 
 
@@ -510,6 +512,7 @@ public class Parse {
      * @return an ArrayList of the parsed words
      */
     public HashMap<String,Term> parse(Article article, boolean stem) {
+        termEntitiesPerDoc = new ArrayList<>();
         dictionary = new HashMap<>();
         termPositionInDocument = 0;
         String content = article.getContent();
@@ -575,6 +578,7 @@ public class Parse {
                 term = new Term(entity);
                 term.setEntity();
                 dictionary.put(entity,term);
+                termEntitiesPerDoc.add(term);
             }
             else{
                 term = dictionary.get(entity);
@@ -726,5 +730,8 @@ public class Parse {
         return results;
     }
 
+    public ArrayList<Term> getTermEntitiesPerDoc(){
+        return termEntitiesPerDoc;
+    }
 
 }

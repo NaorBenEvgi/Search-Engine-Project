@@ -2,6 +2,7 @@ package Searching;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +12,8 @@ public class Searcher {
 
     private static Ranker ranker;
     private String targetPath;
+    private SortedMap<String,String[]> finalDictionary;
+    private HashMap<String,ArrayList<String>> fiveEntitiesPerDoc;
 
     /**
      * The Searcher constructor. The Object gets the final dictionary, the document details file and the path to the indexed files.
@@ -21,6 +24,8 @@ public class Searcher {
     public Searcher(SortedMap<String, String[]> finalDictionary, HashMap<String, String[]> documentDetails, String targetPath){
         ranker = new Ranker(finalDictionary,documentDetails);
         this.targetPath = targetPath;
+        this.finalDictionary = finalDictionary;
+        this.fiveEntitiesPerDoc = new HashMap<>();
     }
 
 
@@ -56,7 +61,10 @@ public class Searcher {
             e.printStackTrace();
         }
 
-         return ranker.rank(postingLinesForQuery, query, semanticTreatment);
+        HashMap<String,Double> mostRelevantDocs = ranker.rank(postingLinesForQuery, query, semanticTreatment);
+        fillFiveEntitiesPerDoc(mostRelevantDocs,stem);
+
+        return mostRelevantDocs;
     }
 
 
@@ -99,5 +107,56 @@ public class Searcher {
 
         return Paths.get(targetPath).resolve(directoryName).resolve(fileName + ".txt").toString();
     }
+
+
+    private void fillFiveEntitiesPerDoc(HashMap<String,Double> mostRelevantDocs, boolean stem){
+        ArrayList<String> docs = new ArrayList<>(mostRelevantDocs.keySet());
+        ArrayList<String> entities;
+        Path entitiesFilePath;
+        if(stem) {
+            entitiesFilePath = Paths.get(targetPath).resolve("indexStem");
+            entitiesFilePath = Paths.get(entitiesFilePath.toString()).resolve("entitiesStem.txt");
+        }
+        else{
+            entitiesFilePath = Paths.get(targetPath).resolve("index");
+            entitiesFilePath = Paths.get(entitiesFilePath.toString()).resolve("entities.txt");
+        }
+
+        BufferedReader entitiesFileReader = null;
+        try {
+            for (String doc : docs) {
+                entities = new ArrayList<>();
+                entitiesFileReader = new BufferedReader(new FileReader(entitiesFilePath.toString()));
+                String line;
+                while((line = entitiesFileReader.readLine()) != null){
+                    if(line.startsWith(doc)){
+                        String[] entitiesInDoc = line.substring(line.indexOf("|")+1).split(",");
+                        for(int i=0; i<entitiesInDoc.length; i++){
+                            if(finalDictionary.containsKey(entitiesInDoc[i])){
+                                entities.add(entitiesInDoc[i]);
+                                if(entities.size() == 5){
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+                fiveEntitiesPerDoc.put(doc,entities);
+            }
+            entitiesFileReader.close();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    public HashMap<String,ArrayList<String>> getFiveEntitiesPerDoc(){
+        return fiveEntitiesPerDoc;
+    }
+
+
+
 
 }
