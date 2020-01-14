@@ -271,10 +271,17 @@ public class View implements Observer {
                     Platform.runLater(() -> {
                         String entities = "";
                         ArrayList<String> entitiesPerDoc = viewController.getFiveEntitiesPerDoc().get((table.getValueAt(table.getSelectedRow(), 2)));
-                        for (int i = 0; i < entitiesPerDoc.size(); i++) {
-                            entities += entitiesPerDoc.get(i) + "\n";
+                        String content = "";
+                        if(entitiesPerDoc.size() == 0){
+                            content = "No entities to show!";
                         }
-                        displayAlert("High Five (entities)!", entities.substring(0, entities.length() - 2));
+                        else {
+                            for (int i = 0; i < entitiesPerDoc.size(); i++) {
+                                entities += entitiesPerDoc.get(i) + "\n";
+                            }
+                            content = entities.substring(0, entities.length() - 2);
+                        }
+                        displayAlert("High Five (entities)!", content);
                         mouseClick = true;
                     });
                 }
@@ -307,7 +314,17 @@ public class View implements Observer {
      * Saves the results of the engine to a query in a text file.
      */
     public void saveResults(){
+       /* FileChooser chooser = new FileChooser();
+        chooser.setTitle("Save maze");
+        File savedMaze = new File("./savedMazes");
+        chooser.setInitialDirectory(savedMaze);
+        chooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("compressed maze files",".txt"));
 
+        //opens the file saving window
+        File compressedMaze = chooser.showSaveDialog((Stage)mazeDisplayer.getScene().getWindow());
+        if(compressedMaze != null){
+            viewModel.saveMaze(compressedMaze);
+        }*/
     }
 
     /**

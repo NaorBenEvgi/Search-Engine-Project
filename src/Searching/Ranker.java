@@ -130,13 +130,15 @@ public class Ranker {
         double innerProduct = 0, documentVecLength = 0, queryVecLength = Math.sqrt(query.size());
         double idf, documentFrequency, termWeight, rank, tf;
 
-        for(String term : query){
-            documentFrequency = Double.valueOf(termsDF.get(term));
-            tf = Double.valueOf(queryWordsTFPerDoc.get(term)) / Double.valueOf(documentDetails.get(docId)[4]);
-            idf = log2(documentDetails.size()/documentFrequency);
-            termWeight = tf*idf;
-            innerProduct += termWeight;
-            documentVecLength += termWeight*termWeight;
+        for(String term : query) {
+            tf = Double.valueOf(queryWordsTFPerDoc.getOrDefault(term, 0)) / Double.valueOf(documentDetails.get(docId)[3]);
+            if (tf != 0) {
+                documentFrequency = Double.valueOf(termsDF.get(term));
+                idf = log2(documentDetails.size() / documentFrequency);
+                termWeight = tf * idf;
+                innerProduct += termWeight;
+                documentVecLength += termWeight * termWeight;
+            }
         }
         documentVecLength = Math.sqrt(documentVecLength);
 
@@ -197,7 +199,7 @@ public class Ranker {
 
         for(String doc : retrievedDocuments){
             HashMap<String,Integer> docTFs = queryWordsTFPerDoc.get(doc);
-            double rank = rankByBM25(query,doc,docTFs) + rankByPosition(query,doc,queryPostingLines) + rankByCosSim(query,doc,docTFs);
+            double rank = rankByBM25(query,doc,docTFs) + rankByPosition(query,doc,queryPostingLines); // + rankByCosSim(query,doc,docTFs);
             if(semanticTreatment){
                 //TODO: add the computation of semantic treatment ranking
                 rank += rankBySemanticTreatment(query,doc,queryPostingLines);

@@ -17,6 +17,7 @@ public class Indexer {
     private SortedMap<String,String[]> finalDictionary;
     private String BY_VERTICLE_BAR = "\\|";
     private HashMap<Integer,String[]> documentDetails;
+
     public Indexer(){
         postingFilesCounter = 0;
         postingLines = new HashMap<>();
@@ -34,34 +35,24 @@ public class Indexer {
     public void collectTermPostingLines(HashMap<String, Term> documentDictionary, Article doc){
         int maxTF = 0, docLength  = 0;
         for(String term : documentDictionary.keySet()){
-            if(!documentDictionary.get(term).isEntity()) {
-                int termFrequency = documentDictionary.get(term).getTermFrequency(doc);
-                docLength += termFrequency; // summing the amount of terms in the document in order to compute its length
-                if (termFrequency > maxTF) {
-                    maxTF = termFrequency;
-                }
-                if (postingLines.containsKey(term)) {
-                    String correctTerm = removeDuplicateTermsIndexer(documentDictionary.get(term).getTerm());
-                    String currentTermInDic = postingLines.get(term).toString().substring(0, postingLines.get(term).toString().indexOf("|"));
-                    if (!correctTerm.equals(currentTermInDic)) {
-                        String tempPL = postingLines.get(term).toString();
-                        tempPL.replace(currentTermInDic, correctTerm);
-                        StringBuilder postingLineAfterReplaceTermAndConcat = new StringBuilder(tempPL).append(documentDictionary.get(term).getPostingLineInDoc(doc));
-                        postingLines.put(term, postingLineAfterReplaceTermAndConcat);
-                    } else {
-                        postingLines.get(term).append(documentDictionary.get(term).getPostingLineInDoc(doc));
-                    }
-                } else {
-                    postingLines.put(term, new StringBuilder(documentDictionary.get(term).getTerm()).append("|").append(documentDictionary.get(term).getPostingLineInDoc(doc)));
-                }
+            int termFrequency = documentDictionary.get(term).getTermFrequency(doc);
+            docLength += termFrequency; // summing the amount of terms in the document in order to compute its length
+            if (termFrequency > maxTF) {
+                maxTF = termFrequency;
             }
-            else{ //an entity
-                if(postingLines.containsKey(term)){
+            if (postingLines.containsKey(term)) {
+                String correctTerm = removeDuplicateTermsIndexer(documentDictionary.get(term).getTerm());
+                String currentTermInDic = postingLines.get(term).toString().substring(0, postingLines.get(term).toString().indexOf("|"));
+                if (!correctTerm.equals(currentTermInDic)) {
+                    String tempPL = postingLines.get(term).toString();
+                    tempPL.replace(currentTermInDic, correctTerm);
+                    StringBuilder postingLineAfterReplaceTermAndConcat = new StringBuilder(tempPL).append(documentDictionary.get(term).getPostingLineInDoc(doc));
+                    postingLines.put(term, postingLineAfterReplaceTermAndConcat);
+                } else {
                     postingLines.get(term).append(documentDictionary.get(term).getPostingLineInDoc(doc));
                 }
-                else{
-                    postingLines.put(term, new StringBuilder(documentDictionary.get(term).getTerm()).append("|").append(documentDictionary.get(term).getPostingLineInDoc(doc)));
-                }
+            } else {
+                postingLines.put(term, new StringBuilder(documentDictionary.get(term).getTerm()).append("|").append(documentDictionary.get(term).getPostingLineInDoc(doc)));
             }
         }
         String[] details = new String[4];
@@ -477,7 +468,7 @@ public class Indexer {
         //In case the term is common enough, we collect its details into the final dictionary
         termDetails[0] = String.valueOf(sumOfTfTerm); //how many times the term appears in the corpus
         termDetails[1] = String.valueOf(dfTerm); //how many documents the term appears in
-  /*      termDetails[2] = postingFileName;*/
+        /*      termDetails[2] = postingFileName;*/
         //termDetails[2] = String.valueOf(postingLineWithTerm.toString().getBytes().length); //the posting line size in memory
         finalDictionary.put(term,termDetails);
 
@@ -522,8 +513,8 @@ public class Indexer {
             termDetails = finalDictionary.get(term);
             totalTF = termDetails[0];
             documentFrequency = termDetails[1];
-           /* postingFileName = termDetails[2];*/
-           // sizeOfPostingLine = termDetails[2];
+            /* postingFileName = termDetails[2];*/
+            // sizeOfPostingLine = termDetails[2];
             dictionaryContent.append(term).append("_" + totalTF).append("_" + documentFrequency).append("\n"); /*.append("_" + sizeOfPostingLine)*/
             if(dictionaryContent.length() >= 70000000){
                 writePostingLinesToTempFile(pathToFinalDictionary.toString(),dictionaryContent.toString());

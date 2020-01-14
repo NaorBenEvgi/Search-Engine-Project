@@ -27,7 +27,7 @@ public class Parse {
     private static final float BILLION = 1000000000;
     protected HashSet<String> stopWords;
     private HashMap<String,Term> dictionary;
-    private ArrayList<Term> termEntitiesPerDoc;
+    private HashMap<String,Term> termEntitiesPerDoc;
     private int termPositionInDocument;
     private boolean skipNextWord = false;
 
@@ -38,7 +38,7 @@ public class Parse {
         fillStopWords(stopWordsPath.toString());
         termPositionInDocument = 0;
         dictionary = new HashMap<>();
-        termEntitiesPerDoc = new ArrayList<>();
+        termEntitiesPerDoc = new HashMap<>();
     }
 
 
@@ -512,7 +512,7 @@ public class Parse {
      * @return an ArrayList of the parsed words
      */
     public HashMap<String,Term> parse(Article article, boolean stem) {
-        termEntitiesPerDoc = new ArrayList<>();
+        termEntitiesPerDoc = new HashMap<>();
         dictionary = new HashMap<>();
         termPositionInDocument = 0;
         String content = article.getContent();
@@ -552,6 +552,9 @@ public class Parse {
                 continue;
             }*/
             else{
+                if(word.equals(word.toUpperCase())){
+                    entitiesInDoc.add(word);
+                }
                 //checks if the dictionary contains this word and how the word should be indexed
                 if (!dictionary.containsKey(word.toLowerCase())) {
                     if (Character.isUpperCase(word.charAt(0)))
@@ -574,14 +577,14 @@ public class Parse {
                 entity = Stemmer.getCurrent();
             }
             Term term;
-            if(!dictionary.containsKey(entity)){
+            if(!termEntitiesPerDoc.containsKey(entity)){
                 term = new Term(entity);
                 term.setEntity();
-                dictionary.put(entity,term);
-                termEntitiesPerDoc.add(term);
+                //dictionary.put(entity,term);
+                termEntitiesPerDoc.put(entity,term);
             }
             else{
-                term = dictionary.get(entity);
+                term = termEntitiesPerDoc.get(entity);
             }
             term.addPositionInDoc(article,0);
         }
@@ -698,6 +701,24 @@ public class Parse {
             entity = Pattern.compile("\n|\\s+").matcher(entity).replaceAll(" ").trim();
             entity = entity.replaceAll("^(?:\\w\\s)+", "");
             entity = entity.toUpperCase();
+
+            //filtering "bad" entities
+            if(entity.contains("ARTICLE") || entity.contains("TYPE") || entity.contains("BFN")){
+                continue;
+            }
+            else{
+                String[] temp = entity.split(" ");
+                if(temp[0].equals("THE")){
+                    try {
+                        entity = entity.substring(4);
+                    } catch (Exception e){
+                        continue;
+                    }
+                }
+                else if(isStopWord(temp[0].toLowerCase())){
+                    continue;
+                }
+            }
             entitiesInDoc.add(entity);
         }
         return entitiesInDoc;
@@ -731,7 +752,11 @@ public class Parse {
     }
 
     public ArrayList<Term> getTermEntitiesPerDoc(){
-        return termEntitiesPerDoc;
+        ArrayList<Term> entities = new ArrayList<>();
+        for(String entity: termEntitiesPerDoc.keySet()){
+            entities.add(termEntitiesPerDoc.get(entity));
+        }
+        return entities;
     }
 
 }

@@ -439,7 +439,10 @@ public class Controller extends Observable{
             }
         }
 
-        writeEntitiesToFile(fiveMostCommon.substring(0,fiveMostCommon.length()-1),targetPath,stem);
+        if(fiveMostCommon.charAt(fiveMostCommon.length()-1) == ',')
+            writeEntitiesToFile(fiveMostCommon.substring(0,fiveMostCommon.length()-1),targetPath,stem);
+        else
+            writeEntitiesToFile(fiveMostCommon.toString(),targetPath,stem);
     }
 
 
@@ -473,6 +476,11 @@ public class Controller extends Observable{
 
     public HashMap<String,ArrayList<String>> getFiveEntitiesPerDoc(){
         return fiveEntitiesPerDoc;
+    }
+
+
+    public void saveQueryResults(File resultsFile){
+
     }
 
 }
