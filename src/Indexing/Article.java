@@ -19,7 +19,7 @@ public class Article {
      * @param content the content of the document
      */
     public Article(String docId, String content) {
-        this.docId = docId;
+        this.docId = docId.trim();
        /* this.date = null;
         this.title = null;*/
         this.content = content;

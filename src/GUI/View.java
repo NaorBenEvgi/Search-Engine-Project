@@ -314,17 +314,16 @@ public class View implements Observer {
      * Saves the results of the engine to a query in a text file.
      */
     public void saveResults(){
-       /* FileChooser chooser = new FileChooser();
-        chooser.setTitle("Save maze");
-        File savedMaze = new File("./savedMazes");
-        chooser.setInitialDirectory(savedMaze);
-        chooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("compressed maze files",".txt"));
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Save results");
+        chooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter(" ",".txt"));
 
         //opens the file saving window
-        File compressedMaze = chooser.showSaveDialog((Stage)mazeDisplayer.getScene().getWindow());
-        if(compressedMaze != null){
-            viewModel.saveMaze(compressedMaze);
-        }*/
+        File resultsFile = chooser.showSaveDialog(new Stage());
+        if(resultsFile != null){
+            resultsFile = new File(resultsFile.getPath()+".txt");
+            viewController.saveQueryResults(resultsFile);
+        }
     }
 
     /**

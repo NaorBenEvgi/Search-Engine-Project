@@ -22,6 +22,7 @@ public class Controller extends Observable{
     private HashMap<String,ArrayList<String>> fiveEntitiesPerDoc;
     private int corpusSize, numOfTerms;
     private static int singleQueryID = 100;
+    private HashMap<String,ArrayList<String>> resultsForEachQuery;
 
     public Controller() {
         indexer = new Indexer();
@@ -30,6 +31,7 @@ public class Controller extends Observable{
         documentDetails = new HashMap<>();
         corpusSize = 0;
         numOfTerms = 0;
+        resultsForEachQuery = new HashMap<>();
     }
 
     /**
@@ -364,7 +366,9 @@ public class Controller extends Observable{
             }
 
             fiveEntitiesPerDoc = searcher.getFiveEntitiesPerDoc();
-            return searcher.runMultipleQueries(parsedQueries, stem, semanticTreatment);
+            HashMap<String,HashMap<String,Double>> multipleQueriesResults = searcher.runMultipleQueries(parsedQueries, stem, semanticTreatment);
+            addResults(multipleQueriesResults);
+            return multipleQueriesResults;
         } else {
             ArrayList<String> queryWords = new ArrayList<>(Arrays.asList(query.split(" ")));
             queryWords = parser.parseQuery(queryWords, stem);
@@ -372,6 +376,7 @@ public class Controller extends Observable{
 
             HashMap<String,HashMap<String,Double>> queryResult = new HashMap<>();
             queryResult.put(String.valueOf(singleQueryID),retrievedDocs);
+            addResults(queryResult);
             singleQueryID++;
 
             fiveEntitiesPerDoc = searcher.getFiveEntitiesPerDoc();
@@ -393,9 +398,9 @@ public class Controller extends Observable{
             reader = new BufferedReader(new FileReader(queryFilePath));
             while((line = reader.readLine()) != null){
                 if(line.startsWith("<num>")){
-                    queryID = line.substring(line.indexOf("<num> Number: ")+14);
+                    queryID = line.substring(line.indexOf("<num> Number: ")+14).trim();
                     line = reader.readLine();
-                    query = line.substring(line.indexOf("<title> "));
+                    query = line.substring(line.indexOf("<title> ")+8);
                     ArrayList<String> queryWords = new ArrayList<>(Arrays.asList(query.split(" ")));
                     queries.put(queryID,queryWords);
                 }
@@ -479,8 +484,43 @@ public class Controller extends Observable{
     }
 
 
-    public void saveQueryResults(File resultsFile){
+    public void addResults(HashMap<String,HashMap<String,Double>> queryResults){
+        ArrayList<String> retrievedDocs;
 
+        for(String queryID : queryResults.keySet()){
+            HashMap<String,Double> docs = queryResults.get(queryID);
+            docs = Ranker.sortByValue(docs);
+            retrievedDocs = new ArrayList<>(docs.keySet());
+            resultsForEachQuery.put(queryID,retrievedDocs);
+        }
+    }
+
+
+
+    public void saveQueryResults(File resultsFile){
+        BufferedWriter resultsWriter;
+        try{
+            resultsWriter = new BufferedWriter(new FileWriter(resultsFile));
+            StringBuilder content = new StringBuilder();
+            ArrayList<String> queryIDs = new ArrayList<>(resultsForEachQuery.keySet());
+            ArrayList<Integer> sortedQueryIDsInt = new ArrayList<>();
+            for(String id : queryIDs){
+                sortedQueryIDsInt.add(Integer.valueOf(id));
+            }
+            Collections.sort(sortedQueryIDsInt);
+            for(Integer queryID : sortedQueryIDsInt){
+                ArrayList<String> docs = resultsForEachQuery.get(queryID.toString());
+                for(int i=0; i<docs.size(); i++){
+                    content.append(queryID.toString()).append(" 0 ").append(docs.get(i).trim()).append(" 0 0.0 a\n");
+                }
+            }
+            resultsWriter.write(content.toString());
+            resultsWriter.close();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        resultsForEachQuery = new HashMap<>();
     }
 
 }

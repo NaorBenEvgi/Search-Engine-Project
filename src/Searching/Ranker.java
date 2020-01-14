@@ -7,6 +7,7 @@ public class Ranker {
 
     private HashMap<String,String[]> documentDetails;
     private HashMap<String,String> termsDF;
+    private SortedMap<String,String[]> finalDictionary;
     private double averageDocumentLength;
 
     /**
@@ -17,6 +18,7 @@ public class Ranker {
      */
     public Ranker(SortedMap<String, String[]> finalDictionary, HashMap<String, String[]> documentDetails) {
         this.documentDetails = documentDetails;
+        this.finalDictionary = finalDictionary;
         fillTermsDF(finalDictionary);
         computeAverageDocumentLength();
     }
@@ -62,12 +64,18 @@ public class Ranker {
         int documentLength = Integer.valueOf(documentDetails.get(docId)[3]);
 
         for(String term : query){
+            if(queryWordsTFPerDoc.containsKey(term.toUpperCase())) {
+                term = term.toUpperCase();
+            }
+            else if(queryWordsTFPerDoc.containsKey(term.toLowerCase())){
+                term = term.toLowerCase();
+            }
             termFrequency = queryWordsTFPerDoc.getOrDefault(term,0);
 
             if(termFrequency != 0) {
                 documentFrequency = Integer.valueOf(termsDF.get(term));
                 //TODO: check if this is the right computation for idf
-                idf = Math.log10(numOfDocs / documentFrequency);
+                idf = log2(numOfDocs / documentFrequency);
 
                 numerator = termFrequency * (k + 1);
                 denominator = termFrequency + k * (1 - b + b * (documentLength / averageDocumentLength));
@@ -87,11 +95,18 @@ public class Ranker {
      * @return the computed rank
      */
     private double rankByPosition(List<String> query, String docId, ArrayList<String> queryPostingLines){
-        double rank = 0;
+        double rank = 0, sum = 0;
+        boolean isEntity;
+        ArrayList<Integer> allPositions = new ArrayList<>();
+        double documentLength = Double.valueOf(documentDetails.get(docId)[3]);
         for(String word : query){
+            isEntity = false;
             for(String postingLine : queryPostingLines) {
                 if (word.equalsIgnoreCase(postingLine.substring(0, postingLine.indexOf("|")))) { //checks if the posting line matches the current term
                     if(postingLine.contains("_" + docId + ":") || postingLine.contains("|" + docId + ":" )){ //checks if the term appears in the document
+                        if(word.toUpperCase().equals(postingLine.substring(0, postingLine.indexOf("|")))){ // an (or a part of) entity
+                            isEntity = true;
+                        }
                         if(postingLine.contains("_" + docId + ":")){
                             postingLine = postingLine.substring(postingLine.indexOf("_" + docId + ":") + docId.length() + 2);
                         }
@@ -99,17 +114,29 @@ public class Ranker {
                             postingLine = postingLine.substring(postingLine.indexOf("|" + docId + ":") + docId.length() + 2);
                         }
                         postingLine = postingLine.substring(0,postingLine.indexOf("_")); //trims the line only to the positions
-                        double documentLength = Double.valueOf(documentDetails.get(docId)[3]);
                         String[] positions = postingLine.split(",");
                         for(int i=0; i<positions.length;i++){ //computes the rank
-                            rank += (1-Double.valueOf(positions[i])/documentLength)/positions.length;
+                            sum += (1-(Double.valueOf(positions[i]))/documentLength);
+                            allPositions.add(Integer.valueOf(positions[i]));
                         }
+                        rank += sum / positions.length;
+                        if(isEntity)
+                            rank++;
+                        sum = 0;
                     }
                     break;
                 }
             }
         }
-        return rank;
+        allPositions.sort(Integer::compareTo);
+        int adjacent = 0;
+        for(int i=0; i<allPositions.size()-1; i++){
+            if(allPositions.get(i) == allPositions.get(i+1)-1){
+                adjacent++;
+            }
+        }
+
+        return rank + rank*adjacent;
     }
 
 
@@ -127,11 +154,11 @@ public class Ranker {
      * @return a rank by cosine similarity indice
      */
     private double rankByCosSim(List<String> query, String docId, HashMap<String,Integer> queryWordsTFPerDoc){
-        double innerProduct = 0, documentVecLength = 0, queryVecLength = Math.sqrt(query.size());
-        double idf, documentFrequency, termWeight, rank, tf;
+        double innerProduct = 0, documentLength = Double.valueOf(documentDetails.get(docId)[3]), documentVecLength = 0, queryVecLength = Math.sqrt(query.size());
+        double idf, documentFrequency, termWeight, tf;
 
         for(String term : query) {
-            tf = Double.valueOf(queryWordsTFPerDoc.getOrDefault(term, 0)) / Double.valueOf(documentDetails.get(docId)[3]);
+            tf = Double.valueOf(queryWordsTFPerDoc.getOrDefault(term, 0)) / documentLength;
             if (tf != 0) {
                 documentFrequency = Double.valueOf(termsDF.get(term));
                 idf = log2(documentDetails.size() / documentFrequency);
@@ -141,8 +168,10 @@ public class Ranker {
             }
         }
         documentVecLength = Math.sqrt(documentVecLength);
+        if(documentVecLength == 0)
+            return 0;
 
-        return innerProduct/(documentVecLength*queryVecLength);
+        return innerProduct/documentVecLength;
     }
 
     /**
@@ -199,7 +228,7 @@ public class Ranker {
 
         for(String doc : retrievedDocuments){
             HashMap<String,Integer> docTFs = queryWordsTFPerDoc.get(doc);
-            double rank = rankByBM25(query,doc,docTFs) + rankByPosition(query,doc,queryPostingLines); // + rankByCosSim(query,doc,docTFs);
+            double rank = 0.3*rankByBM25(query,doc,docTFs) + 0.7*rankByPosition(query,doc,queryPostingLines); // + rankByCosSim(query,doc,docTFs);
             if(semanticTreatment){
                 //TODO: add the computation of semantic treatment ranking
                 rank += rankBySemanticTreatment(query,doc,queryPostingLines);
