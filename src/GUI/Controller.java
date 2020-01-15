@@ -69,7 +69,7 @@ public class Controller extends Observable{
             ArrayList<Article> docsInFile = corpusReader.readOneFile(file.getPath());
             for(Article doc : docsInFile){
                 HashMap<String,Term> termsInDoc = parser.parse(doc,stem);
-                ArrayList<Term> entitiesInDoc = parser.getTermEntitiesPerDoc(); //TODO: add to the report
+                ArrayList<Term> entitiesInDoc = parser.getTermEntitiesPerDoc(); 
                 addDocEntitiesToFile(entitiesInDoc,doc,targetPath,stem);
                 indexer.collectTermPostingLines(termsInDoc,doc);
             }
@@ -114,10 +114,11 @@ public class Controller extends Observable{
         indexer = new Indexer();
 
         //copies the stop words file to the index directory
-        try{ //TODO: add a check if the file exists
+        try{
             Path source = Paths.get(corpusPath).resolve("stop_words.txt");
             Path target = Paths.get(targetPath).resolve("stop_words.txt");
-            Files.copy(source,target);
+            if(!new File(target.toString()).exists())
+                Files.copy(source,target);
         } catch(IOException e){ }
 
         String entitiesDocPath = "entities";
@@ -339,7 +340,7 @@ public class Controller extends Observable{
             detailsAboutDocs[3] = lineComponents[4];
             documentDetails.put(docID,detailsAboutDocs);
         }
-        /*corpusSize = documentDetails.size();*/
+
         documentDetailsReader.close();
     }
 
@@ -421,28 +422,28 @@ public class Controller extends Observable{
      */
     private void addDocEntitiesToFile(ArrayList<Term> entitiesInDoc, Article doc, String targetPath, boolean stem){
         HashMap<String,Double> sortedEntities = new HashMap<>();
-        for(Term entity : entitiesInDoc){
+        for(Term entity : entitiesInDoc){ //puts each entity with its frequency in the document
             sortedEntities.put(entity.getTerm(),(double)(entity.getTermFrequency(doc)));
         }
-        sortedEntities = Ranker.sortByValue(sortedEntities);
+        sortedEntities = Ranker.sortByValue(sortedEntities); //sorts the HashMap by the frequencies
         ArrayList<String> entities = new ArrayList<>(sortedEntities.keySet());
         StringBuilder fiveMostCommon = new StringBuilder().append(doc.getDocId()).append(":");
         boolean collectedFive = false;
         int counter = 0;
         for(String entity : entities){
-            if(sortedEntities.get(entity) > 1){
+            if(sortedEntities.get(entity) > 1){ //checks if the entity is determined as an entity compared to the whole corpus
                 fiveMostCommon.append(entity).append(",");
             }
             else{
                 break;
             }
             counter++;
-            if(counter == 5){
+            if(counter == 5){ //in case five entities were collected
                 collectedFive = true;
                 break;
             }
         }
-        if(!collectedFive){
+        if(!collectedFive){ //in case one or more of the most common five entities cannot be determined as an entity yet
             fiveMostCommon = new StringBuilder().append(doc.getDocId()).append(":");
             for(String entity : entities){
                 fiveMostCommon.append(entity).append(",");

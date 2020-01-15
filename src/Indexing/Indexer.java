@@ -468,8 +468,7 @@ public class Indexer {
         //In case the term is common enough, we collect its details into the final dictionary
         termDetails[0] = String.valueOf(sumOfTfTerm); //how many times the term appears in the corpus
         termDetails[1] = String.valueOf(dfTerm); //how many documents the term appears in
-        /*      termDetails[2] = postingFileName;*/
-        //termDetails[2] = String.valueOf(postingLineWithTerm.toString().getBytes().length); //the posting line size in memory
+
         finalDictionary.put(term,termDetails);
 
         return true;
@@ -513,8 +512,7 @@ public class Indexer {
             termDetails = finalDictionary.get(term);
             totalTF = termDetails[0];
             documentFrequency = termDetails[1];
-            /* postingFileName = termDetails[2];*/
-            // sizeOfPostingLine = termDetails[2];
+
             dictionaryContent.append(term).append("_" + totalTF).append("_" + documentFrequency).append("\n"); /*.append("_" + sizeOfPostingLine)*/
             if(dictionaryContent.length() >= 70000000){
                 writePostingLinesToTempFile(pathToFinalDictionary.toString(),dictionaryContent.toString());

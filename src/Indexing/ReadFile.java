@@ -73,18 +73,13 @@ public class ReadFile {
                 if (article.getNodeType() == Node.ELEMENT_NODE) {
                     Element eElement = (Element) article;
                     String docId = eElement.getElementsByTagName("DOCNO").item(0).getTextContent();
-//                    String date = eElement.getElementsByTagName("DATE1").item(0).getTextContent();
-//                    String title = eElement.getElementsByTagName("TI").item(0).getTextContent();
+
                     try{
                         String content = eElement.getElementsByTagName("TEXT").item(0).getTextContent();
                         articles.add(new Article(docId, content));
-                    } catch (Exception e) {
-//                        System.out.println(docId + " has no text attribute");
-                    }
+                    } catch (Exception e) { }
                 }
-            } catch (Exception e) {
-//                System.out.println(inputFile);
-            }
+            } catch (Exception e) { }
         }
         return articles;
     }
@@ -101,7 +96,6 @@ public class ReadFile {
             articles = extractArticlesFromFile(inputFile);
         } catch (Exception e) {
             e.printStackTrace();
-            //   System.out.println(filePath);
         }
         return articles;
     }

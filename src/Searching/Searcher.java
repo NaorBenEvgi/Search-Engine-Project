@@ -13,6 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.SortedMap;
 
+/**
+ * This class is responsible for searching for relevant documents for a query, and retrieve the highest ranked fifty documents, using the Ranker class.
+ */
 public class Searcher {
 
     private static Ranker ranker;
@@ -142,13 +145,11 @@ public class Searcher {
                 String line;
                 while((line = entitiesFileReader.readLine()) != null){
                     if(line.startsWith(doc)){
-                        String[] entitiesInDoc = line.substring(line.indexOf("|")+1).split(",");
+                        String[] entitiesInDoc = line.substring(line.indexOf(":")+1).split(",");
                         for(int i=0; i<entitiesInDoc.length; i++){
-                            if(finalDictionary.containsKey(entitiesInDoc[i])){
-                                entities.add(entitiesInDoc[i]);
-                                if(entities.size() == 5){
-                                    break;
-                                }
+                            entities.add(entitiesInDoc[i]);
+                            if(entities.size() == 5){
+                                break;
                             }
                         }
                         break;
@@ -158,13 +159,12 @@ public class Searcher {
             }
             entitiesFileReader.close();
         }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+        catch (Exception e){ }
     }
 
     /**
-     * Returns the data structure that stores the five most common entities in the retrieved docs of the queries
+     * Returns the data structure that stores the five most common entities in the retrieved docs of the queries.
+     * The code that contains the computation of similar words was taken from this page: https://github.com/medallia/Word2VecJava
      * @return the data structure that stores the five most common entities in the retrieved docs of the queries
      */
     public HashMap<String,ArrayList<String>> getFiveEntitiesPerDoc(){
@@ -174,10 +174,10 @@ public class Searcher {
     private ArrayList<String> expandQuery(ArrayList<String> query){
         ArrayList<String> expandedQuery = new ArrayList<>();
         try {
-            //Word2VecModel model = Word2VecModel.fromTextFile((new File("C:\\Users\\Naor\\Desktop\\לימודים\\שנה ג\\סמסטר א\\אחזור\\עבודה\\semanticJar\\word2vec.c.output.model.txt")));
+            // creates a list of words that are similar to the words in the query
             Word2VecModel model = Word2VecModel.fromBinFile((new File("resources/corpusVector150K.bin")));
             com.medallia.word2vec.Searcher semanticSearcher = model.forSearch();
-            int numOfResultInList = 2;
+            int numOfResultInList = 2; //the number of similar words we decide to get is limited to 2, since the first one is the word from the query and the second one is the most similar word to it in the corpus
             for(String queryWord : query) {
                 List<com.medallia.word2vec.Searcher.Match> matches;
                 try {

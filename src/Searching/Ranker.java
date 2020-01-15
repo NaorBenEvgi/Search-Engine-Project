@@ -2,12 +2,13 @@ package Searching;
 
 import java.util.*;
 
-
+/**
+ * This class is responsible for ranking the retrieved documents of a query, and send only the highest ranked fifty documents.
+ */
 public class Ranker {
 
     private HashMap<String,String[]> documentDetails;
     private HashMap<String,String> termsDF;
-    private SortedMap<String,String[]> finalDictionary;
     private double averageDocumentLength;
 
     /**
@@ -18,7 +19,6 @@ public class Ranker {
      */
     public Ranker(SortedMap<String, String[]> finalDictionary, HashMap<String, String[]> documentDetails) {
         this.documentDetails = documentDetails;
-        this.finalDictionary = finalDictionary;
         fillTermsDF(finalDictionary);
         computeAverageDocumentLength();
     }
@@ -74,7 +74,6 @@ public class Ranker {
 
             if(termFrequency != 0) {
                 documentFrequency = Integer.valueOf(termsDF.get(term));
-                //TODO: check if this is the right computation for idf
                 idf = log2(numOfDocs / documentFrequency);
 
                 numerator = termFrequency * (k + 1);
@@ -140,34 +139,6 @@ public class Ranker {
         return rank + rank*adjacent*1.5;
     }
 
-
-    /**
-     * Computes the similarity between a query and a document according to cosine similarity indice.
-     * @param query the query
-     * @param docId the ID of the document
-     * @param queryWordsTFPerDoc a data structure that contains the terms in the query and their frequencies in the documents they appear in
-     * @return a rank by cosine similarity indice
-     */
-    private double rankByCosSim(List<String> query, String docId, HashMap<String,Integer> queryWordsTFPerDoc){
-        double innerProduct = 0, documentLength = Double.valueOf(documentDetails.get(docId)[3]), documentVecLength = 0, queryVecLength = Math.sqrt(query.size());
-        double idf, documentFrequency, termWeight, tf;
-
-        for(String term : query) {
-            tf = Double.valueOf(queryWordsTFPerDoc.getOrDefault(term, 0)) / documentLength;
-            if (tf != 0) {
-                documentFrequency = Double.valueOf(termsDF.get(term));
-                idf = log2(documentDetails.size() / documentFrequency);
-                termWeight = tf * idf;
-                innerProduct += termWeight;
-                documentVecLength += termWeight * termWeight;
-            }
-        }
-        documentVecLength = Math.sqrt(documentVecLength);
-        if(documentVecLength == 0)
-            return 0;
-
-        return innerProduct/documentVecLength;
-    }
 
     /**
      * Extracts the term and its frequency in each document to a HashMap

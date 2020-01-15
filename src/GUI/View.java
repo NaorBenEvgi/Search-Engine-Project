@@ -241,7 +241,7 @@ public class View implements Observer {
             HashMap<String,HashMap<String,Double>> retrievedDocs = viewController.runQuery(query,indexPathTextField.getText(),stem, semanticTreatment);
             ArrayList<String> queryIDs = new ArrayList<>(retrievedDocs.keySet());
 
-           ArrayList<String[]> docsToDisplay = new ArrayList<>();
+            ArrayList<String[]> docsToDisplay = new ArrayList<>();
             for(String queryID : queryIDs) {
                 HashMap<String,Double> sortedRetrievedDocs;
                 sortedRetrievedDocs = Ranker.sortByValue(retrievedDocs.get(queryID));
@@ -264,7 +264,6 @@ public class View implements Observer {
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
 
-            // http://java-buddy.blogspot.com/2013/12/java-swing-jtable-and.html - taken from Muhsen and Evgeny
             table.getSelectionModel().addListSelectionListener(event -> {
                 if(!mouseClick) {
                     Platform.runLater(() -> {

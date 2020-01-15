@@ -499,7 +499,6 @@ public class Parse {
         ArrayList<String> entitiesInDoc = parseEntities(content);
         ArrayList<String> words = new ArrayList<>(Arrays.asList(content.replace("--", ", ").split(REGEX_BY_WORDS)));
         words = cleanWords(words);
-       // words = mergeWordsAndEntities(words,entitiesInDoc,article.getDocId());
         words = eliminateStopWords(words);
         words = handleDollarCases(words);
         words = pricesOverMillion(words);
@@ -519,18 +518,7 @@ public class Parse {
                 else{
                     term = dictionary.get(word);
                 }
-            }/*else if(Character.isUpperCase(word.charAt(0)) && word.contains(" ")){ //in case the term is an entity
-                if(!dictionary.containsKey(word)){
-                    term = new Term(word);
-                    term.setEntity();
-                    dictionary.put(word,term);
-                }
-                else{
-                    term = dictionary.get(word);
-                }
-                term.addPositionInDoc(article,termPositionInDocument);
-                continue;
-            }*/
+            }
             else{
                 if(word.equals(word.toUpperCase())){
                     entitiesInDoc.add(word);
@@ -559,7 +547,6 @@ public class Parse {
             Term term;
             if(!termEntitiesPerDoc.containsKey(entity)){
                 term = new Term(entity);
-                //dictionary.put(entity,term);
                 termEntitiesPerDoc.put(entity,term);
             }
             else{
@@ -614,59 +601,6 @@ public class Parse {
         return parsedQuery;
     }
 
-
-/*
-    private ArrayList<String> mergeWordsAndEntities(ArrayList<String> words, ArrayList<String> entities, String docID) {
-        ArrayList<String> mergedWordsAndEntities = new ArrayList<>();
-        String[] splitEntity;
-        int i=0;
-        boolean isEntity;
-        for(String entity: entities){
-            splitEntity = entity.split(" ");
-            int entitySize = splitEntity.length;
-            while(i<words.size()){
-                String word = words.get(i);
-                if (word.length() > 0 && Character.isUpperCase(word.charAt(0))){
-                    isEntity = true;
-
-                    try {
-                        for (int j = 0; j < entitySize; j++) {
-                            if (!Character.isUpperCase(words.get(i + j).charAt(0)) || !words.get(i + j).equalsIgnoreCase(splitEntity[j])) {
-                                isEntity = false;
-                                for (int k = 0; k <= j; k++) {
-                                    mergedWordsAndEntities.add(words.get(i + k));
-                                }
-                                i += j + 1;
-                                break;
-                            }
-                        }
-                    }
-                    catch(IndexOutOfBoundsException e){
-                        System.out.println(docID);
-                    }
-                    if(isEntity){
-                        mergedWordsAndEntities.add(entity);
-                        for(int j=0; j<entitySize;j++){
-                            mergedWordsAndEntities.add(words.get(i));
-                            i++;
-                        }
-                        break;
-                    }
-
-                }
-                else{
-                    mergedWordsAndEntities.add(word);
-                    i++;
-                }
-            }
-        }
-        while(i<words.size()){
-            mergedWordsAndEntities.add(words.get(i));
-            i++;
-        }
-        return mergedWordsAndEntities;
-    }
-*/
 
     /**
      * Finds entities in the content of a document and stores them in a list.
