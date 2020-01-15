@@ -214,10 +214,9 @@ public class Ranker {
      * Ranks the similarity between a query and the documents that contain the terms in the query, and returns the 50 highest ranked documents.
      * @param queryPostingLines a list with the posting lines of the terms in the query
      * @param query a list with the terms in the query
-     * @param semanticTreatment decides whether the rank will include semantic treatment
      * @return he 50 highest ranked documents with their ranks
      */
-    protected HashMap<String,Double> rank(ArrayList<String> queryPostingLines, ArrayList<String> query, boolean semanticTreatment){
+    protected HashMap<String,Double> rank(ArrayList<String> queryPostingLines, ArrayList<String> query){
         HashMap<String,HashMap<String,Integer>> queryWordsTFPerDoc = computeTFForQueryWords(queryPostingLines);
         ArrayList<String> retrievedDocuments = new ArrayList<>(queryWordsTFPerDoc.keySet());
         HashMap<String,Double> rankedDocs = new HashMap<>();
@@ -225,10 +224,6 @@ public class Ranker {
         for(String doc : retrievedDocuments){
             HashMap<String,Integer> docTFs = queryWordsTFPerDoc.get(doc);
             double rank = 0.3*rankByBM25(query,doc,docTFs) + 0.7*rankByPosition(query,doc,queryPostingLines);// - rankByCosSim(query,doc,docTFs);
-            if(semanticTreatment){
-                //TODO: add the computation of semantic treatment ranking
-               // rank += rankBySemanticTreatment(query,doc,queryPostingLines);
-            }
             rankedDocs.put(doc,rank);
         }
         rankedDocs = sortByValue(rankedDocs);

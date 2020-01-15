@@ -1,11 +1,16 @@
 package Searching;
 
+import com.medallia.word2vec.Word2VecModel;
+
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.SortedMap;
 
 public class Searcher {
@@ -31,14 +36,17 @@ public class Searcher {
 
     /**
      * Runs a query and returns the 50 most relevant documents
-     * @param query the query
+     * @param inputQuery the query
      * @param stem indicates whether the indexing process included stemming
      * @return the 50 most relevant documents and their ranks
      */
-    public HashMap<String,Double> runSingleQuery(ArrayList<String> query, boolean stem, boolean semanticTreatment){
+    public HashMap<String,Double> runSingleQuery(ArrayList<String> inputQuery, boolean stem, boolean semanticTreatment){
         ArrayList<String> postingLinesForQuery = new ArrayList<>();
+        ArrayList<String> query = inputQuery;
         BufferedReader postingFilesReader;
-
+        if(semanticTreatment){
+            query = expandQuery(inputQuery);
+        }
         try {
             query.sort(String.CASE_INSENSITIVE_ORDER);
             String lastPostingFile = "", currentPostingFile, line;
@@ -61,7 +69,7 @@ public class Searcher {
             e.printStackTrace();
         }
 
-        HashMap<String,Double> mostRelevantDocs = ranker.rank(postingLinesForQuery, query, semanticTreatment);
+        HashMap<String,Double> mostRelevantDocs = ranker.rank(postingLinesForQuery, query);
         fillFiveEntitiesPerDoc(mostRelevantDocs,stem);
 
         return mostRelevantDocs;
@@ -163,7 +171,32 @@ public class Searcher {
         return fiveEntitiesPerDoc;
     }
 
+    private ArrayList<String> expandQuery(ArrayList<String> query){
+        ArrayList<String> expandedQuery = new ArrayList<>();
+        try {
+            //Word2VecModel model = Word2VecModel.fromTextFile((new File("C:\\Users\\Naor\\Desktop\\לימודים\\שנה ג\\סמסטר א\\אחזור\\עבודה\\semanticJar\\word2vec.c.output.model.txt")));
+            Word2VecModel model = Word2VecModel.fromBinFile((new File("resources/corpusVector150K.bin")));
+            com.medallia.word2vec.Searcher semanticSearcher = model.forSearch();
+            int numOfResultInList = 2;
+            for(String queryWord : query) {
+                List<com.medallia.word2vec.Searcher.Match> matches;
+                try {
+                    matches = semanticSearcher.getMatches(queryWord.toLowerCase(), numOfResultInList);
+                }catch (com.medallia.word2vec.Searcher.UnknownWordException e){
+                    expandedQuery.add(queryWord);
+                    continue;
+                }
+                for (com.medallia.word2vec.Searcher.Match match : matches) {
+                    match.match();
+                    String[] splitMatch = match.toString().split(" ");
+                    expandedQuery.add(splitMatch[0]);
+                }
+            }
+        } catch (IOException e) {
 
+        }
+        return expandedQuery;
+    }
 
 
 }
