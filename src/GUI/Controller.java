@@ -114,13 +114,11 @@ public class Controller extends Observable{
         indexer = new Indexer();
 
         //copies the stop words file to the index directory
-        try{
+        try{ //TODO: add a check if the file exists
             Path source = Paths.get(corpusPath).resolve("stop_words.txt");
             Path target = Paths.get(targetPath).resolve("stop_words.txt");
             Files.copy(source,target);
-        } catch(IOException e){
-            e.printStackTrace();
-        }
+        } catch(IOException e){ }
 
         String entitiesDocPath = "entities";
         Path innerTargetPath;
@@ -413,7 +411,14 @@ public class Controller extends Observable{
         }
     }
 
-
+    /**
+     * Collects the five most common entities in a document to the entities HashMap that is being created during the indexing process.
+     * In case one or more of these five cannot be determined as entities during the accumulation, all of the possible entities in the document will be collected.
+     * @param entitiesInDoc a list of the possible entities in the document
+     * @param doc the document
+     * @param targetPath the path to the index folder
+     * @param stem indicates whether the terms in the documents have gone through stemming or not
+     */
     private void addDocEntitiesToFile(ArrayList<Term> entitiesInDoc, Article doc, String targetPath, boolean stem){
         HashMap<String,Double> sortedEntities = new HashMap<>();
         for(Term entity : entitiesInDoc){
@@ -450,7 +455,12 @@ public class Controller extends Observable{
             writeEntitiesToFile(fiveMostCommon.toString(),targetPath,stem);
     }
 
-
+    /**
+     * Write the five most common entities in a document from the entities HashMap into a file that is being created during the indexing process.
+     * @param entitiesLine the line to be written to the file (the document id and the entities found)
+     * @param targetPath the path to the index folder
+     * @param stem indicates whether the terms in the documents have gone through stemming or not
+     */
     private void writeEntitiesToFile(String entitiesLine, String targetPath, boolean stem){
         Path pathToEntitiesFile;
         if(stem) {
@@ -478,12 +488,18 @@ public class Controller extends Observable{
         }
     }
 
-
+    /**
+     * Returns the data structure that stores the five most common entities in the retrieved docs of the queries
+     * @return the data structure that stores the five most common entities in the retrieved docs of the queries
+     */
     public HashMap<String,ArrayList<String>> getFiveEntitiesPerDoc(){
         return fiveEntitiesPerDoc;
     }
 
-
+    /**
+     * Adds the retrieved documents' ids and the matching queries' ids into a temporary HashMap, until the user clicks the save button.
+     * @param queryResults a HashMap that stores the queries and the retrieved documents for each one
+     */
     public void addResults(HashMap<String,HashMap<String,Double>> queryResults){
         ArrayList<String> retrievedDocs;
 
@@ -496,7 +512,10 @@ public class Controller extends Observable{
     }
 
 
-
+    /**
+     * Saves the results of one or more queries in a text file.
+     * @param resultsFile the file chosen by the user
+     */
     public void saveQueryResults(File resultsFile){
         BufferedWriter resultsWriter;
         try{

@@ -256,7 +256,6 @@ public class View implements Observer {
                     docsToDisplay.add(values);
                 }
             }
-
             JTable table=new JTable(convertQueryResultsToTable(docsToDisplay));
             JFrame frame=new JFrame();
             frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -289,16 +288,14 @@ public class View implements Observer {
                     mouseClick = false;
                 }
             });
-
         }
-
     }
 
 
     /**
-     *
-     * @param
-     * @return
+     * Converts the list of the retrieved documents to a table form, with the serial number of the result, the query id, the document id and the similarity rank as columns.
+     * @param results a list with all the records of the table
+     * @return a table that displays the results of the queries
      */
     public static TableModel convertQueryResultsToTable(ArrayList<String[]> results) {
         DefaultTableModel model = new DefaultTableModel(

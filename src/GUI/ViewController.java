@@ -96,12 +96,18 @@ public class ViewController extends Observable implements Observer {
     }
 
 
-
+    /**
+     * Returns the data structure that stores the five most common entities in the retrieved docs of the queries
+     * @return the data structure that stores the five most common entities in the retrieved docs of the queries
+     */
     public HashMap<String, ArrayList<String>> getFiveEntitiesPerDoc(){
         return controller.getFiveEntitiesPerDoc();
     }
 
-
+    /**
+     * Saves the results of one or more queries in a text file.
+     * @param resultsFile the file chosen by the user
+     */
     public void saveQueryResults(File resultsFile){
         controller.saveQueryResults(resultsFile);
     }

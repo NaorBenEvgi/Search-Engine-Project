@@ -391,27 +391,7 @@ public class Parse {
         // Add hash
         int wordsNumber = articleWords.size();
         for (int i = 0; i < wordsNumber ; i++) {
-            //cleans unnecessary characters from the word
-            //TODO: make sure this is ok
-            String word = articleWords.get(i); //.replaceAll(",", "");
-            /*
-            if(word.startsWith("-") || word.endsWith("-")){
-                word = word.replace("-", "");
-            }
-            if(word.startsWith("/")){
-                while(!word.equals("") && word.charAt(0) == '/')
-                    word = word.substring(1);
-            }
-            if(word.endsWith("/")){
-                while(!word.equals("") && word.charAt(word.length()-1) == '/')
-                    word = word.substring(0,word.length()-1);
-            }
-            if(word.contains(",")){
-                word = word.replace(",","");
-            }
-            if(word.equals("")){
-                continue;
-            }*/
+            String word = articleWords.get(i);
             String nextWord = i + 1 < wordsNumber ? articleWords.get(i + 1).replaceAll(",", ""): "";
             if (word.length() > 1) {
                 if (isNumber(word)) {
@@ -579,7 +559,6 @@ public class Parse {
             Term term;
             if(!termEntitiesPerDoc.containsKey(entity)){
                 term = new Term(entity);
-                term.setEntity();
                 //dictionary.put(entity,term);
                 termEntitiesPerDoc.put(entity,term);
             }
@@ -689,6 +668,11 @@ public class Parse {
     }
 */
 
+    /**
+     * Finds entities in the content of a document and stores them in a list.
+     * @param content the text of a document
+     * @return the list of entities in the document
+     */
     private ArrayList<String> parseEntities(String content){
         ArrayList<String> entitiesInDoc = new ArrayList<>();
         Pattern entities = Pattern.compile("(?:\\w{0,}[A-Z]+\\w*(?:-[A-Za-z]+)*(?:\\W|\\s+)){2,4}",Pattern.MULTILINE);
@@ -725,6 +709,11 @@ public class Parse {
     }
 
 
+    /**
+     * Removes unnecessary characters from the words in the texts of the documents in the corpus
+     * @param words the words as they appear in the document
+     * @return the words after the trim
+     */
     private ArrayList<String> cleanWords(ArrayList<String> words){
         ArrayList<String> results = new ArrayList<>();
         for(String word : words) {
@@ -751,6 +740,10 @@ public class Parse {
         return results;
     }
 
+    /**
+     * Returns the list of entities that appeared in a certain document
+     * @return the list of entities that appeared in a certain document
+     */
     public ArrayList<Term> getTermEntitiesPerDoc(){
         ArrayList<Term> entities = new ArrayList<>();
         for(String entity: termEntitiesPerDoc.keySet()){

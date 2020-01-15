@@ -108,7 +108,11 @@ public class Searcher {
         return Paths.get(targetPath).resolve(directoryName).resolve(fileName + ".txt").toString();
     }
 
-
+    /**
+     * Fills the data structure that stores the five most common entities in the retrieved docs of the queries
+     * @param mostRelevantDocs the retrieved docs of the queries
+     * @param stem indicates whether the indexing process included stemming
+     */
     private void fillFiveEntitiesPerDoc(HashMap<String,Double> mostRelevantDocs, boolean stem){
         ArrayList<String> docs = new ArrayList<>(mostRelevantDocs.keySet());
         ArrayList<String> entities;
@@ -151,7 +155,10 @@ public class Searcher {
         }
     }
 
-
+    /**
+     * Returns the data structure that stores the five most common entities in the retrieved docs of the queries
+     * @return the data structure that stores the five most common entities in the retrieved docs of the queries
+     */
     public HashMap<String,ArrayList<String>> getFiveEntitiesPerDoc(){
         return fiveEntitiesPerDoc;
     }

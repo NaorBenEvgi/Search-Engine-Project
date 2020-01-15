@@ -117,11 +117,12 @@ public class Ranker {
                         String[] positions = postingLine.split(",");
                         for(int i=0; i<positions.length;i++){ //computes the rank
                             sum += (1-(Double.valueOf(positions[i]))/documentLength);
+                            if(isEntity)
+                                rank++;
                             allPositions.add(Integer.valueOf(positions[i]));
                         }
                         rank += sum / positions.length;
-                        if(isEntity)
-                            rank++;
+
                         sum = 0;
                     }
                     break;
@@ -136,13 +137,7 @@ public class Ranker {
             }
         }
 
-        return rank + rank*adjacent;
-    }
-
-
-
-    private double rankBySemanticTreatment(List<String> query, String docId, ArrayList<String> queryPostingLines){
-        return 0;
+        return rank + rank*adjacent*1.5;
     }
 
 
@@ -219,6 +214,7 @@ public class Ranker {
      * Ranks the similarity between a query and the documents that contain the terms in the query, and returns the 50 highest ranked documents.
      * @param queryPostingLines a list with the posting lines of the terms in the query
      * @param query a list with the terms in the query
+     * @param semanticTreatment decides whether the rank will include semantic treatment
      * @return he 50 highest ranked documents with their ranks
      */
     protected HashMap<String,Double> rank(ArrayList<String> queryPostingLines, ArrayList<String> query, boolean semanticTreatment){
@@ -228,10 +224,10 @@ public class Ranker {
 
         for(String doc : retrievedDocuments){
             HashMap<String,Integer> docTFs = queryWordsTFPerDoc.get(doc);
-            double rank = 0.3*rankByBM25(query,doc,docTFs) + 0.7*rankByPosition(query,doc,queryPostingLines); // + rankByCosSim(query,doc,docTFs);
+            double rank = 0.3*rankByBM25(query,doc,docTFs) + 0.7*rankByPosition(query,doc,queryPostingLines);// - rankByCosSim(query,doc,docTFs);
             if(semanticTreatment){
                 //TODO: add the computation of semantic treatment ranking
-                rank += rankBySemanticTreatment(query,doc,queryPostingLines);
+               // rank += rankBySemanticTreatment(query,doc,queryPostingLines);
             }
             rankedDocs.put(doc,rank);
         }
